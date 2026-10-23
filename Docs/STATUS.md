@@ -26,8 +26,20 @@
 3. Botão "atacar tile do mundo": aparece? alcance de 120 tiles? o míssil viaja e destrói/danifica o assentamento? retaliação?
 4. Log sem erros.
 
+## Silo de ICBM (implementado, NÃO testado)
+- `MAS_Turret_ICBMSilo` / gun `MAS_Gun_ICBMSilo`: 3x3, `BuildingBase` + campos da TurretBase do CE (sem thingCategories → não precisa ser minificável), 1000 W, sem operador, `ManualFireOnlyExtension` (não mira sozinho; o CE já não dá "forçar ataque" a torreta sem operador). Só "atacar tile do mundo".
+  - Verbo: `Verb_ShootMortarCE`, range 700, **minRange 0** (a célula de saída na borda nunca fica "perto demais"), warmup 20 s, mag 1, recarga 60 s, cooldown 60 s, `circularError` 6.
+  - Custo: aço 1500, plasteel 300, CompInd 20, CompSp 6; WorkToBuild 120000; construção 10. Não pode ficar sob teto.
+  - Pesquisa `MAS_Research_ICBM` (tático + AdvancedFabrication, 6000, Spacer).
+- `MAS_Ammo_ICBM_HE` → `MAS_Bullet_ICBM_HE`: Bomb 3000, raio 14,9, cratera; shellingProps range 500, tilesPerTick 0,6, damage 5. Receita `MakeMAS_Ammo_ICBM_HE` na bancada de fabricação.
+- **Nuclear (só com Rimatomics)**, `1.6/Rimatomics`: `MAS_Ammo_ICBM_Nuclear` → `MAS_Bullet_ICBM_Nuclear` (classe `ProjectileCE_NuclearStrike`). No impacto gera o `ICBMStrike` do Rimatomics (`Rimatomics.NuclearStrike`) com `Yield` 55 por reflexão; o próprio NuclearStrike faz clarão, onda de choque e `NuclearFallout` (lido no IL: `StartStrike` → `GameConditionMaker.MakeCondition`/`RegisterCondition`, `GoBang`). Mapa-mundo: damage 20 (destrói qualquer nível tecnológico). Receita usa 1 `FissionWarhead` do Rimatomics. Cook-off usa o projétil HE.
+
+## O que testar no silo
+1. Construção (sem teto), energia; não atira em inimigos sozinho; não tem "forçar ataque".
+2. Fabricar ICBM HE; carregar; "atacar tile do mundo" até 500 tiles; assentamento destruído em 1–2 acertos.
+3. Com Rimatomics: receita nuclear aparece; disparo em mapa carregado → explosão nuclear + fallout do Rimatomics; em assentamento não carregado → destruído.
+4. Sprite do silo: tubo vazio / com míssil.
+
 ## Próximos passos
-- Silo de ICBM (convencional), depois de testar o lançador tático.
-- Ogiva nuclear integrada ao Dubs Rimatomics (`Dubwise.Rimatomics`): defs só com o mod ativo (LoadFolders `IfModActive` ou `MayRequire`), DLL nossa referenciando CE para aplicar `NuclearFallout` no impacto. Verificar a API/GameCondition do Rimatomics antes.
 - Vanilla: sistema próprio de tiro no mapa-mundo.
 - Remote do git.

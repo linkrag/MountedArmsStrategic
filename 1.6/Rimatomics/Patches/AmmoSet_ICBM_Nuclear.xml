@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+
+	<!-- With Rimatomics active, the ICBM silo can also load nuclear ICBMs -->
+	<Operation Class="PatchOperationAdd">
+		<xpath>Defs/CombatExtended.AmmoSetDef[defName="MAS_AmmoSet_ICBM"]/ammoTypes</xpath>
+		<value>
+			<MAS_Ammo_ICBM_Nuclear>MAS_Bullet_ICBM_Nuclear</MAS_Ammo_ICBM_Nuclear>
+		</value>
+	</Operation>
+
+</Patch>

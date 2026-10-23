@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- ================================================================= -->
+	<!--  ICBM (Minuteman III class), conventional warhead.                -->
+	<!--  Same projectile rules as the tactical missile (speed 0,          -->
+	<!--  gravityFactor 5). World damage 5: vs Industrial 0.5..1.9 per hit -->
+	<!--  (often one hit), vs Spacer 0.4..1.5 (usually two).               -->
+	<!--  The nuclear warhead lives in 1.6/Rimatomics (needs Rimatomics).  -->
+	<!-- ================================================================= -->
+
+	<CombatExtended.AmmoCategoryDef>
+		<defName>MAS_ICBMHE</defName>
+		<label>ICBM (HE)</label>
+		<labelShort>HE</labelShort>
+		<description>Heavy high-explosive warhead for an intercontinental ballistic missile.</description>
+	</CombatExtended.AmmoCategoryDef>
+
+	<CombatExtended.AmmoSetDef>
+		<defName>MAS_AmmoSet_ICBM</defName>
+		<label>intercontinental ballistic missiles</label>
+		<ammoTypes>
+			<MAS_Ammo_ICBM_HE>MAS_Bullet_ICBM_HE</MAS_Ammo_ICBM_HE>
+		</ammoTypes>
+	</CombatExtended.AmmoSetDef>
+
+	<!-- ==================== Ammo ========================== -->
+
+	<ThingDef Class="CombatExtended.AmmoDef" Name="MAS_ICBMAmmoBase" ParentName="HeavyAmmoBase" Abstract="True">
+		<graphicData>
+			<texPath>MountedArmsStrategic/ICBM_Item</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<drawSize>(2.5,2.5)</drawSize>
+		</graphicData>
+		<tradeTags>
+			<li>CE_AutoEnableCrafting_FabricationBench</li>
+		</tradeTags>
+		<thingCategories>
+			<li>AmmoMissiles</li>
+		</thingCategories>
+		<stackLimit>1</stackLimit>
+		<cookOffFlashScale>60</cookOffFlashScale>
+		<cookOffSound>Explosion_GiantBomb</cookOffSound>
+	</ThingDef>
+
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
+		<defName>MAS_Ammo_ICBM_HE</defName>
+		<label>ICBM (HE)</label>
+		<description>An intercontinental ballistic missile with a heavy high-explosive warhead. Fired from an ICBM silo at settlements and sites anywhere within reach on the world map.</description>
+		<statBases>
+			<MaxHitPoints>600</MaxHitPoints>
+			<Mass>2000</Mass>
+			<Bulk>5000</Bulk>
+			<MarketValue>12000</MarketValue>
+		</statBases>
+		<ammoClass>MAS_ICBMHE</ammoClass>
+		<detonateProjectile>MAS_Bullet_ICBM_HE</detonateProjectile>
+	</ThingDef>
+
+	<!-- ================== Projectile ================== -->
+
+	<ThingDef Name="MAS_ICBMProjectileBase" ParentName="BaseExplosiveBullet" Abstract="True">
+		<thingClass>CombatExtended.ProjectileCE_Explosive</thingClass>
+		<graphicData>
+			<texPath>MountedArmsStrategic/ICBM_Projectile</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<shaderType>TransparentPostLight</shaderType>
+			<drawSize>(2,4)</drawSize>
+		</graphicData>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<speed>0</speed>
+			<gravityFactor>5</gravityFactor>
+			<flyOverhead>true</flyOverhead>
+			<applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+			<soundExplode>Explosion_GiantBomb</soundExplode>
+			<soundHitThickRoof>Explosion_GiantBomb</soundHitThickRoof>
+			<soundImpactAnticipate>MortarRound_PreImpact</soundImpactAnticipate>
+			<soundAmbient>RocketPropelledLoop_Big</soundAmbient>
+			<dropsCasings>false</dropsCasings>
+		</projectile>
+		<comps>
+			<li Class="CombatExtended.CompProperties_ProjectileFleck">
+				<FleckDatas>
+					<li>
+						<fleck>Fleck_CERocketFlame</fleck>
+						<emissionsPerTick>3</emissionsPerTick>
+						<flecksPerEmission>3</flecksPerEmission>
+						<scale>3</scale>
+						<cutoffTickRange>100~150</cutoffTickRange>
+						<originOffset>2</originOffset>
+					</li>
+					<li>
+						<fleck>Fleck_CERocketSmokeTrail</fleck>
+						<emissionsPerTick>2</emissionsPerTick>
+						<rotation>0~360</rotation>
+						<scale>4</scale>
+						<flecksPerEmission>1</flecksPerEmission>
+					</li>
+				</FleckDatas>
+			</li>
+		</comps>
+	</ThingDef>
+
+	<ThingDef ParentName="MAS_ICBMProjectileBase">
+		<defName>MAS_Bullet_ICBM_HE</defName>
+		<label>ICBM (HE)</label>
+		<description>An intercontinental ballistic missile in flight.</description>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>Bomb</damageDef>
+			<damageAmountBase>3000</damageAmountBase>
+			<explosionRadius>14.9</explosionRadius>
+			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
+			<shellingProps>
+				<iconPath>Things/WorldObjects/Munitions/Rocket</iconPath>
+				<tilesPerTick>0.6</tilesPerTick>
+				<range>500</range>
+				<damage>5</damage>
+			</shellingProps>
+		</projectile>
+		<comps>
+			<li Class="CombatExtended.CompProperties_Fragments">
+				<fragments>
+					<Fragment_Large>40</Fragment_Large>
+					<Fragment_Small>60</Fragment_Small>
+				</fragments>
+			</li>
+		</comps>
+	</ThingDef>
+
+	<!-- ==================== Recipe ========================== -->
+
+	<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
+	<RecipeDef ParentName="AmmoRecipeBase">
+		<defName>MakeMAS_Ammo_ICBM_HE</defName>
+		<label>make ICBM (HE)</label>
+		<description>Assemble an intercontinental ballistic missile with a heavy high-explosive warhead.</description>
+		<jobString>Assembling an ICBM.</jobString>
+		<researchPrerequisite>MAS_Research_ICBM</researchPrerequisite>
+		<workAmount>250000</workAmount>
+		<skillRequirements>
+			<Crafting>10</Crafting>
+		</skillRequirements>
+		<ingredients>
+			<li>
+				<filter><thingDefs><li>Steel</li></thingDefs></filter>
+				<count>1000</count>
+			</li>
+			<li>
+				<filter><thingDefs><li>Plasteel</li></thingDefs></filter>
+				<count>200</count>
+			</li>
+			<li>
+				<filter><thingDefs><li>FSX</li></thingDefs></filter>
+				<count>500</count>
+			</li>
+			<li>
+				<filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter>
+				<count>16</count>
+			</li>
+			<li>
+				<filter><thingDefs><li>ComponentSpacer</li></thingDefs></filter>
+				<count>4</count>
+			</li>
+		</ingredients>
+		<fixedIngredientFilter>
+			<thingDefs>
+				<li>Steel</li>
+				<li>Plasteel</li>
+				<li>FSX</li>
+				<li>ComponentIndustrial</li>
+				<li>ComponentSpacer</li>
+			</thingDefs>
+		</fixedIngredientFilter>
+		<products>
+			<MAS_Ammo_ICBM_HE>1</MAS_Ammo_ICBM_HE>
+		</products>
+	</RecipeDef>
+
+</Defs>

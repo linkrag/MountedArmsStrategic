@@ -10,8 +10,9 @@ Mod de RimWorld 1.6 com lançadores de mísseis balísticos que atacam o mapa lo
 |---|---|
 | Lançador de mísseis táticos (3x3, tripulado) | Estilo ATACMS/Iskander. 2 mísseis, mapa local (60–700 células) ou mapa-mundo até 120 tiles |
 | Míssil balístico tático (HE) | Explosão raio 9,9, cratera; ~3 acertos destroem um assentamento industrial |
-
-Planejado: silo de ICBM (ver `Docs/STATUS.md`).
+| Silo de ICBM (3x3, energia) | Só dispara por ordem no mapa-mundo, até 500 tiles; 1 míssil |
+| ICBM (HE) | Explosão raio 14,9; dano 5 no mapa-mundo (1–2 acertos) |
+| ICBM (nuclear), só com Dubs Rimatomics | Usa a ogiva de fissão e a explosão/fallout do próprio Rimatomics; destrói qualquer assentamento |
 
 ## Desenvolvimento
 Guia para agentes: `AGENTS.md`. Texturas: `python tools/gen_tex.py 1.6/Textures/MountedArmsStrategic`.

@@ -133,6 +133,52 @@ def missile_projectile():
     missile(d, 128, 8, 246, 22)
     return img
 
+# ------------------------------------------------------------------ ICBM silo (top-down, round: turret rotation must not show)
+def base_silo():
+    img = canvas(); d = ImageDraw.Draw(img)
+    rect(d, 10, 10, 246, 246, STEEL_D, r=8, hl=False)          # concrete apron
+    rect(d, 20, 20, 236, 236, (120, 122, 118, 255), r=6, hl=False)
+    for (x, y) in ((34, 34), (222, 34), (34, 222), (222, 222)):
+        circ(d, x, y, 6, STEEL_D)                              # anchor bolts
+    rect(d, 96, 208, 160, 234, OLIVE, r=4)                     # service hatch
+    circ(d, 128, 128, 96, BLACK)                               # silo ring
+    circ(d, 128, 128, 90, YELLOW, outline=BLACK)
+    for i in range(16):                                        # hazard ring
+        if i % 2 == 0:
+            d.pieslice(sc((38, 38, 218, 218)), i * 22.5, i * 22.5 + 22.5, fill=BLACK)
+    circ(d, 128, 128, 80, STEEL_D)
+    return shadow(img, (3, 4), 5, 100)
+
+def top_silo(loaded):
+    img = canvas(); d = ImageDraw.Draw(img)
+    circ(d, 128, 128, 78, STEEL)                               # hatch rim
+    circ(d, 128, 128, 66, BLACK)                               # open tube
+    if loaded:
+        circ(d, 128, 128, 52, WHITE)                           # missile body seen from above
+        circ(d, 128, 128, 40, (190, 194, 196, 255), outline=BLACK, w=int(1.2 * S))
+        circ(d, 128, 128, 22, OLIVE, outline=BLACK, w=int(1.2 * S))   # nose band
+        circ(d, 128, 128, 8, WHITE)                            # nose tip
+    else:
+        circ(d, 128, 128, 52, (16, 17, 19, 255), outline=(16, 17, 19, 255))
+        for k in range(4):                                     # guide rails inside the tube
+            a = math.radians(45 + 90 * k)
+            line(d, (128 + 50 * math.cos(a), 128 + 50 * math.sin(a)), (128 + 62 * math.cos(a), 128 + 62 * math.sin(a)), 4, STEEL_D)
+    return img
+
+def icbm_item():
+    img = canvas(); d = ImageDraw.Draw(img)
+    rect(d, 30, 190, 226, 208, OLIVE_D, r=4)
+    big = canvas(); bd = ImageDraw.Draw(big)
+    missile(bd, 128, 6, 248, 18, band=RED)
+    big = big.rotate(-45, resample=Image.BICUBIC)
+    img.alpha_composite(big)
+    return shadow(img, (3, 4), 4, 100)
+
+def icbm_projectile():
+    img = canvas(); d = ImageDraw.Draw(img)
+    missile(d, 128, 4, 248, 26, band=RED)
+    return img
+
 os.makedirs(OUT, exist_ok=True)
 b = base_launcher()
 finish(b, os.path.join(OUT, "TacticalLauncher_Base.png"))
@@ -145,4 +191,11 @@ for n in (0, 1, 2):
 finish(icon(b, t, 3.4 / 3.0), os.path.join(OUT, "TacticalLauncher_Icon.png"))
 finish(missile_item(), os.path.join(OUT, "TacticalMissile_Item.png"))
 finish(missile_projectile(), os.path.join(OUT, "TacticalMissile_Projectile.png"))
+sb = base_silo()
+finish(sb, os.path.join(OUT, "ICBMSilo_Base.png"))
+for n in (0, 1):
+    finish(top_silo(n), os.path.join(OUT, f"ICBMSilo_Top{n}.png"))
+finish(icon(sb, top_silo(1), 2.6 / 3.0), os.path.join(OUT, "ICBMSilo_Icon.png"))
+finish(icbm_item(), os.path.join(OUT, "ICBM_Item.png"))
+finish(icbm_projectile(), os.path.join(OUT, "ICBM_Projectile.png"))
 print("ok")

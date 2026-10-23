@@ -10,7 +10,8 @@
 
 - Tactical ballistic missile launcher: a crewed launcher that fires a heavy guided missile at the local map or at settlements up to 120 world tiles away.
 
-Planned: ICBM silo (conventional and nuclear warheads).
+- ICBM silo: a powered silo that only fires on command, at settlements up to 500 world tiles away. Conventional heavy warhead.
+- With Dubs Rimatomics: nuclear ICBMs built around its fission warheads, using Rimatomics' own nuclear blast and fallout.
 
 Requires Combat Extended. Companion to Mounted Arms, but does not depend on it.</description>
   <modDependencies>
@@ -30,5 +31,6 @@ Requires Combat Extended. Companion to Mounted Arms, but does not depend on it.<
     <li>Ludeon.RimWorld.Odyssey</li>
     <li>CETeam.CombatExtended</li>
     <li>linkrag.mountedarms</li>
+    <li>Dubwise.Rimatomics</li>
   </loadAfter>
 </ModMetaData>

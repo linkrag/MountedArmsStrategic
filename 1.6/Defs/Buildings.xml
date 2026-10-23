@@ -78,4 +78,91 @@
 		</researchPrerequisites>
 	</ThingDef>
 
+	<!-- ICBM silo. Built from vanilla BuildingBase (fields copied from CE's TurretBase) because CE's
+	     turret bases add thingCategories, which would force a fixed silo to be minifiable.
+	     Unmanned + ManualFireOnlyExtension: fires only through CE's "attack world tile". The top
+	     texture is drawn top-down and round, so the turret rotation does not show. -->
+	<ThingDef ParentName="BuildingBase">
+		<defName>MAS_Turret_ICBMSilo</defName>
+		<label>ICBM silo</label>
+		<description>A hardened, powered silo for one intercontinental ballistic missile. It only fires on command, at settlements and sites up to 500 world tiles away, using the "attack world tile" command. Launch takes a long countdown and reloading a missile is slow. A loaded missile can cook off if the silo is destroyed.</description>
+		<thingClass>MountedArmsStrategic.Building_MissileLauncherCE</thingClass>
+		<drawerType>MapMeshAndRealTime</drawerType>
+		<graphicData>
+			<texPath>MountedArmsStrategic/ICBMSilo_Base</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<drawSize>(3,3)</drawSize>
+			<damageData>
+				<rect>(0.1,0.1,0.8,0.8)</rect>
+			</damageData>
+		</graphicData>
+		<uiIconPath>MountedArmsStrategic/ICBMSilo_Icon</uiIconPath>
+		<altitudeLayer>Building</altitudeLayer>
+		<size>(3,3)</size>
+		<rotatable>false</rotatable>
+		<tickerType>Normal</tickerType>
+		<passability>PassThroughOnly</passability>
+		<pathCost>50</pathCost>
+		<fillPercent>0.3</fillPercent>
+		<castEdgeShadows>false</castEdgeShadows>
+		<hasTooltip>true</hasTooltip>
+		<terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+		<designationCategory>Security</designationCategory>
+		<techLevel>Spacer</techLevel>
+		<constructionSkillPrerequisite>10</constructionSkillPrerequisite>
+		<statBases>
+			<MaxHitPoints>1500</MaxHitPoints>
+			<Flammability>0.2</Flammability>
+			<Beauty>-30</Beauty>
+			<WorkToBuild>120000</WorkToBuild>
+			<Mass>10000</Mass>
+			<Bulk>10000</Bulk>
+			<AimingAccuracy>1.0</AimingAccuracy>
+			<ShootingAccuracyTurret>1.0</ShootingAccuracyTurret>
+		</statBases>
+		<costList>
+			<Steel>1500</Steel>
+			<Plasteel>300</Plasteel>
+			<ComponentIndustrial>20</ComponentIndustrial>
+			<ComponentSpacer>6</ComponentSpacer>
+		</costList>
+		<comps>
+			<li Class="CompProperties_Forbiddable" />
+			<li Class="CompProperties_Power">
+				<compClass>CompPowerTrader</compClass>
+				<basePowerConsumption>1000</basePowerConsumption>
+			</li>
+			<li Class="CompProperties_Flickable" />
+			<li Class="CompProperties_Breakdownable" />
+			<li Class="CompProperties_Explosive">
+				<wickTicks>240</wickTicks>
+				<explosiveRadius>9.9</explosiveRadius>
+				<explosiveDamageType>Bomb</explosiveDamageType>
+				<chanceNeverExplodeFromDamage>0.5</chanceNeverExplodeFromDamage>
+			</li>
+		</comps>
+		<building>
+			<turretGunDef>MAS_Gun_ICBMSilo</turretGunDef>
+			<turretTopDrawSize>2.6</turretTopDrawSize>
+			<turretBurstCooldownTime>60</turretBurstCooldownTime>
+			<ai_combatDangerous>false</ai_combatDangerous>
+		</building>
+		<placeWorkers>
+			<li>PlaceWorker_TurretTop</li>
+			<li>PlaceWorker_NotUnderRoof</li>
+		</placeWorkers>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.ManualFireOnlyExtension" />
+			<li Class="MountedArmsStrategic.LoadedTopsExtension">
+				<topTexPaths>
+					<li>MountedArmsStrategic/ICBMSilo_Top0</li>
+					<li>MountedArmsStrategic/ICBMSilo_Top1</li>
+				</topTexPaths>
+			</li>
+		</modExtensions>
+		<researchPrerequisites>
+			<li>MAS_Research_ICBM</li>
+		</researchPrerequisites>
+	</ThingDef>
+
 </Defs>

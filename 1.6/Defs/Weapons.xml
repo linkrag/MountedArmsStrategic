@@ -64,4 +64,66 @@
 		</comps>
 	</ThingDef>
 
+	<!-- ICBM silo gun. The silo is unmanned, so CE gives it no local force-attack, and
+	     ManualFireOnlyExtension (on the building) stops auto-targeting: it only fires through
+	     "attack world tile". minRange 0 so the map-edge exit cell is never "too close". -->
+	<ThingDef ParentName="BaseTurretGun">
+		<defName>MAS_Gun_ICBMSilo</defName>
+		<label>ICBM silo launcher</label>
+		<description>A hardened launch tube for one intercontinental ballistic missile.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/ICBMSilo_Top1</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+		</graphicData>
+		<soundInteract>Artillery_ShellLoaded</soundInteract>
+		<statBases>
+			<SightsEfficiency>1</SightsEfficiency>
+			<ShotSpread>0.05</ShotSpread>
+			<SwayFactor>0.1</SwayFactor>
+			<RangedWeapon_Cooldown>2</RangedWeapon_Cooldown>
+			<Mass>2000</Mass>
+		</statBases>
+		<verbs>
+			<li Class="CombatExtended.VerbPropertiesCE">
+				<verbClass>CombatExtended.Verb_ShootMortarCE</verbClass>
+				<isMortar>true</isMortar>
+				<forceNormalTimeSpeed>false</forceNormalTimeSpeed>
+				<hasStandardCommand>true</hasStandardCommand>
+				<requireLineOfSight>false</requireLineOfSight>
+				<defaultProjectile>MAS_Bullet_ICBM_HE</defaultProjectile>
+				<warmupTime>20</warmupTime>
+				<minRange>0</minRange>
+				<range>700</range>
+				<burstShotCount>1</burstShotCount>
+				<soundCast>RocketswarmLauncher_Fire</soundCast>
+				<soundCastTail>GunTail_Heavy</soundCastTail>
+				<muzzleFlashScale>40</muzzleFlashScale>
+				<circularError>6</circularError>
+				<ai_IsBuildingDestroyer>true</ai_IsBuildingDestroyer>
+				<targetParams>
+					<canTargetLocations>true</canTargetLocations>
+				</targetParams>
+			</li>
+		</verbs>
+		<comps>
+			<li Class="CombatExtended.CompProperties_Charges">
+				<chargeSpeeds>
+					<li>30</li>
+					<li>50</li>
+					<li>70</li>
+					<li>90</li>
+				</chargeSpeeds>
+			</li>
+			<li Class="CombatExtended.CompProperties_AmmoUser">
+				<magazineSize>1</magazineSize>
+				<reloadTime>60</reloadTime>
+				<ammoSet>MAS_AmmoSet_ICBM</ammoSet>
+			</li>
+			<li Class="CombatExtended.CompProperties_FireModes">
+				<aiUseBurstMode>FALSE</aiUseBurstMode>
+				<aiAimMode>AimedShot</aiAimMode>
+			</li>
+		</comps>
+	</ThingDef>
+
 </Defs>

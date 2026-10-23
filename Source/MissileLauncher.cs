@@ -32,11 +32,28 @@ namespace MountedArmsStrategic
     }
 
     /// <summary>
+    /// Marker: the launcher never picks targets on its own; it only fires on player orders
+    /// (e.g. CE's "attack world tile").
+    /// </summary>
+    public class ManualFireOnlyExtension : DefModExtension
+    {
+    }
+
+    /// <summary>
     /// CE turret whose top shows how many missiles are loaded. TurretTop.DrawTurret draws
     /// Building_Turret.TurretTopMaterial, so overriding it is enough.
     /// </summary>
     public class Building_MissileLauncherCE : Building_TurretGunCE
     {
+        public override LocalTargetInfo TryFindNewTarget()
+        {
+            if (def.HasModExtension<ManualFireOnlyExtension>())
+            {
+                return LocalTargetInfo.Invalid;
+            }
+            return base.TryFindNewTarget();
+        }
+
         public override Material TurretTopMaterial
         {
             get

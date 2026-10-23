@@ -23,4 +23,19 @@
     <researchViewY>0.50</researchViewY>
   </ResearchProjectDef>
 
+  <ResearchProjectDef>
+    <defName>MAS_Research_ICBM</defName>
+    <label>intercontinental ballistic missiles</label>
+    <description>Multi-stage ballistic missiles launched from hardened silos, able to reach settlements anywhere within 500 world tiles. Unlocks the ICBM silo and conventional ICBMs. With Dubs Rimatomics, also nuclear ICBMs built around its fission warheads.</description>
+    <baseCost>6000</baseCost>
+    <techLevel>Spacer</techLevel>
+    <tab>MAS_Tab</tab>
+    <prerequisites>
+      <li>MAS_Research_TacticalMissiles</li>
+      <li>AdvancedFabrication</li>
+    </prerequisites>
+    <researchViewX>1.00</researchViewX>
+    <researchViewY>0.50</researchViewY>
+  </ResearchProjectDef>
+
 </Defs>

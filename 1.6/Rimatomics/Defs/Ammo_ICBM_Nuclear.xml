@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- ================================================================= -->
+	<!--  Nuclear ICBM: only loads with Dubs Rimatomics (LoadFolders).     -->
+	<!--  Built around Rimatomics' FissionWarhead. On a loaded map the     -->
+	<!--  projectile spawns Rimatomics' "ICBMStrike" (NuclearStrike) with  -->
+	<!--  Yield 55, which does the blast and the NuclearFallout condition. -->
+	<!--  On an unloaded settlement: CE world damage 20 (razes any tech    -->
+	<!--  level: 20 x 0.4 / 6 > 1).                                        -->
+	<!-- ================================================================= -->
+
+	<CombatExtended.AmmoCategoryDef>
+		<defName>MAS_ICBMNuclear</defName>
+		<label>ICBM (nuclear)</label>
+		<labelShort>Nuclear</labelShort>
+		<description>Fission warhead for an intercontinental ballistic missile.</description>
+	</CombatExtended.AmmoCategoryDef>
+
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
+		<defName>MAS_Ammo_ICBM_Nuclear</defName>
+		<label>ICBM (nuclear)</label>
+		<description>An intercontinental ballistic missile carrying a fission warhead. Its blast levels everything around the impact and leaves nuclear fallout over the map. Fired from an ICBM silo at settlements and sites anywhere within reach on the world map.</description>
+		<statBases>
+			<MaxHitPoints>600</MaxHitPoints>
+			<Mass>1800</Mass>
+			<Bulk>5000</Bulk>
+			<MarketValue>30000</MarketValue>
+		</statBases>
+		<ammoClass>MAS_ICBMNuclear</ammoClass>
+		<!-- cook-off uses the conventional projectile on purpose: a fission warhead does not go
+		     critical from a fire -->
+		<detonateProjectile>MAS_Bullet_ICBM_HE</detonateProjectile>
+	</ThingDef>
+
+	<ThingDef ParentName="MAS_ICBMProjectileBase">
+		<defName>MAS_Bullet_ICBM_Nuclear</defName>
+		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearStrike</thingClass>
+		<label>ICBM (nuclear)</label>
+		<description>A nuclear intercontinental ballistic missile in flight.</description>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>Bomb</damageDef>
+			<damageAmountBase>1000</damageAmountBase>
+			<explosionRadius>5.9</explosionRadius>
+			<shellingProps>
+				<iconPath>Things/WorldObjects/Munitions/Rocket</iconPath>
+				<tilesPerTick>0.6</tilesPerTick>
+				<range>500</range>
+				<damage>20</damage>
+			</shellingProps>
+		</projectile>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.NuclearStrikeExtension">
+				<strikeDef>ICBMStrike</strikeDef>
+				<yield>55</yield>
+			</li>
+		</modExtensions>
+	</ThingDef>
+
+	<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
+	<RecipeDef ParentName="AmmoRecipeBase">
+		<defName>MakeMAS_Ammo_ICBM_Nuclear</defName>
+		<label>make ICBM (nuclear)</label>
+		<description>Mate a Rimatomics fission warhead to an intercontinental ballistic missile.</description>
+		<jobString>Assembling a nuclear ICBM.</jobString>
+		<researchPrerequisite>MAS_Research_ICBM</researchPrerequisite>
+		<workAmount>250000</workAmount>
+		<skillRequirements>
+			<Crafting>12</Crafting>
+		</skillRequirements>
+		<ingredients>
+			<li>
+				<filter><thingDefs><li>FissionWarhead</li></thingDefs></filter>
+				<count>1</count>
+			</li>
+			<li>
+				<filter><thingDefs><li>Steel</li></thingDefs></filter>
+				<count>1000</count>
+			</li>
+			<li>
+				<filter><thingDefs><li>Plasteel</li></thingDefs></filter>
+				<count>200</count>
+			</li>
+			<li>
+				<filter><thingDefs><li>FSX</li></thingDefs></filter>
+				<count>200</count>
+			</li>
+			<li>
+				<filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter>
+				<count>16</count>
+			</li>
+			<li>
+				<filter><thingDefs><li>ComponentSpacer</li></thingDefs></filter>
+				<count>4</count>
+			</li>
+		</ingredients>
+		<fixedIngredientFilter>
+			<thingDefs>
+				<li>FissionWarhead</li>
+				<li>Steel</li>
+				<li>Plasteel</li>
+				<li>FSX</li>
+				<li>ComponentIndustrial</li>
+				<li>ComponentSpacer</li>
+			</thingDefs>
+		</fixedIngredientFilter>
+		<products>
+			<MAS_Ammo_ICBM_Nuclear>1</MAS_Ammo_ICBM_Nuclear>
+		</products>
+	</RecipeDef>
+
+</Defs>
