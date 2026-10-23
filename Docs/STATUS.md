@@ -1,6 +1,8 @@
 # Status (atualize sempre que o usuário testar algo)
 
-## Implementado, NÃO testado em jogo
+## Testado em jogo (out/2026): carrega, pesquisa, construção, tiro local e no mapa-mundo funcionaram
+
+## Detalhes
 - **Lançador de mísseis táticos** `MAS_Turret_TacticalLauncher` / gun `MAS_Gun_TacticalLauncher`
   - 3x3, tripulado (`TurretMannedBuildableBase` do CE), interação ao sul; minificável (exigido pelas thingCategories da base do CE).
   - `Verb_ShootMortarCE`, `isMortar`, range 700 (min 60), warmup 10 s, burst 1, cooldown 30 s, mag 2 (recarga 30 s, um por vez), `circularError` 3, `indirectFirePenalty` 0,05.
@@ -10,6 +12,9 @@
   - speed 0, gravityFactor 5, Bomb 1500, raio 9,9, CraterLarge, fragmentos 20/30.
   - `shellingProps`: range 120 tiles, tilesPerTick 0,4, damage 1,5.
   - Receita `MakeMAS_Ammo_TacticalMissile_HE` (bancada de usinagem, via injector do CE): aço 300, plasteel 20, FSX 120, CompInd 6; trabalho 60000; Crafting 8.
+
+## Sprite por munição (implementado, NÃO testado)
+- `Building_MissileLauncherCE` (subclasse de `Building_TurretGunCE`) sobrescreve `TurretTopMaterial` (o `TurretTop.DrawTurret` do jogo desenha esse material; conferido no IL) e escolhe a textura pela `CompAmmo.CurMagCount`, via `LoadedTopsExtension` (Top0/Top1/Top2).
 
 ## Correções após 1º carregamento
 - "not minifiable yet has thing categories" → `minifiedDef MinifiedThing`.

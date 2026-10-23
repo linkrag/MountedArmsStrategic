@@ -17,6 +17,8 @@ LoadFolders.xml          / e 1.6
 1.6/Defs/                Research, Ammo_*, Weapons, Buildings (defs CE nativos, sem patch)
 1.6/Textures/MountedArmsStrategic/   geradas por tools/gen_tex.py
 tools/gen_tex.py         gerador de texturas (PIL)
+Source/                  C# (DLL só-CE): Building_MissileLauncherCE + LoadedTopsExtension; build.ps1
+1.6/Assemblies/MountedArmsStrategic.dll  compilado (NÃO versionado)
 Docs/                    status, decisões, notas do sistema de mapa-mundo do CE
 ```
 
@@ -28,7 +30,8 @@ Docs/                    status, decisões, notas do sistema de mapa-mundo do CE
 5. `shellingProps.damage` é dividido pelo nível tecnológico da facção alvo e multiplicado por 0,4–1,5 (ver `Docs/CE_WORLD_SHELLING.md`).
 6. Alcance grande: sem `PlaceWorker_ShowTurretRadius` e com `ai_combatDangerous` false.
 7. Receita de munição do CE: defName = `Make` + defName da munição (o injector procura por esse nome). Prédio com `thingCategories` (herdado das bases do CE) precisa ser minificável.
-8. Replace em massa: confira a linha certa; valide o XML depois.
+8. **Compilar:** `powershell -File Source/build.ps1` (csc do .NET Framework, C# 5, contra o mscorlib do jogo com `/noconfig /nostdlib`). Não há SDK .NET nem mono na máquina. Sem recursos de C# 6+ (sem `=>` em membros, sem `?.`, sem interpolação `$""`).
+9. Replace em massa: confira a linha certa; valide o XML depois.
 
 ## Convenções
 - Git: branch `main`, commits curtos no imperativo, identidade `Felipe <linkrag.felipe@gmail.com>` (o global da máquina é outro: use `git -c user.name=... -c user.email=...`). Sem remote ainda.

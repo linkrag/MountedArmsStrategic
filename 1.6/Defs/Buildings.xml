@@ -6,6 +6,8 @@
 	     placeworker and ai_combatDangerous false (same fix as Mounted Arms' rocket battery). -->
 	<ThingDef ParentName="TurretMannedBuildableBase">
 		<defName>MAS_Turret_TacticalLauncher</defName>
+		<!-- Top sprite follows the loaded missile count (LoadedTopsExtension below) -->
+		<thingClass>MountedArmsStrategic.Building_MissileLauncherCE</thingClass>
 		<label>tactical missile launcher</label>
 		<description>A crewed erector-launcher for two tactical ballistic missiles. It strikes the local map in a high arc, or settlements and sites up to 120 world tiles away with the "attack world tile" command. It can be uninstalled and moved. It cannot hit close targets, takes a long time to aim and reload, and needs a colonist at the controls. Loaded missiles can cook off if the launcher is destroyed.</description>
 		<graphicData>
@@ -62,6 +64,15 @@
 			<li>PlaceWorker_TurretTop</li>
 			<li>PlaceWorker_PreventInteractionSpotOverlap</li>
 		</placeWorkers>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.LoadedTopsExtension">
+				<topTexPaths>
+					<li>MountedArmsStrategic/TacticalLauncher_Top0</li>
+					<li>MountedArmsStrategic/TacticalLauncher_Top1</li>
+					<li>MountedArmsStrategic/TacticalLauncher_Top2</li>
+				</topTexPaths>
+			</li>
+		</modExtensions>
 		<researchPrerequisites>
 			<li>MAS_Research_TacticalMissiles</li>
 		</researchPrerequisites>

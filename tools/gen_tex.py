@@ -93,14 +93,18 @@ def base_launcher():
     rect(d, 104, 202, 152, 214, (30, 60, 80, 255), r=2, hl=False)
     return shadow(img)
 
-def top_launcher():
+def top_launcher(loaded=2):
     img = canvas(); d = ImageDraw.Draw(img)
-    # erector frame (points UP), two missiles side by side
+    # erector frame (points UP) with two rails; draws `loaded` missiles (left rail fires last)
     rect(d, 92, 30, 164, 214, OLIVE_D, r=6)
+    for x in (110, 146):
+        rect(d, x - 6, 34, x + 6, 210, GUN, r=2, hl=False)   # empty rail
     for y in (70, 120, 170):
         line(d, (92, y), (164, y), 3, BLACK)
-    missile(d, 110, 18, 206, 11)
-    missile(d, 146, 18, 206, 11)
+    if loaded >= 1:
+        missile(d, 110, 18, 206, 11)
+    if loaded >= 2:
+        missile(d, 146, 18, 206, 11)
     # hydraulic arm and pivot
     rect(d, 120, 150, 136, 230, STEEL, r=3)
     circ(d, 128, 128, 14, STEEL_D)
@@ -131,9 +135,13 @@ def missile_projectile():
 
 os.makedirs(OUT, exist_ok=True)
 b = base_launcher()
-t = top_launcher().rotate(-90, resample=Image.BICUBIC)   # turret tops point EAST
 finish(b, os.path.join(OUT, "TacticalLauncher_Base.png"))
-finish(shadow(t, (2, 3), 4, 90), os.path.join(OUT, "TacticalLauncher_Top.png"))
+# one top per loaded count (LoadedTopsExtension); turret tops point EAST
+for n in (0, 1, 2):
+    tn = top_launcher(n).rotate(-90, resample=Image.BICUBIC)
+    finish(shadow(tn, (2, 3), 4, 90), os.path.join(OUT, f"TacticalLauncher_Top{n}.png"))
+    if n == 2:
+        t = tn
 finish(icon(b, t, 3.4 / 3.0), os.path.join(OUT, "TacticalLauncher_Icon.png"))
 finish(missile_item(), os.path.join(OUT, "TacticalMissile_Item.png"))
 finish(missile_projectile(), os.path.join(OUT, "TacticalMissile_Projectile.png"))

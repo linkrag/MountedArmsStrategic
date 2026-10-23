@@ -8,7 +8,7 @@
 		<label>tactical missile erector</label>
 		<description>An erector-launcher rail for two tactical ballistic missiles.</description>
 		<graphicData>
-			<texPath>MountedArmsStrategic/TacticalLauncher_Top</texPath>
+			<texPath>MountedArmsStrategic/TacticalLauncher_Top2</texPath>
 			<graphicClass>Graphic_Single</graphicClass>
 		</graphicData>
 		<soundInteract>Artillery_ShellLoaded</soundInteract>
