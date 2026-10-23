@@ -17,7 +17,7 @@ LoadFolders.xml          / e 1.6; 1.6/Rimatomics só com Dubwise.Rimatomics
 1.6/Defs/                Research, Ammo_*, Weapons, Buildings (defs CE nativos, sem patch)
 1.6/Textures/MountedArmsStrategic/   geradas por tools/gen_tex.py
 tools/gen_tex.py         gerador de texturas (PIL)
-Source/                  C# (DLL só-CE): Building_MissileLauncherCE / Building_MissileInterceptorCE (+ LoadedTopsExtension, ManualFireOnlyExtension), ProjectileCE_NuclearStrike (+ NuclearStrikeExtension); build.ps1
+Source/                  C# (DLL só-CE): Verb_ShootGuidedCE, AmmoUnload, ProjectileCE_Cluster, Building_MissileLauncherCE / Building_MissileInterceptorCE (+ LoadedTopsExtension, ManualFireOnlyExtension), ProjectileCE_NuclearStrike (+ NuclearStrikeExtension); build.ps1
 1.6/Patches/             ShellingResponse.xml (retaliação da IA com nossos mísseis)
 1.6/Rimatomics/          ICBM nuclear (defs + patch no AmmoSet), sem referência de compilação ao Rimatomics
 1.6/Assemblies/MountedArmsStrategic.dll  compilado (NÃO versionado)
@@ -34,7 +34,9 @@ Docs/                    status, decisões, notas do sistema de mapa-mundo do CE
 7. Receita de munição do CE: defName = `Make` + defName da munição (o injector procura por esse nome). Prédio com `thingCategories` (herdado das bases do CE) precisa ser minificável.
 8. **Compilar:** `powershell -File Source/build.ps1` (csc do .NET Framework, C# 5, contra o mscorlib do jogo com `/noconfig /nostdlib`). Não há SDK .NET nem mono na máquina. Sem recursos de C# 6+ (sem `=>` em membros, sem `?.`, sem interpolação `$""`).
 9. **Interceptação (CIWS do CE):** `Building_CIWS_CE` + verbos `VerbProperties_CIWSProjectile`/`CIWSSkyfaller` + comp `CompVerbDisabler`; alvo = `ProjectileCE` hostil com `flyOverhead` e `speed` < 80 (os nossos mísseis entram). Alcance ≤ 119 (anéis de alcance quebram em 120). Sem `PlaceWorker_ShowTurretRadius` em torreta sem verbo de chão. Detalhes em `../MountedArms/Docs/CE_NOTES.md`.
-10. Replace em massa: confira a linha certa; valide o XML depois.
+10. **Lançador guiado** (míssil/foguete com GPS/inércia): `verbClass` `MountedArmsStrategic.Verb_ShootGuidedCE` e `CombatExtended.OrbitalTurretExtension` (`isMarkMandatory` false) na gun; precisão só pelo `circularError`. Artilharia não guiada fica no `Verb_ShootMortarCE`.
+11. Compile a DLL com o jogo **fechado** (o jogo trava o arquivo).
+12. Replace em massa: confira a linha certa; valide o XML depois.
 
 ## Convenções
 - Git: branch `main`, commits curtos no imperativo, identidade `Felipe <linkrag.felipe@gmail.com>` (o global da máquina é outro: use `git -c user.name=... -c user.email=...`). Sem remote ainda.

@@ -21,6 +21,12 @@ Fonte: `CombatExtended-Continued/CombatExtended`, arquivos `Things/Building_Turr
 ## Marcador de artilharia (mapa carregado)
 `Command_ArtilleryTarget`: se o mapa do alvo está carregado (há colonos lá), exige `ArtilleryMarker` na célula quando a opção global `RequireArtilleryMarkerForOffMapArtillery` está ligada **e** `turret.OrbitalTurretExtension?.isMarkMandatory ?? true`. A extensão fica na **gun** (`Gun.def`), padrão `isMarkMandatory = false`; ela também habilita `CanShootOtherLayers`.
 
+## Precisão do tiro global (por que o Minuteman errava 30+ células)
+- `Verb_LaunchProjectileCE.ShiftVecReportFor(GlobalTargetInfo)`: `shotDist` = tiles × 5, `lightingShift` = 1 e `smokeDensity` = 10 **fixos**; `Verb_ShootMortarCE` recalcula `weatherShift` e o `circularMissRadius` (`circularError` × 0,5–1).
+- `ShiftGlobalTarget`: `shotDist` ≥ `maxRange × 0,444` sem marcador (0,111 com marcador); desvio = erro de distância (`distShift` = shotDist² / maxRange × min(accuracyFactor·0,5; 0,8), accuracyFactor = (1,5 − AimingAccuracy) / SightsEfficiency) + círculo de `visibilityShift + circularMissRadius` (+ spread). `visibilityShift` cresce com luz/fumaça e com shotDist / 50.
+- Célula fora do mapa na chegada → `TravelingShell` sorteia uma célula aleatória.
+- Nosso `Verb_ShootGuidedCE`: zera luz/fumaça/clima (tiro local e global) e põe AimingAccuracy 1,5 no global (accuracyFactor 0 → sem erro de distância). Resta o círculo de `circularError`.
+
 ## Salva
 - `Command_ArtilleryTarget` agrupa (`GroupsWith`/`MergeWith`): várias torretas selecionadas recebem a mesma ordem.
 - `Verb_ShootMortarCE.TryCastShot` usa `TryCastGlobalShot` em cada tiro da rajada; `ShiftGlobalTarget` sorteia dispersão por tiro.

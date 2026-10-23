@@ -9,7 +9,7 @@
 		<!-- Top sprite follows the loaded missile count (LoadedTopsExtension below) -->
 		<thingClass>MountedArmsStrategic.Building_MissileLauncherCE</thingClass>
 		<label>M270 launcher (ATACMS)</label>
-		<description>A crewed erector-launcher for two tactical ballistic missiles. It strikes the local map in a high arc, or settlements and sites up to 120 world tiles away with the "attack world tile" command. It can be uninstalled and moved. It cannot hit close targets, takes a long time to aim and reload, and needs a colonist at the controls. Loaded missiles can cook off if the launcher is destroyed.</description>
+		<description>A crewed erector-launcher for two tactical ballistic missiles. It strikes the local map in a high arc, or settlements and sites up to 120 world tiles away with the "attack world tile" command. It can be uninstalled and moved. It cannot hit close targets, takes a long time to aim and reload, and needs power and a colonist at the controls. Loaded missiles can cook off if the launcher is destroyed.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/TacticalLauncher_Base</texPath>
 			<drawSize>(3,3)</drawSize>
@@ -42,6 +42,10 @@
 			<ComponentSpacer>2</ComponentSpacer>
 		</costList>
 		<comps>
+			<li Class="CompProperties_Power">
+				<compClass>CompPowerTrader</compClass>
+				<basePowerConsumption>300</basePowerConsumption>
+			</li>
 			<li Class="CompProperties_Explosive">
 				<wickTicks>240</wickTicks>
 				<explosiveRadius>5.9</explosiveRadius>

@@ -21,7 +21,8 @@
 		</statBases>
 		<verbs>
 			<li Class="CombatExtended.VerbPropertiesCE">
-				<verbClass>CombatExtended.Verb_ShootMortarCE</verbClass>
+				<!-- guided: no light/smoke/weather/range-estimate error, only circularError (CEP) -->
+				<verbClass>MountedArmsStrategic.Verb_ShootGuidedCE</verbClass>
 				<isMortar>true</isMortar>
 				<forceNormalTimeSpeed>false</forceNormalTimeSpeed>
 				<hasStandardCommand>true</hasStandardCommand>
@@ -98,7 +99,8 @@
 		</statBases>
 		<verbs>
 			<li Class="CombatExtended.VerbPropertiesCE">
-				<verbClass>CombatExtended.Verb_ShootMortarCE</verbClass>
+				<!-- guided: no light/smoke/weather/range-estimate error, only circularError (CEP) -->
+				<verbClass>MountedArmsStrategic.Verb_ShootGuidedCE</verbClass>
 				<isMortar>true</isMortar>
 				<forceNormalTimeSpeed>false</forceNormalTimeSpeed>
 				<hasStandardCommand>true</hasStandardCommand>
@@ -111,7 +113,7 @@
 				<soundCast>RocketswarmLauncher_Fire</soundCast>
 				<soundCastTail>GunTail_Heavy</soundCastTail>
 				<muzzleFlashScale>40</muzzleFlashScale>
-				<circularError>6</circularError>
+				<circularError>4</circularError>
 				<ai_IsBuildingDestroyer>true</ai_IsBuildingDestroyer>
 				<targetParams>
 					<canTargetLocations>true</canTargetLocations>
@@ -168,7 +170,8 @@
 		</statBases>
 		<verbs>
 			<li Class="CombatExtended.VerbPropertiesCE">
-				<verbClass>CombatExtended.Verb_ShootMortarCE</verbClass>
+				<!-- guided: no light/smoke/weather/range-estimate error, only circularError (CEP) -->
+				<verbClass>MountedArmsStrategic.Verb_ShootGuidedCE</verbClass>
 				<isMortar>true</isMortar>
 				<forceNormalTimeSpeed>false</forceNormalTimeSpeed>
 				<hasStandardCommand>true</hasStandardCommand>
@@ -238,7 +241,8 @@
 		</statBases>
 		<verbs>
 			<li Class="CombatExtended.VerbPropertiesCE">
-				<verbClass>CombatExtended.Verb_ShootMortarCE</verbClass>
+				<!-- guided: no light/smoke/weather/range-estimate error, only circularError (CEP) -->
+				<verbClass>MountedArmsStrategic.Verb_ShootGuidedCE</verbClass>
 				<isMortar>true</isMortar>
 				<forceNormalTimeSpeed>false</forceNormalTimeSpeed>
 				<hasStandardCommand>true</hasStandardCommand>
