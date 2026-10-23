@@ -7,7 +7,7 @@
 	<ThingDef ParentName="TurretMannedBuildableBase">
 		<defName>MAS_Turret_TacticalLauncher</defName>
 		<label>tactical missile launcher</label>
-		<description>A crewed erector-launcher for two tactical ballistic missiles. It strikes the local map in a high arc, or settlements and sites up to 120 world tiles away with the "attack world tile" command. It cannot hit close targets, takes a long time to aim and reload, and needs a colonist at the controls. Loaded missiles can cook off if the launcher is destroyed.</description>
+		<description>A crewed erector-launcher for two tactical ballistic missiles. It strikes the local map in a high arc, or settlements and sites up to 120 world tiles away with the "attack world tile" command. It can be uninstalled and moved. It cannot hit close targets, takes a long time to aim and reload, and needs a colonist at the controls. Loaded missiles can cook off if the launcher is destroyed.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/TacticalLauncher_Base</texPath>
 			<drawSize>(3,3)</drawSize>
@@ -17,6 +17,9 @@
 		</graphicData>
 		<uiIconPath>MountedArmsStrategic/TacticalLauncher_Icon</uiIconPath>
 		<size>(3,3)</size>
+		<!-- CE turret base sets thingCategories; the game requires those buildings to be minifiable.
+		     A mobile launcher being re-deployable also fits the real system. -->
+		<minifiedDef>MinifiedThing</minifiedDef>
 		<interactionCellOffset>(0,0,-2)</interactionCellOffset>
 		<fillPercent>0.6</fillPercent>
 		<terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>

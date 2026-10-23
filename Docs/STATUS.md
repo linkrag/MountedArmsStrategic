@@ -2,14 +2,18 @@
 
 ## Implementado, NÃO testado em jogo
 - **Lançador de mísseis táticos** `MAS_Turret_TacticalLauncher` / gun `MAS_Gun_TacticalLauncher`
-  - 3x3, tripulado (`TurretMannedBuildableBase` do CE), interação ao sul.
+  - 3x3, tripulado (`TurretMannedBuildableBase` do CE), interação ao sul; minificável (exigido pelas thingCategories da base do CE).
   - `Verb_ShootMortarCE`, `isMortar`, range 700 (min 60), warmup 10 s, burst 1, cooldown 30 s, mag 2 (recarga 30 s, um por vez), `circularError` 3, `indirectFirePenalty` 0,05.
   - Custo: aço 800, plasteel 120, CompInd 12, CompSp 2; WorkToBuild 40000; construção 8.
   - Pesquisa `MAS_Research_TacticalMissiles` (Mortars + MicroelectronicsBasics, 3000).
 - **Míssil** `MAS_Ammo_TacticalMissile_HE` → projétil `MAS_Bullet_TacticalMissile_HE`
   - speed 0, gravityFactor 5, Bomb 1500, raio 9,9, CraterLarge, fragmentos 20/30.
   - `shellingProps`: range 120 tiles, tilesPerTick 0,4, damage 1,5.
-  - Receita (bancada de usinagem, via injector do CE): aço 300, plasteel 20, FSX 120, CompInd 6; trabalho 60000; Crafting 8.
+  - Receita `MakeMAS_Ammo_TacticalMissile_HE` (bancada de usinagem, via injector do CE): aço 300, plasteel 20, FSX 120, CompInd 6; trabalho 60000; Crafting 8.
+
+## Correções após 1º carregamento
+- "not minifiable yet has thing categories" → `minifiedDef MinifiedThing`.
+- "ammo injector found no recipe named MakeMAS_Ammo_TacticalMissile_HE" → receita renomeada.
 
 ## O que testar
 1. Pesquisa aparece na aba "Strategic Missiles"; prédio no menu Security; míssil na bancada de usinagem.

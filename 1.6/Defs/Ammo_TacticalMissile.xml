@@ -123,7 +123,8 @@
 	<!-- ==================== Recipe ========================== -->
 
 	<RecipeDef ParentName="AmmoRecipeBase">
-		<defName>MAS_MakeAmmo_TacticalMissile_HE</defName>
+		<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
+		<defName>MakeMAS_Ammo_TacticalMissile_HE</defName>
 		<label>make tactical ballistic missile (HE)</label>
 		<description>Assemble a single tactical ballistic missile with a high-explosive warhead.</description>
 		<jobString>Assembling a tactical ballistic missile.</jobString>
