@@ -337,7 +337,7 @@
 
 	<!-- M777 155 mm howitzer: crewed, towed (minifiable), manual traverse ~10 deg/s. -->
 	<ThingDef ParentName="TurretMannedBuildableBase">
-		<defName>MAS_Turret_M777</defName>
+		<defName>MAS_Turret_M777_Howitzer</defName>
 		<label>M777 howitzer</label>
 		<description>A lightweight towed 155 mm howitzer. Fires heavy shells in a high arc over walls at the local map, or at settlements up to 60 world tiles away with the "attack world tile" command. Slow to traverse and to reload, and needs a crew and 155 mm shells. Can be uninstalled and moved.</description>
 		<graphicData>
@@ -368,7 +368,7 @@
 			<ComponentIndustrial>6</ComponentIndustrial>
 		</costList>
 		<building>
-			<turretGunDef>MAS_Gun_M777</turretGunDef>
+			<turretGunDef>MAS_Gun_M777_Howitzer</turretGunDef>
 			<turretTopDrawSize>3.2</turretTopDrawSize>
 			<turretBurstCooldownTime>4</turretBurstCooldownTime>
 			<ai_combatDangerous>false</ai_combatDangerous>

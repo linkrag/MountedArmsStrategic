@@ -257,7 +257,7 @@
 
 	<!-- M777 155 mm howitzer: CE's own 155 mm shells (gravityFactor 5, world range 60 tiles). -->
 	<ThingDef ParentName="BaseTurretGun">
-		<defName>MAS_Gun_M777</defName>
+		<defName>MAS_Gun_M777_Howitzer</defName>
 		<label>M777 155mm howitzer</label>
 		<description>A lightweight towed 155 mm howitzer.</description>
 		<graphicData>

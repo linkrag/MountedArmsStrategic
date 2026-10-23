@@ -25,7 +25,7 @@ Docs/                    status, decisões, notas do sistema de mapa-mundo do CE
 ```
 
 ## Regras de ouro
-1. Prefixo `MAS_` em todos os defs. **defName de ThingDef nunca termina em dígito.**
+1. Prefixo `MAS_` em todos os defs. **defName de ThingDef nunca termina em dígito** (já quebrou com `M777`: use `_M777_Howitzer`). Rode `python tools/check_defnames.py` antes de entregar.
 2. Como o mod exige CE, os defs usam classes do CE direto (`TurretMannedBuildableBase`, `BaseTurretGun`, `VerbPropertiesCE`, `AmmoDef`...), não `PatchOperationMakeGunCECompatible`.
 3. **Projétil de artilharia CE: `speed` 0 e `gravityFactor` 5** com cargas 30/50/70/90. `ProjectileCE.Launch` voa a `Max(carga, def.speed)`; speed > carga ignora a carga e o tiro sai do mapa (bug da bateria do Mounted Arms).
 4. O botão "atacar tile do mundo" do CE só aparece se o prédio é artilharia (verbo `isMortar`/projétil `flyOverhead`), está ativo, é do jogador e o projétil tem `shellingProps`.
