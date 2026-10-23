@@ -54,9 +54,28 @@ namespace MountedArmsStrategic
     {
     }
 
+    /// <summary>
+    /// Fixed launchers (VLS cells, silos): the turret top is pinned to this angle instead of turning
+    /// toward the target. The shot direction is computed by the verb, not by the top.
+    /// </summary>
+    public class FixedTopExtension : DefModExtension
+    {
+        public float angle = 0f;
+    }
+
     /// <summary>CE turret whose top shows how many missiles are loaded.</summary>
     public class Building_MissileLauncherCE : Building_TurretGunCE
     {
+        public override void Tick()
+        {
+            base.Tick();
+            FixedTopExtension fixedTop = def.GetModExtension<FixedTopExtension>();
+            if (fixedTop != null && top != null)
+            {
+                top.CurRotation = fixedTop.angle;
+            }
+        }
+
         public override LocalTargetInfo TryFindNewTarget()
         {
             if (def.HasModExtension<ManualFireOnlyExtension>())

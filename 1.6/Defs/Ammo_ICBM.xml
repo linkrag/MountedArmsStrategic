@@ -21,6 +21,9 @@
 		<label>intercontinental ballistic missiles</label>
 		<ammoTypes>
 			<MAS_Ammo_ICBM_HE>MAS_Bullet_ICBM_HE</MAS_Ammo_ICBM_HE>
+			<MAS_Ammo_ICBM_Cluster>MAS_Bullet_ICBM_Cluster</MAS_Ammo_ICBM_Cluster>
+			<MAS_Ammo_ICBM_Thermobaric>MAS_Bullet_ICBM_Thermobaric</MAS_Ammo_ICBM_Thermobaric>
+			<MAS_Ammo_ICBM_EMP>MAS_Bullet_ICBM_EMP</MAS_Ammo_ICBM_EMP>
 		</ammoTypes>
 	</CombatExtended.AmmoSetDef>
 
@@ -57,6 +60,57 @@
 		<detonateProjectile>MAS_Bullet_ICBM_HE</detonateProjectile>
 	</ThingDef>
 
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
+		<defName>MAS_Ammo_ICBM_Cluster</defName>
+		<label>ICBM (cluster)</label>
+		<description>An intercontinental ballistic missile whose warhead blankets a huge area with bomblets. Deadly against troops in the open, weaker against fortifications.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/ICBM_Item_Cluster</texPath>
+		</graphicData>
+		<statBases>
+			<MaxHitPoints>600</MaxHitPoints>
+			<Mass>2000</Mass>
+			<Bulk>5000</Bulk>
+			<MarketValue>13000</MarketValue>
+		</statBases>
+		<ammoClass>MAS_WarheadCluster</ammoClass>
+		<detonateProjectile>MAS_Bullet_ICBM_Cluster</detonateProjectile>
+	</ThingDef>
+
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
+		<defName>MAS_Ammo_ICBM_Thermobaric</defName>
+		<label>ICBM (thermobaric)</label>
+		<description>An intercontinental ballistic missile with a massive fuel-air warhead that levels and burns everything around the impact.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/ICBM_Item_Thermobaric</texPath>
+		</graphicData>
+		<statBases>
+			<MaxHitPoints>600</MaxHitPoints>
+			<Mass>2000</Mass>
+			<Bulk>5000</Bulk>
+			<MarketValue>13000</MarketValue>
+		</statBases>
+		<ammoClass>MAS_WarheadThermobaric</ammoClass>
+		<detonateProjectile>MAS_Bullet_ICBM_Thermobaric</detonateProjectile>
+	</ThingDef>
+
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
+		<defName>MAS_Ammo_ICBM_EMP</defName>
+		<label>ICBM (EMP)</label>
+		<description>An intercontinental ballistic missile with a powerful electromagnetic pulse warhead. Usually wipes out a mechanoid hive in one strike, but barely harms human settlements.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/ICBM_Item_EMP</texPath>
+		</graphicData>
+		<statBases>
+			<MaxHitPoints>600</MaxHitPoints>
+			<Mass>1800</Mass>
+			<Bulk>5000</Bulk>
+			<MarketValue>14000</MarketValue>
+		</statBases>
+		<ammoClass>MAS_WarheadEMP</ammoClass>
+		<detonateProjectile>MAS_Bullet_ICBM_EMP</detonateProjectile>
+	</ThingDef>
+
 	<!-- ================== Projectile ================== -->
 
 	<ThingDef Name="MAS_ICBMProjectileBase" ParentName="BaseExplosiveBullet" Abstract="True">
@@ -77,6 +131,11 @@
 			<soundImpactAnticipate>MortarRound_PreImpact</soundImpactAnticipate>
 			<soundAmbient>RocketPropelledLoop_Big</soundAmbient>
 			<dropsCasings>false</dropsCasings>
+			<shellingProps>
+				<iconPath>Things/WorldObjects/Munitions/Rocket</iconPath>
+				<tilesPerTick>0.6</tilesPerTick>
+				<range>500</range>
+			</shellingProps>
 		</projectile>
 		<comps>
 			<li Class="CombatExtended.CompProperties_ProjectileFleck">
@@ -111,9 +170,6 @@
 			<explosionRadius>14.9</explosionRadius>
 			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<shellingProps>
-				<iconPath>Things/WorldObjects/Munitions/Rocket</iconPath>
-				<tilesPerTick>0.6</tilesPerTick>
-				<range>500</range>
 				<damage>5</damage>
 			</shellingProps>
 		</projectile>
@@ -125,6 +181,60 @@
 				</fragments>
 			</li>
 		</comps>
+	</ThingDef>
+
+	<!-- Cluster: central charge + 60 bomblets over radius 16 -->
+	<ThingDef ParentName="MAS_ICBMProjectileBase">
+		<defName>MAS_Bullet_ICBM_Cluster</defName>
+		<label>ICBM (cluster)</label>
+		<description>An intercontinental ballistic missile in flight.</description>
+		<thingClass>MountedArmsStrategic.ProjectileCE_Cluster</thingClass>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>Bomb</damageDef>
+			<damageAmountBase>400</damageAmountBase>
+			<explosionRadius>3.9</explosionRadius>
+			<shellingProps>
+				<damage>3.5</damage>
+			</shellingProps>
+		</projectile>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.ClusterExtension">
+				<count>60</count>
+				<spreadRadius>16</spreadRadius>
+				<subExplosionRadius>2.4</subExplosionRadius>
+				<damageDef>Bomb</damageDef>
+				<damageAmount>120</damageAmount>
+			</li>
+		</modExtensions>
+	</ThingDef>
+
+	<ThingDef ParentName="MAS_ICBMProjectileBase">
+		<defName>MAS_Bullet_ICBM_Thermobaric</defName>
+		<label>ICBM (thermobaric)</label>
+		<description>An intercontinental ballistic missile in flight.</description>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>Thermobaric</damageDef>
+			<damageAmountBase>2500</damageAmountBase>
+			<explosionRadius>14.9</explosionRadius>
+			<ai_IsIncendiary>true</ai_IsIncendiary>
+			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
+			<shellingProps>
+				<damage>6</damage>
+			</shellingProps>
+		</projectile>
+	</ThingDef>
+
+	<!-- EMP: no shellingProps.damage, so CE's EMP estimate applies. Radius 7.9 keeps it far from
+	     hurting human settlements (CE sums 2^radius terms) while one-shotting most mechanoid hives. -->
+	<ThingDef ParentName="MAS_ICBMProjectileBase">
+		<defName>MAS_Bullet_ICBM_EMP</defName>
+		<label>ICBM (EMP)</label>
+		<description>An intercontinental ballistic missile in flight.</description>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>EMP</damageDef>
+			<damageAmountBase>600</damageAmountBase>
+			<explosionRadius>7.9</explosionRadius>
+		</projectile>
 	</ThingDef>
 
 	<!-- ==================== Recipe ========================== -->
@@ -174,6 +284,71 @@
 		<products>
 			<MAS_Ammo_ICBM_HE>1</MAS_Ammo_ICBM_HE>
 		</products>
+	</RecipeDef>
+
+
+	<RecipeDef ParentName="AmmoRecipeBase">
+		<defName>MakeMAS_Ammo_ICBM_Cluster</defName>
+		<label>make ICBM (cluster)</label>
+		<description>Assemble an intercontinental ballistic missile with a cluster warhead.</description>
+		<jobString>Assembling an ICBM.</jobString>
+		<researchPrerequisite>MAS_Research_SpecialWarheads</researchPrerequisite>
+		<workAmount>250000</workAmount>
+		<skillRequirements>
+			<Crafting>10</Crafting>
+		</skillRequirements>
+		<ingredients>
+			<li><filter><thingDefs><li>Steel</li></thingDefs></filter><count>1000</count></li>
+			<li><filter><thingDefs><li>Plasteel</li></thingDefs></filter><count>200</count></li>
+			<li><filter><thingDefs><li>FSX</li></thingDefs></filter><count>550</count></li>
+			<li><filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter><count>16</count></li>
+			<li><filter><thingDefs><li>ComponentSpacer</li></thingDefs></filter><count>4</count></li>
+		</ingredients>
+		<fixedIngredientFilter><thingDefs><li>Steel</li><li>Plasteel</li><li>FSX</li><li>ComponentIndustrial</li><li>ComponentSpacer</li></thingDefs></fixedIngredientFilter>
+		<products><MAS_Ammo_ICBM_Cluster>1</MAS_Ammo_ICBM_Cluster></products>
+	</RecipeDef>
+
+	<RecipeDef ParentName="AmmoRecipeBase">
+		<defName>MakeMAS_Ammo_ICBM_Thermobaric</defName>
+		<label>make ICBM (thermobaric)</label>
+		<description>Assemble an intercontinental ballistic missile with a thermobaric warhead.</description>
+		<jobString>Assembling an ICBM.</jobString>
+		<researchPrerequisite>MAS_Research_SpecialWarheads</researchPrerequisite>
+		<workAmount>250000</workAmount>
+		<skillRequirements>
+			<Crafting>10</Crafting>
+		</skillRequirements>
+		<ingredients>
+			<li><filter><thingDefs><li>Steel</li></thingDefs></filter><count>1000</count></li>
+			<li><filter><thingDefs><li>Plasteel</li></thingDefs></filter><count>200</count></li>
+			<li><filter><thingDefs><li>Chemfuel</li></thingDefs></filter><count>600</count></li>
+			<li><filter><thingDefs><li>FSX</li></thingDefs></filter><count>250</count></li>
+			<li><filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter><count>16</count></li>
+			<li><filter><thingDefs><li>ComponentSpacer</li></thingDefs></filter><count>4</count></li>
+		</ingredients>
+		<fixedIngredientFilter><thingDefs><li>Steel</li><li>Plasteel</li><li>Chemfuel</li><li>FSX</li><li>ComponentIndustrial</li><li>ComponentSpacer</li></thingDefs></fixedIngredientFilter>
+		<products><MAS_Ammo_ICBM_Thermobaric>1</MAS_Ammo_ICBM_Thermobaric></products>
+	</RecipeDef>
+
+	<RecipeDef ParentName="AmmoRecipeBase">
+		<defName>MakeMAS_Ammo_ICBM_EMP</defName>
+		<label>make ICBM (EMP)</label>
+		<description>Assemble an intercontinental ballistic missile with an EMP warhead.</description>
+		<jobString>Assembling an ICBM.</jobString>
+		<researchPrerequisite>MAS_Research_SpecialWarheads</researchPrerequisite>
+		<workAmount>250000</workAmount>
+		<skillRequirements>
+			<Crafting>10</Crafting>
+		</skillRequirements>
+		<ingredients>
+			<li><filter><thingDefs><li>Steel</li></thingDefs></filter><count>1000</count></li>
+			<li><filter><thingDefs><li>Plasteel</li></thingDefs></filter><count>200</count></li>
+			<li><filter><thingDefs><li>FSX</li></thingDefs></filter><count>300</count></li>
+			<li><filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter><count>20</count></li>
+			<li><filter><thingDefs><li>ComponentSpacer</li></thingDefs></filter><count>8</count></li>
+		</ingredients>
+		<fixedIngredientFilter><thingDefs><li>Steel</li><li>Plasteel</li><li>FSX</li><li>ComponentIndustrial</li><li>ComponentSpacer</li></thingDefs></fixedIngredientFilter>
+		<products><MAS_Ammo_ICBM_EMP>1</MAS_Ammo_ICBM_EMP></products>
 	</RecipeDef>
 
 </Defs>

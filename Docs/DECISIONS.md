@@ -7,6 +7,8 @@
 
 - **Defesa antimíssil** e **IA retaliando com mísseis por nível** (Spacer: tático; Ultra/Archotech: tático + ICBM HE; sem nuclear para a IA). A bateria também intercepta drop pods.
 
+- Lote 3 pedido pelo usuário ("pode fazer todos"): salva (rajada + seleção múltipla), MLRS, míssil de cruzeiro, ogivas cluster/termobárica/EMP, M777.
+
 ## Técnicas
 - Defs CE nativos (o mod exige CE), herdando das bases do CE.
 - Projétil de artilharia: speed 0 + gravityFactor 5 (lição da bateria do Mounted Arms).

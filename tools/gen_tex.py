@@ -219,6 +219,127 @@ def interceptor_item():
         line(d, (70, y), (186, y), 3, BLACK)
     return shadow(img, (3, 4), 4, 100)
 
+# ------------------------------------------------------------------ batch 3: MLRS, cruise VLS, M777, warhead variants
+ORANGE = (214, 110, 40, 255)
+BRASS  = (190, 150, 62, 255)
+BLUE   = (60, 120, 200, 255)
+WARHEAD_BANDS = {"Cluster": YELLOW, "Thermobaric": ORANGE, "EMP": BLUE}
+
+def base_mlrs():
+    img = canvas(); d = ImageDraw.Draw(img)
+    rect(d, 30, 40, 226, 220, OLIVE_D, r=10)                   # chassis bed
+    rect(d, 40, 50, 216, 210, OLIVE, r=8, hl=False)
+    for x in (36, 220):                                       # wheels (3 per side)
+        for y in (64, 128, 192):
+            rect(d, x - 10, y - 18, x + 10, y + 18, BLACK, r=5, hl=False)
+    rect(d, 92, 190, 164, 232, OLIVE, r=6)                    # cab (operator side)
+    rect(d, 100, 196, 156, 212, (30, 60, 80, 255), r=2, hl=False)
+    circ(d, 128, 120, 40, STEEL_D); circ(d, 128, 120, 30, GUN)
+    return shadow(img)
+
+def top_mlrs(loaded):
+    img = canvas(); d = ImageDraw.Draw(img)
+    # 6-cell pod (2 x 3), front UP; cells empty in firing order
+    rect(d, 78, 40, 178, 206, OLIVE_D, r=6)
+    k = 0
+    for row in range(3):
+        for col in range(2):
+            x = 88 + col * 44; y = 50 + row * 50
+            rect(d, x, y, x + 36, y + 42, OLIVE, r=3, hl=False)
+            if k < loaded:
+                circ(d, x + 18, y + 21, 13, WHITE)
+                circ(d, x + 18, y + 21, 5, GUN, outline=BLACK, w=int(1.2 * S))
+            else:
+                circ(d, x + 18, y + 21, 13, BLACK)
+            k += 1
+    circ(d, 128, 128, 10, STEEL_D)
+    return img
+
+def base_vls():
+    img = canvas(); d = ImageDraw.Draw(img)
+    rect(d, 14, 14, 242, 242, STEEL_D, r=8, hl=False)
+    rect(d, 24, 24, 232, 232, (120, 122, 118, 255), r=6, hl=False)
+    rivets(d, [(36, 36), (220, 36), (36, 220), (220, 220)])
+    return shadow(img, (3, 4), 5, 100)
+
+def top_vls(loaded):
+    img = canvas(); d = ImageDraw.Draw(img)
+    # 2x2 cell hatches seen from above; square-symmetric (FixedTopExtension pins the angle)
+    cells = [(40, 40), (132, 40), (40, 132), (132, 132)]
+    for i, (x, y) in enumerate(cells):
+        rect(d, x, y, x + 84, y + 84, STEEL, r=4)
+        if i < loaded:
+            rect(d, x + 10, y + 10, x + 74, y + 74, STEEL_D, r=3, hl=False)   # closed hatch
+            line(d, (x + 10, y + 42), (x + 74, y + 42), 2, BLACK)
+        else:
+            rect(d, x + 10, y + 10, x + 74, y + 74, BLACK, r=3, hl=False)     # open, empty
+    return img
+
+def base_m777():
+    img = canvas(); d = ImageDraw.Draw(img)
+    # four split trails seen from above + spades
+    for (ex, ey) in ((40, 220), (216, 220), (40, 36), (216, 36)):
+        line(d, (128, 128), (ex, ey), 12, BLACK); line(d, (128, 128), (ex, ey), 8, OLIVE_D)
+        rect(d, ex - 12, ey - 8, ex + 12, ey + 8, STEEL_D, r=2)
+    circ(d, 128, 128, 40, STEEL_D); circ(d, 128, 128, 30, GUN)
+    for i in range(3):                                         # shells ready at the operator side
+        rect(d, 100 + i * 20, 196, 114 + i * 20, 236, BRASS, r=3)
+    return shadow(img)
+
+def top_m777():
+    img = canvas(); d = ImageDraw.Draw(img)
+    rect(d, 121, 6, 135, 150, GUN, r=3)                       # long barrel
+    rect(d, 114, 6, 142, 20, STEEL_D, r=3)                    # muzzle brake
+    rect(d, 106, 120, 150, 196, OLIVE, r=6)                   # cradle / breech
+    rect(d, 96, 140, 106, 186, STEEL, r=3); rect(d, 150, 140, 160, 186, STEEL, r=3)   # recuperators
+    rect(d, 118, 190, 138, 214, STEEL_D, r=3)
+    return img
+
+def item_missile(band, length=236, r=16):
+    img = canvas(); d = ImageDraw.Draw(img)
+    rect(d, 40, 180, 216, 200, OLIVE_D, r=4)
+    big = canvas(); bd = ImageDraw.Draw(big)
+    missile(bd, 128, 256 - length, 236, r, band=band)
+    img.alpha_composite(big.rotate(-45, resample=Image.BICUBIC))
+    return shadow(img, (3, 4), 4, 100)
+
+def cruise_item():
+    img = canvas(); d = ImageDraw.Draw(img)
+    rect(d, 70, 20, 186, 236, STEEL_D, r=6)                   # launch canister
+    rect(d, 80, 30, 176, 226, STEEL, r=4, hl=False)
+    rect(d, 80, 30, 176, 60, WHITE, r=3, hl=False)
+    line(d, (80, 140), (176, 140), 3, BLACK)
+    return shadow(img, (3, 4), 4, 100)
+
+def cruise_projectile():
+    img = canvas(); d = ImageDraw.Draw(img)
+    poly(d, [(128, 6), (146, 40), (110, 40)], WHITE)
+    rect(d, 110, 36, 146, 236, WHITE, r=4)
+    poly(d, [(110, 120), (40, 150), (40, 162), (110, 146)], STEEL_D)      # wings
+    poly(d, [(146, 120), (216, 150), (216, 162), (146, 146)], STEEL_D)
+    poly(d, [(110, 214), (84, 246), (110, 236)], STEEL_D)                 # tail fins
+    poly(d, [(146, 214), (172, 246), (146, 236)], STEEL_D)
+    return img
+
+def gmlrs_item():
+    img = canvas(); d = ImageDraw.Draw(img)
+    rect(d, 70, 30, 186, 226, OLIVE_D, r=6)                   # pod-cell container
+    rect(d, 80, 40, 176, 216, OLIVE, r=4, hl=False)
+    circ(d, 128, 80, 26, WHITE); circ(d, 128, 80, 8, GUN, outline=BLACK, w=int(1.2 * S))
+    return shadow(img, (3, 4), 4, 100)
+
+def launcher_set(name, base_fn, top_fn, counts, rotate=True, top_cells=None, base_cells=3.0):
+    b = base_fn()
+    finish(b, os.path.join(OUT, f"{name}_Base.png"))
+    last = None
+    for n in counts:
+        t = top_fn(n)
+        if rotate:
+            t = t.rotate(-90, resample=Image.BICUBIC)       # turret tops point EAST
+        finish(shadow(t, (2, 3), 4, 90), os.path.join(OUT, f"{name}_Top{n}.png"))
+        last = t
+    finish(icon(b, last, (top_cells or base_cells) / base_cells), os.path.join(OUT, f"{name}_Icon.png"))
+
 os.makedirs(OUT, exist_ok=True)
 b = base_launcher()
 finish(b, os.path.join(OUT, "TacticalLauncher_Base.png"))
@@ -246,4 +367,16 @@ for n in range(5):
     if n == 4:
         finish(icon(ib, tn, 2.6 / 3.0), os.path.join(OUT, "Interceptor_Icon.png"))
 finish(interceptor_item(), os.path.join(OUT, "Interceptor_Item.png"))
+launcher_set("MLRS", base_mlrs, top_mlrs, range(7))
+launcher_set("CruiseVLS", base_vls, top_vls, range(5), rotate=False, base_cells=2.0)
+mb = base_m777(); mt = top_m777().rotate(-90, resample=Image.BICUBIC)
+finish(mb, os.path.join(OUT, "M777_Base.png"))
+finish(shadow(mt, (2, 3), 4, 90), os.path.join(OUT, "M777_Top.png"))
+finish(icon(mb, mt, 3.2 / 3.0), os.path.join(OUT, "M777_Icon.png"))
+for w, band in WARHEAD_BANDS.items():
+    finish(item_missile(band), os.path.join(OUT, f"TacticalMissile_Item_{w}.png"))
+    finish(item_missile(band, 250, 18), os.path.join(OUT, f"ICBM_Item_{w}.png"))
+finish(cruise_item(), os.path.join(OUT, "CruiseMissile_Item.png"))
+finish(cruise_projectile(), os.path.join(OUT, "CruiseMissile_Projectile.png"))
+finish(gmlrs_item(), os.path.join(OUT, "GMLRS_Item.png"))
 print("ok")

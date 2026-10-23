@@ -10,6 +10,9 @@
 	<!--  shellingProps.damage is divided by the target faction tech level -->
 	<!--  (Industrial 4, Spacer 5, Ultra 6) and rolled x0.4..1.5 by CE;    -->
 	<!--  1.5 takes about 3 hits to raze an industrial settlement.         -->
+	<!--  A set damage OVERRIDES CE's own estimate; the EMP warhead leaves -->
+	<!--  it unset so CE's EMP formula applies (full vs mechanoids, ~3-18% -->
+	<!--  vs humans by tech level).                                        -->
 	<!-- ================================================================= -->
 
 	<CombatExtended.AmmoCategoryDef>
@@ -19,22 +22,42 @@
 		<description>Unitary high-explosive warhead for a tactical ballistic missile.</description>
 	</CombatExtended.AmmoCategoryDef>
 
+	<CombatExtended.AmmoCategoryDef>
+		<defName>MAS_WarheadCluster</defName>
+		<label>cluster warhead</label>
+		<labelShort>cluster</labelShort>
+		<description>Releases dozens of bomblets over a wide area. Devastating against troops in the open, weaker against fortifications.</description>
+	</CombatExtended.AmmoCategoryDef>
+
+	<CombatExtended.AmmoCategoryDef>
+		<defName>MAS_WarheadThermobaric</defName>
+		<label>thermobaric warhead</label>
+		<labelShort>thermobaric</labelShort>
+		<description>A fuel-air warhead: a huge, long fireball and blast that wrecks buildings and burns everything around.</description>
+	</CombatExtended.AmmoCategoryDef>
+
+	<CombatExtended.AmmoCategoryDef>
+		<defName>MAS_WarheadEMP</defName>
+		<label>EMP warhead</label>
+		<labelShort>EMP</labelShort>
+		<description>An electromagnetic pulse warhead. Harmless to flesh, but it disables mechanoids, turrets and electronics, and cripples mechanoid hives.</description>
+	</CombatExtended.AmmoCategoryDef>
+
 	<CombatExtended.AmmoSetDef>
 		<defName>MAS_AmmoSet_TacticalMissile</defName>
 		<label>tactical ballistic missiles</label>
 		<ammoTypes>
 			<MAS_Ammo_TacticalMissile_HE>MAS_Bullet_TacticalMissile_HE</MAS_Ammo_TacticalMissile_HE>
+			<MAS_Ammo_TacticalMissile_Cluster>MAS_Bullet_TacticalMissile_Cluster</MAS_Ammo_TacticalMissile_Cluster>
+			<MAS_Ammo_TacticalMissile_Thermobaric>MAS_Bullet_TacticalMissile_Thermobaric</MAS_Ammo_TacticalMissile_Thermobaric>
+			<MAS_Ammo_TacticalMissile_EMP>MAS_Bullet_TacticalMissile_EMP</MAS_Ammo_TacticalMissile_EMP>
 		</ammoTypes>
 	</CombatExtended.AmmoSetDef>
 
 	<!-- ==================== Ammo ========================== -->
 
-	<ThingDef Class="CombatExtended.AmmoDef" ParentName="HeavyAmmoBase">
-		<defName>MAS_Ammo_TacticalMissile_HE</defName>
-		<label>tactical ballistic missile (HE)</label>
-		<description>A short-range ballistic missile with inertial and satellite guidance and a unitary high-explosive warhead. Fired from a tactical missile launcher at the local map or at settlements on the world map.</description>
+	<ThingDef Class="CombatExtended.AmmoDef" Name="MAS_TacticalAmmoBase" ParentName="HeavyAmmoBase" Abstract="True">
 		<graphicData>
-			<texPath>MountedArmsStrategic/TacticalMissile_Item</texPath>
 			<graphicClass>Graphic_Single</graphicClass>
 			<drawSize>(2,2)</drawSize>
 		</graphicData>
@@ -53,16 +76,56 @@
 		<stackLimit>4</stackLimit>
 		<cookOffFlashScale>40</cookOffFlashScale>
 		<cookOffSound>MortarBomb_Explode</cookOffSound>
+	</ThingDef>
+
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_TacticalAmmoBase">
+		<defName>MAS_Ammo_TacticalMissile_HE</defName>
+		<label>tactical ballistic missile (HE)</label>
+		<description>A short-range ballistic missile with inertial and satellite guidance and a unitary high-explosive warhead. Fired from a tactical missile launcher at the local map or at settlements on the world map.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/TacticalMissile_Item</texPath>
+		</graphicData>
 		<ammoClass>MAS_TacticalMissileHE</ammoClass>
 		<detonateProjectile>MAS_Bullet_TacticalMissile_HE</detonateProjectile>
 	</ThingDef>
 
-	<!-- ================== Projectile ================== -->
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_TacticalAmmoBase">
+		<defName>MAS_Ammo_TacticalMissile_Cluster</defName>
+		<label>tactical ballistic missile (cluster)</label>
+		<description>A short-range ballistic missile whose warhead scatters dozens of bomblets over a wide area. Deadly against troops in the open, weaker against fortifications and settlements.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/TacticalMissile_Item_Cluster</texPath>
+		</graphicData>
+		<ammoClass>MAS_WarheadCluster</ammoClass>
+		<detonateProjectile>MAS_Bullet_TacticalMissile_Cluster</detonateProjectile>
+	</ThingDef>
 
-	<ThingDef ParentName="BaseExplosiveBullet">
-		<defName>MAS_Bullet_TacticalMissile_HE</defName>
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_TacticalAmmoBase">
+		<defName>MAS_Ammo_TacticalMissile_Thermobaric</defName>
+		<label>tactical ballistic missile (thermobaric)</label>
+		<description>A short-range ballistic missile with a fuel-air warhead: a huge fireball and blast that wrecks buildings and sets the area ablaze.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/TacticalMissile_Item_Thermobaric</texPath>
+		</graphicData>
+		<ammoClass>MAS_WarheadThermobaric</ammoClass>
+		<detonateProjectile>MAS_Bullet_TacticalMissile_Thermobaric</detonateProjectile>
+	</ThingDef>
+
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_TacticalAmmoBase">
+		<defName>MAS_Ammo_TacticalMissile_EMP</defName>
+		<label>tactical ballistic missile (EMP)</label>
+		<description>A short-range ballistic missile with an electromagnetic pulse warhead. It disables mechanoids, turrets and electronics in a wide radius and cripples mechanoid hives on the world map, but barely harms human settlements.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/TacticalMissile_Item_EMP</texPath>
+		</graphicData>
+		<ammoClass>MAS_WarheadEMP</ammoClass>
+		<detonateProjectile>MAS_Bullet_TacticalMissile_EMP</detonateProjectile>
+	</ThingDef>
+
+	<!-- ================== Projectiles ================== -->
+
+	<ThingDef Name="MAS_TacticalProjectileBase" ParentName="BaseExplosiveBullet" Abstract="True">
 		<thingClass>CombatExtended.ProjectileCE_Explosive</thingClass>
-		<label>tactical ballistic missile (HE)</label>
 		<description>A tactical ballistic missile in flight.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/TacticalMissile_Projectile</texPath>
@@ -74,11 +137,7 @@
 			<speed>0</speed>
 			<gravityFactor>5</gravityFactor>
 			<flyOverhead>true</flyOverhead>
-			<damageDef>Bomb</damageDef>
-			<damageAmountBase>1500</damageAmountBase>
-			<explosionRadius>9.9</explosionRadius>
 			<applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
-			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<soundExplode>Explosion_GiantBomb</soundExplode>
 			<soundHitThickRoof>Explosion_GiantBomb</soundHitThickRoof>
 			<soundImpactAnticipate>MortarRound_PreImpact</soundImpactAnticipate>
@@ -88,16 +147,9 @@
 				<iconPath>Things/WorldObjects/Munitions/Rocket</iconPath>
 				<tilesPerTick>0.4</tilesPerTick>
 				<range>120</range>
-				<damage>1.5</damage>
 			</shellingProps>
 		</projectile>
 		<comps>
-			<li Class="CombatExtended.CompProperties_Fragments">
-				<fragments>
-					<Fragment_Large>20</Fragment_Large>
-					<Fragment_Small>30</Fragment_Small>
-				</fragments>
-			</li>
 			<li Class="CombatExtended.CompProperties_ProjectileFleck">
 				<FleckDatas>
 					<li>
@@ -120,48 +172,150 @@
 		</comps>
 	</ThingDef>
 
-	<!-- ==================== Recipe ========================== -->
+	<ThingDef ParentName="MAS_TacticalProjectileBase">
+		<defName>MAS_Bullet_TacticalMissile_HE</defName>
+		<label>tactical ballistic missile (HE)</label>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>Bomb</damageDef>
+			<damageAmountBase>1500</damageAmountBase>
+			<explosionRadius>9.9</explosionRadius>
+			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
+			<shellingProps>
+				<damage>1.5</damage>
+			</shellingProps>
+		</projectile>
+		<comps>
+			<li Class="CombatExtended.CompProperties_Fragments">
+				<fragments>
+					<Fragment_Large>20</Fragment_Large>
+					<Fragment_Small>30</Fragment_Small>
+				</fragments>
+			</li>
+		</comps>
+	</ThingDef>
 
-	<RecipeDef ParentName="AmmoRecipeBase">
-		<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
-		<defName>MakeMAS_Ammo_TacticalMissile_HE</defName>
-		<label>make tactical ballistic missile (HE)</label>
-		<description>Assemble a single tactical ballistic missile with a high-explosive warhead.</description>
+	<!-- Cluster: small central charge + 24 bomblets over radius 8 (ProjectileCE_Cluster) -->
+	<ThingDef ParentName="MAS_TacticalProjectileBase">
+		<defName>MAS_Bullet_TacticalMissile_Cluster</defName>
+		<label>tactical ballistic missile (cluster)</label>
+		<thingClass>MountedArmsStrategic.ProjectileCE_Cluster</thingClass>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>Bomb</damageDef>
+			<damageAmountBase>200</damageAmountBase>
+			<explosionRadius>2.9</explosionRadius>
+			<shellingProps>
+				<damage>1.2</damage>
+			</shellingProps>
+		</projectile>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.ClusterExtension">
+				<count>24</count>
+				<spreadRadius>8</spreadRadius>
+				<subExplosionRadius>1.9</subExplosionRadius>
+				<damageDef>Bomb</damageDef>
+				<damageAmount>90</damageAmount>
+			</li>
+		</modExtensions>
+	</ThingDef>
+
+	<!-- Thermobaric: CE's Thermobaric damage (flame worker, x2 vs buildings) -->
+	<ThingDef ParentName="MAS_TacticalProjectileBase">
+		<defName>MAS_Bullet_TacticalMissile_Thermobaric</defName>
+		<label>tactical ballistic missile (thermobaric)</label>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>Thermobaric</damageDef>
+			<damageAmountBase>900</damageAmountBase>
+			<explosionRadius>8.9</explosionRadius>
+			<ai_IsIncendiary>true</ai_IsIncendiary>
+			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
+			<shellingProps>
+				<damage>1.8</damage>
+			</shellingProps>
+		</projectile>
+	</ThingDef>
+
+	<!-- EMP: no shellingProps.damage, so CE's EMP estimate is used (see header) -->
+	<ThingDef ParentName="MAS_TacticalProjectileBase">
+		<defName>MAS_Bullet_TacticalMissile_EMP</defName>
+		<label>tactical ballistic missile (EMP)</label>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>EMP</damageDef>
+			<damageAmountBase>400</damageAmountBase>
+			<explosionRadius>6.9</explosionRadius>
+		</projectile>
+	</ThingDef>
+
+	<!-- ==================== Recipes ========================== -->
+	<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
+
+	<RecipeDef Name="MAS_TacticalRecipeBase" ParentName="AmmoRecipeBase" Abstract="True">
 		<jobString>Assembling a tactical ballistic missile.</jobString>
-		<researchPrerequisite>MAS_Research_TacticalMissiles</researchPrerequisite>
 		<workAmount>60000</workAmount>
 		<skillRequirements>
 			<Crafting>8</Crafting>
 		</skillRequirements>
+	</RecipeDef>
+
+	<RecipeDef ParentName="MAS_TacticalRecipeBase">
+		<defName>MakeMAS_Ammo_TacticalMissile_HE</defName>
+		<label>make tactical ballistic missile (HE)</label>
+		<description>Assemble a single tactical ballistic missile with a high-explosive warhead.</description>
+		<researchPrerequisite>MAS_Research_TacticalMissiles</researchPrerequisite>
 		<ingredients>
-			<li>
-				<filter><thingDefs><li>Steel</li></thingDefs></filter>
-				<count>300</count>
-			</li>
-			<li>
-				<filter><thingDefs><li>Plasteel</li></thingDefs></filter>
-				<count>20</count>
-			</li>
-			<li>
-				<filter><thingDefs><li>FSX</li></thingDefs></filter>
-				<count>120</count>
-			</li>
-			<li>
-				<filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter>
-				<count>6</count>
-			</li>
+			<li><filter><thingDefs><li>Steel</li></thingDefs></filter><count>300</count></li>
+			<li><filter><thingDefs><li>Plasteel</li></thingDefs></filter><count>20</count></li>
+			<li><filter><thingDefs><li>FSX</li></thingDefs></filter><count>120</count></li>
+			<li><filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter><count>6</count></li>
 		</ingredients>
-		<fixedIngredientFilter>
-			<thingDefs>
-				<li>Steel</li>
-				<li>Plasteel</li>
-				<li>FSX</li>
-				<li>ComponentIndustrial</li>
-			</thingDefs>
-		</fixedIngredientFilter>
-		<products>
-			<MAS_Ammo_TacticalMissile_HE>1</MAS_Ammo_TacticalMissile_HE>
-		</products>
+		<fixedIngredientFilter><thingDefs><li>Steel</li><li>Plasteel</li><li>FSX</li><li>ComponentIndustrial</li></thingDefs></fixedIngredientFilter>
+		<products><MAS_Ammo_TacticalMissile_HE>1</MAS_Ammo_TacticalMissile_HE></products>
+	</RecipeDef>
+
+	<RecipeDef ParentName="MAS_TacticalRecipeBase">
+		<defName>MakeMAS_Ammo_TacticalMissile_Cluster</defName>
+		<label>make tactical ballistic missile (cluster)</label>
+		<description>Assemble a single tactical ballistic missile with a cluster warhead.</description>
+		<researchPrerequisite>MAS_Research_SpecialWarheads</researchPrerequisite>
+		<ingredients>
+			<li><filter><thingDefs><li>Steel</li></thingDefs></filter><count>360</count></li>
+			<li><filter><thingDefs><li>Plasteel</li></thingDefs></filter><count>20</count></li>
+			<li><filter><thingDefs><li>FSX</li></thingDefs></filter><count>140</count></li>
+			<li><filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter><count>8</count></li>
+		</ingredients>
+		<fixedIngredientFilter><thingDefs><li>Steel</li><li>Plasteel</li><li>FSX</li><li>ComponentIndustrial</li></thingDefs></fixedIngredientFilter>
+		<products><MAS_Ammo_TacticalMissile_Cluster>1</MAS_Ammo_TacticalMissile_Cluster></products>
+	</RecipeDef>
+
+	<RecipeDef ParentName="MAS_TacticalRecipeBase">
+		<defName>MakeMAS_Ammo_TacticalMissile_Thermobaric</defName>
+		<label>make tactical ballistic missile (thermobaric)</label>
+		<description>Assemble a single tactical ballistic missile with a thermobaric warhead.</description>
+		<researchPrerequisite>MAS_Research_SpecialWarheads</researchPrerequisite>
+		<ingredients>
+			<li><filter><thingDefs><li>Steel</li></thingDefs></filter><count>300</count></li>
+			<li><filter><thingDefs><li>Plasteel</li></thingDefs></filter><count>20</count></li>
+			<li><filter><thingDefs><li>Chemfuel</li></thingDefs></filter><count>150</count></li>
+			<li><filter><thingDefs><li>FSX</li></thingDefs></filter><count>60</count></li>
+			<li><filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter><count>6</count></li>
+		</ingredients>
+		<fixedIngredientFilter><thingDefs><li>Steel</li><li>Plasteel</li><li>Chemfuel</li><li>FSX</li><li>ComponentIndustrial</li></thingDefs></fixedIngredientFilter>
+		<products><MAS_Ammo_TacticalMissile_Thermobaric>1</MAS_Ammo_TacticalMissile_Thermobaric></products>
+	</RecipeDef>
+
+	<RecipeDef ParentName="MAS_TacticalRecipeBase">
+		<defName>MakeMAS_Ammo_TacticalMissile_EMP</defName>
+		<label>make tactical ballistic missile (EMP)</label>
+		<description>Assemble a single tactical ballistic missile with an EMP warhead.</description>
+		<researchPrerequisite>MAS_Research_SpecialWarheads</researchPrerequisite>
+		<ingredients>
+			<li><filter><thingDefs><li>Steel</li></thingDefs></filter><count>300</count></li>
+			<li><filter><thingDefs><li>Plasteel</li></thingDefs></filter><count>30</count></li>
+			<li><filter><thingDefs><li>FSX</li></thingDefs></filter><count>80</count></li>
+			<li><filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter><count>8</count></li>
+			<li><filter><thingDefs><li>ComponentSpacer</li></thingDefs></filter><count>1</count></li>
+		</ingredients>
+		<fixedIngredientFilter><thingDefs><li>Steel</li><li>Plasteel</li><li>FSX</li><li>ComponentIndustrial</li><li>ComponentSpacer</li></thingDefs></fixedIngredientFilter>
+		<products><MAS_Ammo_TacticalMissile_EMP>1</MAS_Ammo_TacticalMissile_EMP></products>
 	</RecipeDef>
 
 </Defs>

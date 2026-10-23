@@ -170,4 +170,222 @@
 		</researchPrerequisites>
 	</ThingDef>
 
+
+	<!-- MLRS (HIMARS class): crewed, mobile, 6-rocket salvo. Top shows loaded rockets. -->
+	<ThingDef ParentName="TurretMannedBuildableBase">
+		<defName>MAS_Turret_MLRS</defName>
+		<label>multiple rocket launcher</label>
+		<description>A crewed launcher for a six-cell pod of 227 mm guided rockets. Fires salvos that blanket an area on the local map, or strikes settlements up to 40 world tiles away with the "attack world tile" command (select several launchers to fire them together). The fire mode toggle switches between a full salvo and single rockets. Reloading swaps the whole pod. Can be uninstalled and moved.</description>
+		<thingClass>MountedArmsStrategic.Building_MissileLauncherCE</thingClass>
+		<graphicData>
+			<texPath>MountedArmsStrategic/MLRS_Base</texPath>
+			<drawSize>(3,3)</drawSize>
+			<shadowData>
+				<volume>(2.4,0.5,2.4)</volume>
+			</shadowData>
+		</graphicData>
+		<uiIconPath>MountedArmsStrategic/MLRS_Icon</uiIconPath>
+		<size>(3,3)</size>
+		<minifiedDef>MinifiedThing</minifiedDef>
+		<interactionCellOffset>(0,0,-2)</interactionCellOffset>
+		<fillPercent>0.6</fillPercent>
+		<terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+		<constructionSkillPrerequisite>7</constructionSkillPrerequisite>
+		<statBases>
+			<MaxHitPoints>450</MaxHitPoints>
+			<Flammability>0.4</Flammability>
+			<WorkToBuild>30000</WorkToBuild>
+			<Mass>1500</Mass>
+			<Bulk>1500</Bulk>
+			<AimingAccuracy>1.0</AimingAccuracy>
+			<ShootingAccuracyTurret>1.0</ShootingAccuracyTurret>
+		</statBases>
+		<costList>
+			<Steel>700</Steel>
+			<Plasteel>60</Plasteel>
+			<ComponentIndustrial>10</ComponentIndustrial>
+		</costList>
+		<comps>
+			<li Class="CompProperties_Explosive">
+				<wickTicks>240</wickTicks>
+				<explosiveRadius>5.9</explosiveRadius>
+				<explosiveDamageType>Bomb</explosiveDamageType>
+				<chanceNeverExplodeFromDamage>0.5</chanceNeverExplodeFromDamage>
+			</li>
+		</comps>
+		<building>
+			<turretGunDef>MAS_Gun_MLRS</turretGunDef>
+			<turretTopDrawSize>3.0</turretTopDrawSize>
+			<turretBurstCooldownTime>10</turretBurstCooldownTime>
+			<ai_combatDangerous>false</ai_combatDangerous>
+		</building>
+		<placeWorkers Inherit="False">
+			<li>PlaceWorker_TurretTop</li>
+			<li>PlaceWorker_PreventInteractionSpotOverlap</li>
+		</placeWorkers>
+		<modExtensions>
+			<!-- launcher traverse ~20 deg/s (CE speed is degrees per tick) -->
+			<li Class="CombatExtended.NonSnapTurretExtension">
+				<speed>0.33</speed>
+				<angleWeightMultiplier>2</angleWeightMultiplier>
+			</li>
+			<li Class="MountedArmsStrategic.LoadedTopsExtension">
+				<topTexPaths>
+					<li>MountedArmsStrategic/MLRS_Top0</li>
+					<li>MountedArmsStrategic/MLRS_Top1</li>
+					<li>MountedArmsStrategic/MLRS_Top2</li>
+					<li>MountedArmsStrategic/MLRS_Top3</li>
+					<li>MountedArmsStrategic/MLRS_Top4</li>
+					<li>MountedArmsStrategic/MLRS_Top5</li>
+					<li>MountedArmsStrategic/MLRS_Top6</li>
+				</topTexPaths>
+			</li>
+		</modExtensions>
+		<researchPrerequisites>
+			<li>MAS_Research_MLRS</li>
+		</researchPrerequisites>
+	</ThingDef>
+
+	<!-- Cruise missile VLS (Mk 41 class): fixed 2x2 block of four cells, powered, fires only through
+	     "attack world tile". FixedTopExtension pins the top so the cell block never turns. -->
+	<ThingDef ParentName="BuildingBase">
+		<defName>MAS_Turret_CruiseVLS</defName>
+		<label>cruise missile launcher</label>
+		<description>A powered block of four vertical launch cells for land-attack cruise missiles. It only fires on command, at settlements and sites up to 400 world tiles away, using the "attack world tile" command. Cruise missiles fly slowly but hit with great precision. A loaded missile can cook off if the launcher is destroyed.</description>
+		<thingClass>MountedArmsStrategic.Building_MissileLauncherCE</thingClass>
+		<drawerType>MapMeshAndRealTime</drawerType>
+		<graphicData>
+			<texPath>MountedArmsStrategic/CruiseVLS_Base</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<drawSize>(2,2)</drawSize>
+			<damageData>
+				<rect>(0.1,0.1,0.8,0.8)</rect>
+			</damageData>
+		</graphicData>
+		<uiIconPath>MountedArmsStrategic/CruiseVLS_Icon</uiIconPath>
+		<altitudeLayer>Building</altitudeLayer>
+		<size>(2,2)</size>
+		<rotatable>false</rotatable>
+		<tickerType>Normal</tickerType>
+		<passability>PassThroughOnly</passability>
+		<pathCost>50</pathCost>
+		<fillPercent>0.4</fillPercent>
+		<castEdgeShadows>false</castEdgeShadows>
+		<hasTooltip>true</hasTooltip>
+		<terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+		<designationCategory>Security</designationCategory>
+		<techLevel>Industrial</techLevel>
+		<constructionSkillPrerequisite>8</constructionSkillPrerequisite>
+		<statBases>
+			<MaxHitPoints>800</MaxHitPoints>
+			<Flammability>0.2</Flammability>
+			<Beauty>-20</Beauty>
+			<WorkToBuild>50000</WorkToBuild>
+			<Mass>4000</Mass>
+			<Bulk>4000</Bulk>
+			<AimingAccuracy>1.0</AimingAccuracy>
+			<ShootingAccuracyTurret>1.0</ShootingAccuracyTurret>
+		</statBases>
+		<costList>
+			<Steel>800</Steel>
+			<Plasteel>120</Plasteel>
+			<ComponentIndustrial>12</ComponentIndustrial>
+			<ComponentSpacer>2</ComponentSpacer>
+		</costList>
+		<comps>
+			<li Class="CompProperties_Forbiddable" />
+			<li Class="CompProperties_Power">
+				<compClass>CompPowerTrader</compClass>
+				<basePowerConsumption>300</basePowerConsumption>
+			</li>
+			<li Class="CompProperties_Flickable" />
+			<li Class="CompProperties_Breakdownable" />
+			<li Class="CompProperties_Explosive">
+				<wickTicks>240</wickTicks>
+				<explosiveRadius>6.9</explosiveRadius>
+				<explosiveDamageType>Bomb</explosiveDamageType>
+				<chanceNeverExplodeFromDamage>0.5</chanceNeverExplodeFromDamage>
+			</li>
+		</comps>
+		<building>
+			<turretGunDef>MAS_Gun_CruiseVLS</turretGunDef>
+			<turretTopDrawSize>2.0</turretTopDrawSize>
+			<turretBurstCooldownTime>20</turretBurstCooldownTime>
+			<ai_combatDangerous>false</ai_combatDangerous>
+		</building>
+		<placeWorkers>
+			<li>PlaceWorker_TurretTop</li>
+			<li>PlaceWorker_NotUnderRoof</li>
+		</placeWorkers>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.ManualFireOnlyExtension" />
+			<li Class="MountedArmsStrategic.FixedTopExtension" />
+			<li Class="MountedArmsStrategic.LoadedTopsExtension">
+				<topTexPaths>
+					<li>MountedArmsStrategic/CruiseVLS_Top0</li>
+					<li>MountedArmsStrategic/CruiseVLS_Top1</li>
+					<li>MountedArmsStrategic/CruiseVLS_Top2</li>
+					<li>MountedArmsStrategic/CruiseVLS_Top3</li>
+					<li>MountedArmsStrategic/CruiseVLS_Top4</li>
+				</topTexPaths>
+			</li>
+		</modExtensions>
+		<researchPrerequisites>
+			<li>MAS_Research_CruiseMissiles</li>
+		</researchPrerequisites>
+	</ThingDef>
+
+	<!-- M777 155 mm howitzer: crewed, towed (minifiable), manual traverse ~10 deg/s. -->
+	<ThingDef ParentName="TurretMannedBuildableBase">
+		<defName>MAS_Turret_M777</defName>
+		<label>M777 howitzer</label>
+		<description>A lightweight towed 155 mm howitzer. Fires heavy shells in a high arc over walls at the local map, or at settlements up to 60 world tiles away with the "attack world tile" command. Slow to traverse and to reload, and needs a crew and 155 mm shells. Can be uninstalled and moved.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/M777_Base</texPath>
+			<drawSize>(3,3)</drawSize>
+			<shadowData>
+				<volume>(2,0.4,2)</volume>
+			</shadowData>
+		</graphicData>
+		<uiIconPath>MountedArmsStrategic/M777_Icon</uiIconPath>
+		<size>(3,3)</size>
+		<minifiedDef>MinifiedThing</minifiedDef>
+		<interactionCellOffset>(0,0,-2)</interactionCellOffset>
+		<fillPercent>0.5</fillPercent>
+		<terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
+		<constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+		<statBases>
+			<MaxHitPoints>400</MaxHitPoints>
+			<Flammability>0.4</Flammability>
+			<WorkToBuild>24000</WorkToBuild>
+			<Mass>420</Mass>
+			<Bulk>1200</Bulk>
+			<AimingAccuracy>1.0</AimingAccuracy>
+			<ShootingAccuracyTurret>1.0</ShootingAccuracyTurret>
+		</statBases>
+		<costList>
+			<Steel>650</Steel>
+			<ComponentIndustrial>6</ComponentIndustrial>
+		</costList>
+		<building>
+			<turretGunDef>MAS_Gun_M777</turretGunDef>
+			<turretTopDrawSize>3.2</turretTopDrawSize>
+			<turretBurstCooldownTime>4</turretBurstCooldownTime>
+			<ai_combatDangerous>false</ai_combatDangerous>
+		</building>
+		<placeWorkers Inherit="False">
+			<li>PlaceWorker_TurretTop</li>
+			<li>PlaceWorker_PreventInteractionSpotOverlap</li>
+		</placeWorkers>
+		<modExtensions>
+			<li Class="CombatExtended.NonSnapTurretExtension">
+				<speed>0.17</speed>
+				<angleWeightMultiplier>2</angleWeightMultiplier>
+			</li>
+		</modExtensions>
+		<researchPrerequisites>
+			<li>MAS_Research_Howitzer</li>
+		</researchPrerequisites>
+	</ThingDef>
+
 </Defs>

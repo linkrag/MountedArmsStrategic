@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- ================================================================= -->
+	<!--  MLRS / HIMARS guided rockets (GMLRS class). A salvo weapon:      -->
+	<!--  world range 40 tiles (ER GMLRS ~150 km vs ATACMS ~300 km = 120), -->
+	<!--  each rocket world damage 0.4 (a 6-rocket salvo ~ one tactical    -->
+	<!--  missile). Same projectile rules: speed 0, gravityFactor 5.       -->
+	<!-- ================================================================= -->
+
+	<CombatExtended.AmmoCategoryDef>
+		<defName>MAS_GMLRS</defName>
+		<label>guided rocket (HE)</label>
+		<labelShort>GMLRS</labelShort>
+		<description>227 mm satellite-guided artillery rocket with a unitary high-explosive warhead.</description>
+	</CombatExtended.AmmoCategoryDef>
+
+	<CombatExtended.AmmoSetDef>
+		<defName>MAS_AmmoSet_GMLRS</defName>
+		<label>227mm guided rockets</label>
+		<ammoTypes>
+			<MAS_Ammo_GMLRS>MAS_Bullet_GMLRS</MAS_Ammo_GMLRS>
+		</ammoTypes>
+	</CombatExtended.AmmoSetDef>
+
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="HeavyAmmoBase">
+		<defName>MAS_Ammo_GMLRS</defName>
+		<label>227mm guided rocket</label>
+		<description>A satellite-guided artillery rocket for a multiple rocket launcher. Fired in salvos at the local map or at settlements up to 40 world tiles away.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/GMLRS_Item</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<drawSize>(1.5,1.5)</drawSize>
+		</graphicData>
+		<statBases>
+			<MaxHitPoints>200</MaxHitPoints>
+			<Mass>300</Mass>
+			<Bulk>700</Bulk>
+			<MarketValue>700</MarketValue>
+		</statBases>
+		<tradeTags>
+			<li>CE_AutoEnableCrafting_TableMachining</li>
+		</tradeTags>
+		<thingCategories>
+			<li>AmmoMissiles</li>
+		</thingCategories>
+		<stackLimit>12</stackLimit>
+		<cookOffFlashScale>30</cookOffFlashScale>
+		<cookOffSound>MortarBomb_Explode</cookOffSound>
+		<ammoClass>MAS_GMLRS</ammoClass>
+		<detonateProjectile>MAS_Bullet_GMLRS</detonateProjectile>
+	</ThingDef>
+
+	<ThingDef ParentName="BaseExplosiveBullet">
+		<defName>MAS_Bullet_GMLRS</defName>
+		<thingClass>CombatExtended.ProjectileCE_Explosive</thingClass>
+		<label>227mm guided rocket</label>
+		<description>A guided artillery rocket in flight.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/TacticalMissile_Projectile</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<shaderType>TransparentPostLight</shaderType>
+			<drawSize>(1,2)</drawSize>
+		</graphicData>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<speed>0</speed>
+			<gravityFactor>5</gravityFactor>
+			<flyOverhead>true</flyOverhead>
+			<damageDef>Bomb</damageDef>
+			<damageAmountBase>350</damageAmountBase>
+			<explosionRadius>4.9</explosionRadius>
+			<applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+			<preExplosionSpawnSingleThingDef>CraterMedium</preExplosionSpawnSingleThingDef>
+			<soundExplode>MortarBomb_Explode</soundExplode>
+			<soundHitThickRoof>Artillery_HitThickRoof</soundHitThickRoof>
+			<soundImpactAnticipate>MortarRound_PreImpact</soundImpactAnticipate>
+			<soundAmbient>RocketPropelledLoop_Big</soundAmbient>
+			<dropsCasings>false</dropsCasings>
+			<shellingProps>
+				<iconPath>Things/WorldObjects/Munitions/Rocket</iconPath>
+				<tilesPerTick>0.5</tilesPerTick>
+				<range>40</range>
+				<damage>0.4</damage>
+			</shellingProps>
+		</projectile>
+		<comps>
+			<li Class="CombatExtended.CompProperties_Fragments">
+				<fragments>
+					<Fragment_Large>10</Fragment_Large>
+					<Fragment_Small>20</Fragment_Small>
+				</fragments>
+			</li>
+			<li Class="CombatExtended.CompProperties_ProjectileFleck">
+				<FleckDatas>
+					<li>
+						<fleck>Fleck_CERocketFlame</fleck>
+						<emissionsPerTick>2</emissionsPerTick>
+						<flecksPerEmission>2</flecksPerEmission>
+						<scale>1.5</scale>
+						<cutoffTickRange>60~100</cutoffTickRange>
+						<originOffset>1</originOffset>
+					</li>
+					<li>
+						<fleck>Fleck_CERocketSmokeTrail</fleck>
+						<emissionsPerTick>2</emissionsPerTick>
+						<rotation>0~360</rotation>
+						<scale>2</scale>
+						<flecksPerEmission>1</flecksPerEmission>
+					</li>
+				</FleckDatas>
+			</li>
+		</comps>
+	</ThingDef>
+
+	<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
+	<RecipeDef ParentName="AmmoRecipeBase">
+		<defName>MakeMAS_Ammo_GMLRS</defName>
+		<label>make 227mm guided rocket</label>
+		<description>Assemble a single satellite-guided artillery rocket.</description>
+		<jobString>Assembling a guided rocket.</jobString>
+		<researchPrerequisite>MAS_Research_MLRS</researchPrerequisite>
+		<workAmount>9000</workAmount>
+		<skillRequirements>
+			<Crafting>6</Crafting>
+		</skillRequirements>
+		<ingredients>
+			<li><filter><thingDefs><li>Steel</li></thingDefs></filter><count>70</count></li>
+			<li><filter><thingDefs><li>FSX</li></thingDefs></filter><count>25</count></li>
+			<li><filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter><count>1</count></li>
+		</ingredients>
+		<fixedIngredientFilter><thingDefs><li>Steel</li><li>FSX</li><li>ComponentIndustrial</li></thingDefs></fixedIngredientFilter>
+		<products><MAS_Ammo_GMLRS>1</MAS_Ammo_GMLRS></products>
+	</RecipeDef>
+
+</Defs>

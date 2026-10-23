@@ -7,7 +7,7 @@
 	<!--  ShellingResponseDef, paying "points" from a budget. Only shells  -->
 	<!--  whose shellingProps.range >= half the distance are picked.       -->
 	<!--  CE reference points: 81 mm 250, 105 mm 1000, antigrain 7000.     -->
-	<!--  Spacer: tactical missiles. Ultra/Archotech: tactical + ICBM HE.  -->
+	<!--  Spacer: GMLRS + tactical. Ultra/Archotech: tactical + ICBM HE.   -->
 	<!--  No nuclear for the AI (decision).                                -->
 	<!--  Children that lack <projectiles> get the node; list inheritance  -->
 	<!--  then appends ours to the parent's shells.                        -->
@@ -23,6 +23,11 @@
 					<points>1500</points>
 					<weight>0.25</weight>
 				</li>
+				<li>
+					<projectile>MAS_Bullet_GMLRS</projectile>
+					<points>400</points>
+					<weight>0.35</weight>
+				</li>
 			</value>
 		</match>
 		<nomatch Class="PatchOperationAdd">
@@ -33,6 +38,11 @@
 						<projectile>MAS_Bullet_TacticalMissile_HE</projectile>
 						<points>1500</points>
 						<weight>0.25</weight>
+					</li>
+					<li>
+						<projectile>MAS_Bullet_GMLRS</projectile>
+						<points>400</points>
+						<weight>0.35</weight>
 					</li>
 				</projectiles>
 			</value>

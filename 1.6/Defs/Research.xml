@@ -52,4 +52,64 @@
     <researchViewY>1.50</researchViewY>
   </ResearchProjectDef>
 
+
+  <ResearchProjectDef>
+    <defName>MAS_Research_Howitzer</defName>
+    <label>towed howitzers</label>
+    <description>Lightweight 155 mm towed howitzers able to shell targets on the world map. Unlocks the M777 howitzer (uses Combat Extended 155 mm shells).</description>
+    <baseCost>1800</baseCost>
+    <techLevel>Industrial</techLevel>
+    <tab>MAS_Tab</tab>
+    <prerequisites>
+      <li>Mortars</li>
+    </prerequisites>
+    <researchViewX>0.00</researchViewX>
+    <researchViewY>2.50</researchViewY>
+  </ResearchProjectDef>
+
+  <ResearchProjectDef>
+    <defName>MAS_Research_MLRS</defName>
+    <label>multiple rocket launchers</label>
+    <description>Launchers firing salvos of satellite-guided 227 mm rockets. Unlocks the multiple rocket launcher and its rockets.</description>
+    <baseCost>2500</baseCost>
+    <techLevel>Industrial</techLevel>
+    <tab>MAS_Tab</tab>
+    <prerequisites>
+      <li>Mortars</li>
+      <li>MicroelectronicsBasics</li>
+    </prerequisites>
+    <researchViewX>0.00</researchViewX>
+    <researchViewY>1.50</researchViewY>
+  </ResearchProjectDef>
+
+  <ResearchProjectDef>
+    <defName>MAS_Research_CruiseMissiles</defName>
+    <label>cruise missiles</label>
+    <description>Subsonic, terrain-following land-attack missiles with very long reach and great precision. Unlocks the cruise missile launcher and cruise missiles.</description>
+    <baseCost>4500</baseCost>
+    <techLevel>Industrial</techLevel>
+    <tab>MAS_Tab</tab>
+    <prerequisites>
+      <li>MAS_Research_TacticalMissiles</li>
+    </prerequisites>
+    <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
+    <researchViewX>1.00</researchViewX>
+    <researchViewY>2.50</researchViewY>
+  </ResearchProjectDef>
+
+  <ResearchProjectDef>
+    <defName>MAS_Research_SpecialWarheads</defName>
+    <label>special warheads</label>
+    <description>Cluster, thermobaric and EMP warheads for tactical ballistic missiles and ICBMs. EMP warheads are the weapon of choice against mechanoid hives.</description>
+    <baseCost>3500</baseCost>
+    <techLevel>Industrial</techLevel>
+    <tab>MAS_Tab</tab>
+    <prerequisites>
+      <li>MAS_Research_TacticalMissiles</li>
+    </prerequisites>
+    <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
+    <researchViewX>2.00</researchViewX>
+    <researchViewY>0.50</researchViewY>
+  </ResearchProjectDef>
+
 </Defs>

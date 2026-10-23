@@ -30,7 +30,9 @@
 				<warmupTime>10</warmupTime>
 				<minRange>60</minRange>
 				<range>700</range>
-				<burstShotCount>1</burstShotCount>
+				<!-- burst fires both missiles; the CE fire mode toggle lets the player fire one -->
+				<burstShotCount>2</burstShotCount>
+				<ticksBetweenBurstShots>90</ticksBetweenBurstShots>
 				<soundCast>RocketswarmLauncher_Fire</soundCast>
 				<soundCastTail>GunTail_Heavy</soundCastTail>
 				<muzzleFlashScale>30</muzzleFlashScale>
@@ -118,6 +120,195 @@
 				<magazineSize>1</magazineSize>
 				<reloadTime>60</reloadTime>
 				<ammoSet>MAS_AmmoSet_ICBM</ammoSet>
+			</li>
+			<li Class="CombatExtended.CompProperties_FireModes">
+				<aiUseBurstMode>FALSE</aiUseBurstMode>
+				<aiAimMode>AimedShot</aiAimMode>
+			</li>
+		</comps>
+	</ThingDef>
+
+
+	<!-- MLRS: 6-rocket pod, salvo with spread (ShotSpread spreads the burst on the local map; on the
+	     world map CE scatters every shot on arrival). Pod swap = whole magazine at once. -->
+	<ThingDef ParentName="BaseTurretGun">
+		<defName>MAS_Gun_MLRS</defName>
+		<label>MLRS launcher pod</label>
+		<description>A six-cell pod for 227 mm guided rockets on a traversing launcher.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/MLRS_Top6</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+		</graphicData>
+		<soundInteract>Artillery_ShellLoaded</soundInteract>
+		<statBases>
+			<SightsEfficiency>1</SightsEfficiency>
+			<ShotSpread>0.6</ShotSpread>
+			<SwayFactor>0.1</SwayFactor>
+			<RangedWeapon_Cooldown>2</RangedWeapon_Cooldown>
+			<Mass>400</Mass>
+		</statBases>
+		<verbs>
+			<li Class="CombatExtended.VerbPropertiesCE">
+				<verbClass>CombatExtended.Verb_ShootMortarCE</verbClass>
+				<isMortar>true</isMortar>
+				<forceNormalTimeSpeed>false</forceNormalTimeSpeed>
+				<hasStandardCommand>true</hasStandardCommand>
+				<requireLineOfSight>false</requireLineOfSight>
+				<defaultProjectile>MAS_Bullet_GMLRS</defaultProjectile>
+				<warmupTime>4</warmupTime>
+				<minRange>30</minRange>
+				<range>700</range>
+				<burstShotCount>6</burstShotCount>
+				<ticksBetweenBurstShots>25</ticksBetweenBurstShots>
+				<soundCast>RocketswarmLauncher_Fire</soundCast>
+				<soundCastTail>GunTail_Heavy</soundCastTail>
+				<muzzleFlashScale>25</muzzleFlashScale>
+				<circularError>2</circularError>
+				<indirectFirePenalty>0.05</indirectFirePenalty>
+				<ai_IsBuildingDestroyer>true</ai_IsBuildingDestroyer>
+				<targetParams>
+					<canTargetLocations>true</canTargetLocations>
+				</targetParams>
+			</li>
+		</verbs>
+		<comps>
+			<li Class="CombatExtended.CompProperties_Charges">
+				<chargeSpeeds>
+					<li>30</li>
+					<li>50</li>
+					<li>70</li>
+					<li>90</li>
+				</chargeSpeeds>
+			</li>
+			<li Class="CombatExtended.CompProperties_AmmoUser">
+				<magazineSize>6</magazineSize>
+				<reloadTime>30</reloadTime>
+				<ammoSet>MAS_AmmoSet_GMLRS</ammoSet>
+			</li>
+			<li Class="CombatExtended.CompProperties_FireModes">
+				<aiUseBurstMode>FALSE</aiUseBurstMode>
+				<aiAimMode>AimedShot</aiAimMode>
+			</li>
+		</comps>
+	</ThingDef>
+
+	<!-- Cruise missile VLS: unmanned, fires only through "attack world tile"; very precise. -->
+	<ThingDef ParentName="BaseTurretGun">
+		<defName>MAS_Gun_CruiseVLS</defName>
+		<label>vertical launch cells</label>
+		<description>Four vertical launch cells for cruise missiles.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/CruiseVLS_Top4</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+		</graphicData>
+		<soundInteract>Artillery_ShellLoaded</soundInteract>
+		<statBases>
+			<SightsEfficiency>1</SightsEfficiency>
+			<ShotSpread>0.02</ShotSpread>
+			<SwayFactor>0.1</SwayFactor>
+			<RangedWeapon_Cooldown>2</RangedWeapon_Cooldown>
+			<Mass>800</Mass>
+		</statBases>
+		<verbs>
+			<li Class="CombatExtended.VerbPropertiesCE">
+				<verbClass>CombatExtended.Verb_ShootMortarCE</verbClass>
+				<isMortar>true</isMortar>
+				<forceNormalTimeSpeed>false</forceNormalTimeSpeed>
+				<hasStandardCommand>true</hasStandardCommand>
+				<requireLineOfSight>false</requireLineOfSight>
+				<defaultProjectile>MAS_Bullet_CruiseMissile</defaultProjectile>
+				<warmupTime>8</warmupTime>
+				<minRange>0</minRange>
+				<range>700</range>
+				<burstShotCount>1</burstShotCount>
+				<ticksBetweenBurstShots>1</ticksBetweenBurstShots>
+				<soundCast>RocketswarmLauncher_Fire</soundCast>
+				<soundCastTail>GunTail_Heavy</soundCastTail>
+				<muzzleFlashScale>30</muzzleFlashScale>
+				<circularError>1</circularError>
+				<indirectFirePenalty>0</indirectFirePenalty>
+				<ai_IsBuildingDestroyer>true</ai_IsBuildingDestroyer>
+				<targetParams>
+					<canTargetLocations>true</canTargetLocations>
+				</targetParams>
+			</li>
+		</verbs>
+		<comps>
+			<li Class="CombatExtended.CompProperties_Charges">
+				<chargeSpeeds>
+					<li>30</li>
+					<li>50</li>
+					<li>70</li>
+					<li>90</li>
+				</chargeSpeeds>
+			</li>
+			<li Class="CombatExtended.CompProperties_AmmoUser">
+				<magazineSize>4</magazineSize>
+				<reloadOneAtATime>true</reloadOneAtATime>
+				<reloadTime>30</reloadTime>
+				<ammoSet>MAS_AmmoSet_CruiseMissile</ammoSet>
+			</li>
+			<li Class="CombatExtended.CompProperties_FireModes">
+				<aiUseBurstMode>FALSE</aiUseBurstMode>
+				<aiAimMode>AimedShot</aiAimMode>
+			</li>
+		</comps>
+	</ThingDef>
+
+	<!-- M777 155 mm howitzer: CE's own 155 mm shells (gravityFactor 5, world range 60 tiles). -->
+	<ThingDef ParentName="BaseTurretGun">
+		<defName>MAS_Gun_M777</defName>
+		<label>M777 155mm howitzer</label>
+		<description>A lightweight towed 155 mm howitzer.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/M777_Top</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+		</graphicData>
+		<soundInteract>Artillery_ShellLoaded</soundInteract>
+		<statBases>
+			<SightsEfficiency>1</SightsEfficiency>
+			<ShotSpread>0.05</ShotSpread>
+			<SwayFactor>0.1</SwayFactor>
+			<RangedWeapon_Cooldown>2</RangedWeapon_Cooldown>
+			<Mass>900</Mass>
+		</statBases>
+		<verbs>
+			<li Class="CombatExtended.VerbPropertiesCE">
+				<verbClass>CombatExtended.Verb_ShootMortarCE</verbClass>
+				<isMortar>true</isMortar>
+				<forceNormalTimeSpeed>false</forceNormalTimeSpeed>
+				<hasStandardCommand>true</hasStandardCommand>
+				<requireLineOfSight>false</requireLineOfSight>
+				<defaultProjectile>Bullet_155mmHowitzerShell_HE</defaultProjectile>
+				<warmupTime>5</warmupTime>
+				<minRange>40</minRange>
+				<range>700</range>
+				<burstShotCount>1</burstShotCount>
+				<ticksBetweenBurstShots>1</ticksBetweenBurstShots>
+				<soundCast>Mortar_LaunchA</soundCast>
+				<soundCastTail>GunTail_Heavy</soundCastTail>
+				<muzzleFlashScale>40</muzzleFlashScale>
+				<circularError>3</circularError>
+				<indirectFirePenalty>0.2</indirectFirePenalty>
+				<ai_IsBuildingDestroyer>true</ai_IsBuildingDestroyer>
+				<targetParams>
+					<canTargetLocations>true</canTargetLocations>
+				</targetParams>
+			</li>
+		</verbs>
+		<comps>
+			<li Class="CombatExtended.CompProperties_Charges">
+				<chargeSpeeds>
+					<li>30</li>
+					<li>50</li>
+					<li>70</li>
+					<li>90</li>
+				</chargeSpeeds>
+			</li>
+			<li Class="CombatExtended.CompProperties_AmmoUser">
+				<magazineSize>1</magazineSize>
+				<reloadTime>7</reloadTime>
+				<ammoSet>AmmoSet_155mmHowitzerShell</ammoSet>
 			</li>
 			<li Class="CombatExtended.CompProperties_FireModes">
 				<aiUseBurstMode>FALSE</aiUseBurstMode>

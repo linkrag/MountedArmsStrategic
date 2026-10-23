@@ -54,6 +54,17 @@
 1. Bateria abate granadas de morteiro inimigas e mísseis da retaliação; botões de "segurar fogo" (projéteis/drop pods) aparecem; sprite 0–4.
 2. Atacar assentamento espacial e ver se a retaliação usa mísseis táticos.
 
+## Lote 3 (implementado, NÃO testado)
+- **Salva no mapa-mundo:** o botão "atacar tile do mundo" do CE agrupa torretas selecionadas (`Command_ArtilleryTarget.MergeWith`) e a rajada do verbo repete o tiro global. Lançador tático agora tem rajada 2 (90 ticks entre mísseis); o modo de tiro do CE alterna rajada/tiro único.
+- **MLRS** `MAS_Turret_MLRS` / `MAS_Gun_MLRS`: tripulado 3x3, minificável, pod de 6 (troca o pod inteiro, 30 s), rajada 6 × 25 ticks, ShotSpread 0,6, circularError 2, giro 20°/s. Foguete `MAS_Ammo_GMLRS` → `MAS_Bullet_GMLRS`: Bomb 350 r 4,9; mundo range 40, 0,5 tiles/tick, damage 0,4. Pesquisa `MAS_Research_MLRS` (Mortars + Microeletrônica).
+- **Míssil de cruzeiro** `MAS_Turret_CruiseVLS` (2x2, 300 W, sem operador, `ManualFireOnlyExtension` + `FixedTopExtension` → topo não gira) / `MAS_Gun_CruiseVLS` (mag 4, circularError 1). `MAS_Ammo_CruiseMissile`: Bomb 1200 r 7,9; mundo range 400, 0,15 tiles/tick, damage 3. Bancada de fabricação. Pesquisa `MAS_Research_CruiseMissiles`.
+- **M777** `MAS_Turret_M777`: tripulado 3x3, minificável, `AmmoSet_155mmHowitzerShell` do CE (mundo 60 tiles), giro 10°/s. Pesquisa `MAS_Research_Howitzer` (Mortars).
+- **Ogivas especiais** (pesquisa `MAS_Research_SpecialWarheads`), tático / ICBM:
+  - Cluster (`ProjectileCE_Cluster`, C# nosso: N explosões num raio): 24 × r1,9 em raio 8 / 60 × r2,4 em raio 16; mundo 1,2 / 3,5.
+  - Termobárica (dano `Thermobaric` do CE): 900 r 8,9 / 2500 r 14,9; mundo 1,8 / 6.
+  - EMP: 400 r 6,9 / 600 r 7,9, **sem** `shellingProps.damage` → o CE calcula com o modificador EMP (1,0 contra mecanoides; 0,03–0,18 contra humanos). Estimativa: tático derruba colmeia em 1–2, ICBM em 1; humanos quase intactos.
+- Retaliação: Spacer também usa GMLRS (400 pts, peso 0,35).
+
 ## Próximos passos
 - Vanilla: sistema próprio de tiro no mapa-mundo.
 - Remote do git.
