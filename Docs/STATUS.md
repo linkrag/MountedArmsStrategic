@@ -40,6 +40,18 @@
 3. Com Rimatomics: receita nuclear aparece; disparo em mapa carregado → explosão nuclear + fallout do Rimatomics; em assentamento não carregado → destruído.
 4. Sprite do silo: tubo vazio / com míssil.
 
+## Bateria antimíssil (implementado, NÃO testado)
+- `MAS_Turret_InterceptorBattery` (classe `Building_MissileInterceptorCE`, subclasse do `Building_CIWS_CE` do CE com sprite por munição) / gun `MAS_Gun_InterceptorBattery`: só verbos de interceptação (projéteis e drop pods), alcance 119, rajada 2, mag 4 (recarga 8 s, um por vez). 3x3, 400 W, minificável. Aço 600, plasteel 100, CompInd 10, CompSp 3. Pesquisa `MAS_Research_MissileDefense` (tático, 4000).
+- Interceptador `MAS_Ammo_Interceptor` → `MAS_Bullet_Interceptor` (speed 180, `impactChance` 0,85); receita `MakeMAS_Ammo_Interceptor` (bancada de usinagem).
+- Depende da opção do CE "Enable CIWS" (Controller.settings.EnableCIWS).
+
+## Retaliação da IA com mísseis (implementado, NÃO testado)
+- `1.6/Patches/ShellingResponse.xml`: Spacer + tático (1500 pts, peso 0,25); Ultra e Archotech + tático (1500, 0,4) e ICBM HE (4000, 0,15). Sem nuclear para a IA.
+
+## O que testar (defesa/IA)
+1. Bateria abate granadas de morteiro inimigas e mísseis da retaliação; botões de "segurar fogo" (projéteis/drop pods) aparecem; sprite 0–4.
+2. Atacar assentamento espacial e ver se a retaliação usa mísseis táticos.
+
 ## Próximos passos
 - Vanilla: sistema próprio de tiro no mapa-mundo.
 - Remote do git.

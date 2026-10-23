@@ -38,4 +38,18 @@
     <researchViewY>0.50</researchViewY>
   </ResearchProjectDef>
 
+  <ResearchProjectDef>
+    <defName>MAS_Research_MissileDefense</defName>
+    <label>missile defense</label>
+    <description>Radar-guided hit-to-kill interceptors that destroy artillery shells and ballistic missiles in flight. Unlocks the missile defense battery and interceptor missiles.</description>
+    <baseCost>4000</baseCost>
+    <techLevel>Industrial</techLevel>
+    <tab>MAS_Tab</tab>
+    <prerequisites>
+      <li>MAS_Research_TacticalMissiles</li>
+    </prerequisites>
+    <researchViewX>1.00</researchViewX>
+    <researchViewY>1.50</researchViewY>
+  </ResearchProjectDef>
+
 </Defs>

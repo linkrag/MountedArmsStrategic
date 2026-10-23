@@ -5,6 +5,8 @@
 - Fazer **os dois**: lançador de míssil balístico tático e silo de ICBM.
 - Ogivas do ICBM: convencional **e** nuclear (perguntou "tem como?"). Depois apontou que o **Dubs Rimatomics** já tem armas nucleares → decidiu: **nuclear integrada ao Rimatomics** (a ogiva nuclear só existe com o Rimatomics ativo e usa o fallout dele, `NuclearFallout`). Sem Rimatomics, o ICBM só tem ogivas convencionais.
 
+- **Defesa antimíssil** e **IA retaliando com mísseis por nível** (Spacer: tático; Ultra/Archotech: tático + ICBM HE; sem nuclear para a IA). A bateria também intercepta drop pods.
+
 ## Técnicas
 - Defs CE nativos (o mod exige CE), herdando das bases do CE.
 - Projétil de artilharia: speed 0 + gravityFactor 5 (lição da bateria do Mounted Arms).

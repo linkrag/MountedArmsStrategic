@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- ================================================================= -->
+	<!--  Missile defense battery (Patriot PAC-3 class).                   -->
+	<!--  Built on CE's CIWS: Building_CIWS_CE + VerbCIWSProjectile, which -->
+	<!--  targets hostile flyOverhead ProjectileCE with def speed < 80      -->
+	<!--  (mortar/howitzer shells, our missiles: all speed 0). One hit     -->
+	<!--  destroys the target (CompCIWSImpactHandler HP 0.0001 by default). -->
+	<!--  Range 119: CE skips/breaks range rings at 120+.                  -->
+	<!-- ================================================================= -->
+
+	<CombatExtended.AmmoCategoryDef>
+		<defName>MAS_Interceptor</defName>
+		<label>interceptor missile</label>
+		<labelShort>interceptor</labelShort>
+		<description>Hit-to-kill interceptor missile.</description>
+	</CombatExtended.AmmoCategoryDef>
+
+	<CombatExtended.AmmoSetDef>
+		<defName>MAS_AmmoSet_Interceptor</defName>
+		<label>interceptor missiles</label>
+		<ammoTypes>
+			<MAS_Ammo_Interceptor>MAS_Bullet_Interceptor</MAS_Ammo_Interceptor>
+		</ammoTypes>
+	</CombatExtended.AmmoSetDef>
+
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="HeavyAmmoBase">
+		<defName>MAS_Ammo_Interceptor</defName>
+		<label>interceptor missile</label>
+		<description>A small, very fast hit-to-kill missile in its launch canister. Loaded into a missile defense battery to shoot down incoming artillery shells and ballistic missiles.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/Interceptor_Item</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<drawSize>(1.5,1.5)</drawSize>
+		</graphicData>
+		<statBases>
+			<MaxHitPoints>200</MaxHitPoints>
+			<Mass>300</Mass>
+			<Bulk>600</Bulk>
+			<MarketValue>1400</MarketValue>
+		</statBases>
+		<tradeTags>
+			<li>CE_AutoEnableCrafting_TableMachining</li>
+		</tradeTags>
+		<thingCategories>
+			<li>AmmoMissiles</li>
+		</thingCategories>
+		<stackLimit>8</stackLimit>
+		<ammoClass>MAS_Interceptor</ammoClass>
+	</ThingDef>
+
+	<!-- Interceptor in flight. CE turns it into a ProjectileCE_CIWS when fired by a CIWS verb;
+	     impactChance = chance that a pass actually kills the target. -->
+	<ThingDef ParentName="BaseBulletCE">
+		<defName>MAS_Bullet_Interceptor</defName>
+		<label>interceptor missile</label>
+		<graphicData>
+			<texPath>MountedArmsStrategic/TacticalMissile_Projectile</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<shaderType>TransparentPostLight</shaderType>
+			<drawSize>(0.6,1.2)</drawSize>
+		</graphicData>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>Bullet</damageDef>
+			<damageAmountBase>120</damageAmountBase>
+			<armorPenetrationSharp>40</armorPenetrationSharp>
+			<armorPenetrationBlunt>200</armorPenetrationBlunt>
+			<speed>180</speed>
+			<impactChance>0.85</impactChance>
+			<dropsCasings>false</dropsCasings>
+		</projectile>
+		<comps>
+			<li Class="CombatExtended.CompProperties_ProjectileFleck">
+				<FleckDatas>
+					<li>
+						<fleck>Fleck_CERocketFlame</fleck>
+						<emissionsPerTick>2</emissionsPerTick>
+						<flecksPerEmission>2</flecksPerEmission>
+						<scale>1</scale>
+						<originOffset>0.5</originOffset>
+					</li>
+					<li>
+						<fleck>Fleck_CERocketSmokeTrail</fleck>
+						<emissionsPerTick>2</emissionsPerTick>
+						<rotation>0~360</rotation>
+						<flecksPerEmission>1</flecksPerEmission>
+					</li>
+				</FleckDatas>
+			</li>
+		</comps>
+	</ThingDef>
+
+	<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
+	<RecipeDef ParentName="AmmoRecipeBase">
+		<defName>MakeMAS_Ammo_Interceptor</defName>
+		<label>make interceptor missile</label>
+		<description>Assemble a hit-to-kill interceptor missile in its launch canister.</description>
+		<jobString>Assembling an interceptor missile.</jobString>
+		<researchPrerequisite>MAS_Research_MissileDefense</researchPrerequisite>
+		<workAmount>20000</workAmount>
+		<skillRequirements>
+			<Crafting>8</Crafting>
+		</skillRequirements>
+		<ingredients>
+			<li>
+				<filter><thingDefs><li>Steel</li></thingDefs></filter>
+				<count>100</count>
+			</li>
+			<li>
+				<filter><thingDefs><li>Plasteel</li></thingDefs></filter>
+				<count>15</count>
+			</li>
+			<li>
+				<filter><thingDefs><li>FSX</li></thingDefs></filter>
+				<count>30</count>
+			</li>
+			<li>
+				<filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter>
+				<count>4</count>
+			</li>
+		</ingredients>
+		<fixedIngredientFilter>
+			<thingDefs>
+				<li>Steel</li>
+				<li>Plasteel</li>
+				<li>FSX</li>
+				<li>ComponentIndustrial</li>
+			</thingDefs>
+		</fixedIngredientFilter>
+		<products>
+			<MAS_Ammo_Interceptor>1</MAS_Ammo_Interceptor>
+		</products>
+	</RecipeDef>
+
+	<!-- Gun: interception verbs only (no ground fire), like CE's VFE anti-air patch.
+	     Two interceptors per engagement (shoot-shoot doctrine). -->
+	<ThingDef ParentName="BaseTurretGun">
+		<defName>MAS_Gun_InterceptorBattery</defName>
+		<label>interceptor launcher</label>
+		<description>A four-canister launcher for hit-to-kill interceptor missiles.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/Interceptor_Top4</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+		</graphicData>
+		<soundInteract>Artillery_ShellLoaded</soundInteract>
+		<statBases>
+			<SightsEfficiency>2</SightsEfficiency>
+			<ShotSpread>0.02</ShotSpread>
+			<SwayFactor>0.1</SwayFactor>
+			<RangedWeapon_Cooldown>1</RangedWeapon_Cooldown>
+			<Mass>300</Mass>
+		</statBases>
+		<verbs>
+			<li Class="CombatExtended.VerbProperties_CIWSProjectile">
+				<verbClass>CombatExtended.VerbCIWSProjectile</verbClass>
+				<hasStandardCommand>true</hasStandardCommand>
+				<defaultProjectile>MAS_Bullet_Interceptor</defaultProjectile>
+				<warmupTime>0.5</warmupTime>
+				<range>119</range>
+				<ticksBetweenBurstShots>20</ticksBetweenBurstShots>
+				<burstShotCount>2</burstShotCount>
+				<soundCast>RocketswarmLauncher_Fire</soundCast>
+				<soundCastTail>GunTail_Heavy</soundCastTail>
+				<muzzleFlashScale>20</muzzleFlashScale>
+				<holdFireLabel>HoldCloseInProjectilesFire</holdFireLabel>
+				<holdFireDesc>HoldCloseInProjectilesFireDesc</holdFireDesc>
+			</li>
+			<li Class="CombatExtended.VerbProperties_CIWSSkyfaller">
+				<verbClass>CombatExtended.VerbCIWSSkyfaller</verbClass>
+				<hasStandardCommand>true</hasStandardCommand>
+				<defaultProjectile>MAS_Bullet_Interceptor</defaultProjectile>
+				<warmupTime>0.8</warmupTime>
+				<range>119</range>
+				<ticksBetweenBurstShots>20</ticksBetweenBurstShots>
+				<burstShotCount>2</burstShotCount>
+				<soundCast>RocketswarmLauncher_Fire</soundCast>
+				<soundCastTail>GunTail_Heavy</soundCastTail>
+				<muzzleFlashScale>20</muzzleFlashScale>
+				<holdFireLabel>HoldCloseInSkyfallersFire</holdFireLabel>
+			</li>
+		</verbs>
+		<comps>
+			<li Class="CombatExtended.CompProperties_AmmoUser">
+				<magazineSize>4</magazineSize>
+				<reloadOneAtATime>true</reloadOneAtATime>
+				<reloadTime>8</reloadTime>
+				<ammoSet>MAS_AmmoSet_Interceptor</ammoSet>
+			</li>
+			<li Class="CombatExtended.CompProperties_FireModes">
+				<aiUseBurstMode>FALSE</aiUseBurstMode>
+				<aiAimMode>AimedShot</aiAimMode>
+				<noSingleShot>true</noSingleShot>
+			</li>
+			<li>
+				<compClass>CombatExtended.CompVerbDisabler</compClass>
+			</li>
+		</comps>
+	</ThingDef>
+
+	<!-- Mobile launcher (trailer): CE's auto turret base sets thingCategories, so it is minifiable. -->
+	<ThingDef ParentName="TurretAutoBase">
+		<defName>MAS_Turret_InterceptorBattery</defName>
+		<label>missile defense battery</label>
+		<description>A powered launcher for four hit-to-kill interceptor missiles, guided by its own radar. It automatically shoots down hostile artillery shells, ballistic missiles and drop pods within its reach; it cannot attack ground targets. Fires two interceptors per threat. Needs interceptor missiles loaded. Can be uninstalled and moved.</description>
+		<thingClass>MountedArmsStrategic.Building_MissileInterceptorCE</thingClass>
+		<graphicData>
+			<texPath>MountedArmsStrategic/Interceptor_Base</texPath>
+			<drawSize>(3,3)</drawSize>
+		</graphicData>
+		<uiIconPath>MountedArmsStrategic/Interceptor_Icon</uiIconPath>
+		<size>(3,3)</size>
+		<minifiedDef>MinifiedThing</minifiedDef>
+		<fillPercent>0.6</fillPercent>
+		<terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+		<constructionSkillPrerequisite>8</constructionSkillPrerequisite>
+		<techLevel>Industrial</techLevel>
+		<statBases>
+			<MaxHitPoints>400</MaxHitPoints>
+			<WorkToBuild>30000</WorkToBuild>
+			<Mass>1500</Mass>
+			<Bulk>1500</Bulk>
+			<AimingAccuracy>1.0</AimingAccuracy>
+			<ShootingAccuracyTurret>1.25</ShootingAccuracyTurret>
+			<NightVisionEfficiency>0.8</NightVisionEfficiency>
+		</statBases>
+		<costList>
+			<Steel>600</Steel>
+			<Plasteel>100</Plasteel>
+			<ComponentIndustrial>10</ComponentIndustrial>
+			<ComponentSpacer>3</ComponentSpacer>
+		</costList>
+		<comps>
+			<li Class="CompProperties_Power">
+				<compClass>CompPowerTrader</compClass>
+				<basePowerConsumption>400</basePowerConsumption>
+			</li>
+		</comps>
+		<building>
+			<turretGunDef>MAS_Gun_InterceptorBattery</turretGunDef>
+			<turretTopDrawSize>2.6</turretTopDrawSize>
+			<turretBurstCooldownTime>1</turretBurstCooldownTime>
+			<ai_combatDangerous>false</ai_combatDangerous>
+		</building>
+		<!-- no ShowTurretRadius: it breaks on turrets without a ground verb (CE note on the VFE patch) -->
+		<placeWorkers Inherit="False">
+			<li>PlaceWorker_TurretTop</li>
+		</placeWorkers>
+		<specialDisplayRadius>119</specialDisplayRadius>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.LoadedTopsExtension">
+				<topTexPaths>
+					<li>MountedArmsStrategic/Interceptor_Top0</li>
+					<li>MountedArmsStrategic/Interceptor_Top1</li>
+					<li>MountedArmsStrategic/Interceptor_Top2</li>
+					<li>MountedArmsStrategic/Interceptor_Top3</li>
+					<li>MountedArmsStrategic/Interceptor_Top4</li>
+				</topTexPaths>
+			</li>
+		</modExtensions>
+		<researchPrerequisites>
+			<li>MAS_Research_MissileDefense</li>
+		</researchPrerequisites>
+	</ThingDef>
+
+</Defs>

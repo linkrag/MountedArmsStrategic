@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+
+	<!-- ================================================================= -->
+	<!--  AI retaliation (CE HostilitySheller): when the player shells a   -->
+	<!--  settlement, its faction may shell back with projectiles from its -->
+	<!--  ShellingResponseDef, paying "points" from a budget. Only shells  -->
+	<!--  whose shellingProps.range >= half the distance are picked.       -->
+	<!--  CE reference points: 81 mm 250, 105 mm 1000, antigrain 7000.     -->
+	<!--  Spacer: tactical missiles. Ultra/Archotech: tactical + ICBM HE.  -->
+	<!--  No nuclear for the AI (decision).                                -->
+	<!--  Children that lack <projectiles> get the node; list inheritance  -->
+	<!--  then appends ours to the parent's shells.                        -->
+	<!-- ================================================================= -->
+
+	<Operation Class="PatchOperationConditional">
+		<xpath>Defs/CombatExtended.ShellingResponseDef[defName="CE_ShellingPreset_Spacer"]/projectiles</xpath>
+		<match Class="PatchOperationAdd">
+			<xpath>Defs/CombatExtended.ShellingResponseDef[defName="CE_ShellingPreset_Spacer"]/projectiles</xpath>
+			<value>
+				<li>
+					<projectile>MAS_Bullet_TacticalMissile_HE</projectile>
+					<points>1500</points>
+					<weight>0.25</weight>
+				</li>
+			</value>
+		</match>
+		<nomatch Class="PatchOperationAdd">
+			<xpath>Defs/CombatExtended.ShellingResponseDef[defName="CE_ShellingPreset_Spacer"]</xpath>
+			<value>
+				<projectiles>
+					<li>
+						<projectile>MAS_Bullet_TacticalMissile_HE</projectile>
+						<points>1500</points>
+						<weight>0.25</weight>
+					</li>
+				</projectiles>
+			</value>
+		</nomatch>
+	</Operation>
+
+	<Operation Class="PatchOperationConditional">
+		<xpath>Defs/CombatExtended.ShellingResponseDef[defName="CE_ShellingPreset_Ultra" or defName="CE_ShellingPreset_Archotech"]/projectiles</xpath>
+		<match Class="PatchOperationAdd">
+			<xpath>Defs/CombatExtended.ShellingResponseDef[defName="CE_ShellingPreset_Ultra" or defName="CE_ShellingPreset_Archotech"]/projectiles</xpath>
+			<value>
+				<li>
+					<projectile>MAS_Bullet_TacticalMissile_HE</projectile>
+					<points>1500</points>
+					<weight>0.4</weight>
+				</li>
+				<li>
+					<projectile>MAS_Bullet_ICBM_HE</projectile>
+					<points>4000</points>
+					<weight>0.15</weight>
+				</li>
+			</value>
+		</match>
+		<nomatch Class="PatchOperationAdd">
+			<xpath>Defs/CombatExtended.ShellingResponseDef[defName="CE_ShellingPreset_Ultra" or defName="CE_ShellingPreset_Archotech"]</xpath>
+			<value>
+				<projectiles>
+					<li>
+						<projectile>MAS_Bullet_TacticalMissile_HE</projectile>
+						<points>1500</points>
+						<weight>0.4</weight>
+					</li>
+					<li>
+						<projectile>MAS_Bullet_ICBM_HE</projectile>
+						<points>4000</points>
+						<weight>0.15</weight>
+					</li>
+				</projectiles>
+			</value>
+		</nomatch>
+	</Operation>
+
+</Patch>

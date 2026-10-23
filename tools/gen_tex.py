@@ -179,6 +179,46 @@ def icbm_projectile():
     missile(d, 128, 4, 248, 26, band=RED)
     return img
 
+# ------------------------------------------------------------------ missile defense battery (Patriot-like)
+def base_interceptor():
+    img = canvas(); d = ImageDraw.Draw(img)
+    # trailer bed with four outriggers and a radar/generator box at the operator side
+    rect(d, 46, 26, 210, 230, OLIVE_D, r=8)
+    rect(d, 54, 34, 202, 222, OLIVE, r=6, hl=False)
+    for (x, y) in ((30, 46), (226, 46), (30, 210), (226, 210)):
+        line(d, (128, 128), (x, y), 8, BLACK); line(d, (128, 128), (x, y), 5, STEEL_D)
+        rect(d, x - 10, y - 10, x + 10, y + 10, STEEL_D, r=3); circ(d, x, y, 4, BLACK)
+    circ(d, 128, 128, 46, STEEL_D); circ(d, 128, 128, 36, GUN); circ(d, 128, 128, 16, STEEL_D)
+    rect(d, 92, 196, 164, 226, STEEL, r=4)
+    for x in range(100, 160, 8):
+        line(d, (x, 202), (x, 220), 2, STEEL_D)                # radiator fins
+    return shadow(img)
+
+def top_interceptor(loaded):
+    img = canvas(); d = ImageDraw.Draw(img)
+    # 2x2 block of square canisters, front (muzzles) UP; fire order: front-left, front-right, rear-left, rear-right
+    rect(d, 70, 40, 186, 214, OLIVE_D, r=6)
+    cells = [(76, 46), (130, 46), (76, 130), (130, 130)]
+    for i, (x, y) in enumerate(cells):
+        rect(d, x, y, x + 50, y + 78, OLIVE, r=3)
+        if i < loaded:
+            rect(d, x + 6, y + 6, x + 44, y + 40, WHITE, r=2, hl=False)          # frangible cover intact
+            line(d, (x + 6, y + 23), (x + 44, y + 23), 1.5, STEEL_D)
+        else:
+            rect(d, x + 6, y + 6, x + 44, y + 40, BLACK, r=2, hl=False)          # empty, cover blown
+    rect(d, 110, 200, 146, 236, STEEL, r=4)                                       # elevation ram
+    circ(d, 128, 128, 10, STEEL_D)
+    return img
+
+def interceptor_item():
+    img = canvas(); d = ImageDraw.Draw(img)
+    rect(d, 60, 40, 196, 220, OLIVE_D, r=6)
+    rect(d, 70, 50, 186, 210, OLIVE, r=4, hl=False)
+    rect(d, 80, 58, 176, 100, WHITE, r=3, hl=False)
+    for y in (130, 170):
+        line(d, (70, y), (186, y), 3, BLACK)
+    return shadow(img, (3, 4), 4, 100)
+
 os.makedirs(OUT, exist_ok=True)
 b = base_launcher()
 finish(b, os.path.join(OUT, "TacticalLauncher_Base.png"))
@@ -198,4 +238,12 @@ for n in (0, 1):
 finish(icon(sb, top_silo(1), 2.6 / 3.0), os.path.join(OUT, "ICBMSilo_Icon.png"))
 finish(icbm_item(), os.path.join(OUT, "ICBM_Item.png"))
 finish(icbm_projectile(), os.path.join(OUT, "ICBM_Projectile.png"))
+ib = base_interceptor()
+finish(ib, os.path.join(OUT, "Interceptor_Base.png"))
+for n in range(5):
+    tn = top_interceptor(n).rotate(-90, resample=Image.BICUBIC)   # turret tops point EAST
+    finish(shadow(tn, (2, 3), 4, 90), os.path.join(OUT, f"Interceptor_Top{n}.png"))
+    if n == 4:
+        finish(icon(ib, tn, 2.6 / 3.0), os.path.join(OUT, "Interceptor_Icon.png"))
+finish(interceptor_item(), os.path.join(OUT, "Interceptor_Item.png"))
 print("ok")

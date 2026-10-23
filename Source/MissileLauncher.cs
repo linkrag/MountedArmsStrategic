@@ -29,6 +29,21 @@ namespace MountedArmsStrategic
             }
             return mats[Mathf.Clamp(loaded, 0, mats.Length - 1)];
         }
+
+        /// <summary>
+        /// Top material for a CE turret: by loaded count when the def has this extension, else the fallback.
+        /// TurretTop.DrawTurret draws Building_Turret.TurretTopMaterial, so turrets override that property.
+        /// </summary>
+        public static Material TopFor(Building_TurretGunCE turret, Material fallback)
+        {
+            LoadedTopsExtension ext = turret.def.GetModExtension<LoadedTopsExtension>();
+            CompAmmoUser ammo = turret.CompAmmo;
+            if (ext == null || ext.topTexPaths.NullOrEmpty() || ammo == null)
+            {
+                return fallback;
+            }
+            return ext.MatFor(ammo.CurMagCount);
+        }
     }
 
     /// <summary>
@@ -39,10 +54,7 @@ namespace MountedArmsStrategic
     {
     }
 
-    /// <summary>
-    /// CE turret whose top shows how many missiles are loaded. TurretTop.DrawTurret draws
-    /// Building_Turret.TurretTopMaterial, so overriding it is enough.
-    /// </summary>
+    /// <summary>CE turret whose top shows how many missiles are loaded.</summary>
     public class Building_MissileLauncherCE : Building_TurretGunCE
     {
         public override LocalTargetInfo TryFindNewTarget()
@@ -56,16 +68,16 @@ namespace MountedArmsStrategic
 
         public override Material TurretTopMaterial
         {
-            get
-            {
-                LoadedTopsExtension ext = def.GetModExtension<LoadedTopsExtension>();
-                CompAmmoUser ammo = CompAmmo;
-                if (ext == null || ext.topTexPaths.NullOrEmpty() || ammo == null)
-                {
-                    return base.TurretTopMaterial;
-                }
-                return ext.MatFor(ammo.CurMagCount);
-            }
+            get { return LoadedTopsExtension.TopFor(this, base.TurretTopMaterial); }
+        }
+    }
+
+    /// <summary>CE CIWS turret (projectile/skyfaller interception) whose top shows loaded interceptors.</summary>
+    public class Building_MissileInterceptorCE : Building_CIWS_CE
+    {
+        public override Material TurretTopMaterial
+        {
+            get { return LoadedTopsExtension.TopFor(this, base.TurretTopMaterial); }
         }
     }
 }
