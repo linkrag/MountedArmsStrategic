@@ -65,6 +65,11 @@
 			<li>PlaceWorker_PreventInteractionSpotOverlap</li>
 		</placeWorkers>
 		<modExtensions>
+			<!-- erector turntable traverse: 12 deg/s (CE speed is degrees per tick) -->
+			<li Class="CombatExtended.NonSnapTurretExtension">
+				<speed>0.2</speed>
+				<angleWeightMultiplier>2</angleWeightMultiplier>
+			</li>
 			<li Class="MountedArmsStrategic.LoadedTopsExtension">
 				<topTexPaths>
 					<li>MountedArmsStrategic/TacticalLauncher_Top0</li>

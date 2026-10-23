@@ -20,6 +20,8 @@
 - "not minifiable yet has thing categories" → `minifiedDef MinifiedThing`.
 - "ammo injector found no recipe named MakeMAS_Ammo_TacticalMissile_HE" → receita renomeada.
 
+- Giro do erguedor: `NonSnapTurretExtension` 0,2°/tick (12°/s), NÃO testado. Silo e bateria antimíssil sem giro (tubo fixo / lançador do Patriot aponta para um setor e o míssil manobra).
+
 ## O que testar
 1. Pesquisa aparece na aba "Strategic Missiles"; prédio no menu Security; míssil na bancada de usinagem.
 2. Construir, carregar 2 mísseis, atirar no mapa local (> 60 células).
