@@ -47,6 +47,32 @@ namespace MountedArmsStrategic
     }
 
     /// <summary>
+    /// "Unload" button for CE turrets. CE only offers unloading in the reload menu of a manned turret
+    /// while it is manned; launchers and auto turrets need it too, to empty or swap warheads.
+    /// </summary>
+    public static class AmmoUnload
+    {
+        public static Command_Action UnloadCommand(Building_TurretGunCE turret)
+        {
+            CompAmmoUser ammo = turret.CompAmmo;
+            if (ammo == null || !ammo.UseAmmo || !ammo.HasMagazine || turret.Faction != Faction.OfPlayer)
+            {
+                return null;
+            }
+            Command_Action cmd = new Command_Action();
+            cmd.defaultLabel = "CE_UnloadLabel".Translate();
+            cmd.defaultDesc = "MAS_UnloadDesc".Translate();
+            cmd.icon = ContentFinder<Texture2D>.Get("UI/Buttons/Reload", true);
+            cmd.action = delegate { ammo.TryUnload(true); };
+            if (ammo.CurMagCount <= 0)
+            {
+                cmd.Disable("MAS_UnloadEmpty".Translate());
+            }
+            return cmd;
+        }
+    }
+
+    /// <summary>
     /// Marker: the launcher never picks targets on its own; it only fires on player orders
     /// (e.g. CE's "attack world tile").
     /// </summary>
@@ -89,6 +115,19 @@ namespace MountedArmsStrategic
         {
             get { return LoadedTopsExtension.TopFor(this, base.TurretTopMaterial); }
         }
+
+        public override IEnumerable<Gizmo> GetGizmos()
+        {
+            foreach (Gizmo g in base.GetGizmos())
+            {
+                yield return g;
+            }
+            Command_Action unload = AmmoUnload.UnloadCommand(this);
+            if (unload != null)
+            {
+                yield return unload;
+            }
+        }
     }
 
     /// <summary>CE CIWS turret (projectile/skyfaller interception) whose top shows loaded interceptors.</summary>
@@ -97,6 +136,19 @@ namespace MountedArmsStrategic
         public override Material TurretTopMaterial
         {
             get { return LoadedTopsExtension.TopFor(this, base.TurretTopMaterial); }
+        }
+
+        public override IEnumerable<Gizmo> GetGizmos()
+        {
+            foreach (Gizmo g in base.GetGizmos())
+            {
+                yield return g;
+            }
+            Command_Action unload = AmmoUnload.UnloadCommand(this);
+            if (unload != null)
+            {
+                yield return unload;
+            }
         }
     }
 }

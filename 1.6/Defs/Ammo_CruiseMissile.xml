@@ -26,7 +26,7 @@
 
 	<ThingDef Class="CombatExtended.AmmoDef" ParentName="HeavyAmmoBase">
 		<defName>MAS_Ammo_CruiseMissile</defName>
-		<label>cruise missile</label>
+		<label>BGM-109 Tomahawk</label>
 		<description>A subsonic land-attack cruise missile in its launch canister. Slow, but very precise and with a very long reach on the world map.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/CruiseMissile_Item</texPath>
@@ -55,7 +55,7 @@
 	<ThingDef ParentName="BaseExplosiveBullet">
 		<defName>MAS_Bullet_CruiseMissile</defName>
 		<thingClass>CombatExtended.ProjectileCE_Explosive</thingClass>
-		<label>cruise missile</label>
+		<label>BGM-109 Tomahawk</label>
 		<description>A cruise missile in flight.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/CruiseMissile_Projectile</texPath>
@@ -68,8 +68,8 @@
 			<gravityFactor>5</gravityFactor>
 			<flyOverhead>true</flyOverhead>
 			<damageDef>Bomb</damageDef>
-			<damageAmountBase>1200</damageAmountBase>
-			<explosionRadius>7.9</explosionRadius>
+			<damageAmountBase>5600</damageAmountBase>
+			<explosionRadius>17.9</explosionRadius>
 			<applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
 			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<soundExplode>Explosion_GiantBomb</soundExplode>

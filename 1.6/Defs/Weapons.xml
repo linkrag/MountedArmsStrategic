@@ -5,7 +5,7 @@
 	     artillery, which is what makes CE show its "attack world tile" command. -->
 	<ThingDef ParentName="BaseTurretGun">
 		<defName>MAS_Gun_TacticalLauncher</defName>
-		<label>tactical missile erector</label>
+		<label>M270 ATACMS launcher pod</label>
 		<description>An erector-launcher rail for two tactical ballistic missiles.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/TacticalLauncher_Top2</texPath>
@@ -32,6 +32,9 @@
 				<range>700</range>
 				<!-- burst fires both missiles; the CE fire mode toggle lets the player fire one -->
 				<burstShotCount>2</burstShotCount>
+				<!-- CE recoil is 0 on the first shot of a burst, so this only spreads the 2nd missile of a
+				     salvo; single fire is unaffected (no DLL change) -->
+				<recoilAmount>1.2</recoilAmount>
 				<ticksBetweenBurstShots>90</ticksBetweenBurstShots>
 				<soundCast>RocketswarmLauncher_Fire</soundCast>
 				<soundCastTail>GunTail_Heavy</soundCastTail>
@@ -64,6 +67,14 @@
 				<aiAimMode>AimedShot</aiAimMode>
 			</li>
 		</comps>
+		<!-- CE: OrbitalTurretExtension on the gun with isMarkMandatory=false lets the launcher strike a loaded
+		     map (where you have colonists) at any cell, without an artillery marker. Side effect: it can also
+		     target other planet layers (Odyssey orbit). Unguided artillery (M777) keeps the marker rule. -->
+		<modExtensions>
+			<li Class="CombatExtended.OrbitalTurretExtension">
+				<isMarkMandatory>false</isMarkMandatory>
+			</li>
+		</modExtensions>
 	</ThingDef>
 
 	<!-- ICBM silo gun. The silo is unmanned, so CE gives it no local force-attack, and
@@ -71,7 +82,7 @@
 	     "attack world tile". minRange 0 so the map-edge exit cell is never "too close". -->
 	<ThingDef ParentName="BaseTurretGun">
 		<defName>MAS_Gun_ICBMSilo</defName>
-		<label>ICBM silo launcher</label>
+		<label>Minuteman III launch tube</label>
 		<description>A hardened launch tube for one intercontinental ballistic missile.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/ICBMSilo_Top1</texPath>
@@ -126,6 +137,14 @@
 				<aiAimMode>AimedShot</aiAimMode>
 			</li>
 		</comps>
+		<!-- CE: OrbitalTurretExtension on the gun with isMarkMandatory=false lets the launcher strike a loaded
+		     map (where you have colonists) at any cell, without an artillery marker. Side effect: it can also
+		     target other planet layers (Odyssey orbit). Unguided artillery (M777) keeps the marker rule. -->
+		<modExtensions>
+			<li Class="CombatExtended.OrbitalTurretExtension">
+				<isMarkMandatory>false</isMarkMandatory>
+			</li>
+		</modExtensions>
 	</ThingDef>
 
 
@@ -133,7 +152,7 @@
 	     world map CE scatters every shot on arrival). Pod swap = whole magazine at once. -->
 	<ThingDef ParentName="BaseTurretGun">
 		<defName>MAS_Gun_MLRS</defName>
-		<label>MLRS launcher pod</label>
+		<label>HIMARS rocket pod</label>
 		<description>A six-cell pod for 227 mm guided rockets on a traversing launcher.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/MLRS_Top6</texPath>
@@ -190,12 +209,20 @@
 				<aiAimMode>AimedShot</aiAimMode>
 			</li>
 		</comps>
+		<!-- CE: OrbitalTurretExtension on the gun with isMarkMandatory=false lets the launcher strike a loaded
+		     map (where you have colonists) at any cell, without an artillery marker. Side effect: it can also
+		     target other planet layers (Odyssey orbit). Unguided artillery (M777) keeps the marker rule. -->
+		<modExtensions>
+			<li Class="CombatExtended.OrbitalTurretExtension">
+				<isMarkMandatory>false</isMarkMandatory>
+			</li>
+		</modExtensions>
 	</ThingDef>
 
 	<!-- Cruise missile VLS: unmanned, fires only through "attack world tile"; very precise. -->
 	<ThingDef ParentName="BaseTurretGun">
 		<defName>MAS_Gun_CruiseVLS</defName>
-		<label>vertical launch cells</label>
+		<label>Mk 41 launch cells</label>
 		<description>Four vertical launch cells for cruise missiles.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/CruiseVLS_Top4</texPath>
@@ -253,6 +280,14 @@
 				<aiAimMode>AimedShot</aiAimMode>
 			</li>
 		</comps>
+		<!-- CE: OrbitalTurretExtension on the gun with isMarkMandatory=false lets the launcher strike a loaded
+		     map (where you have colonists) at any cell, without an artillery marker. Side effect: it can also
+		     target other planet layers (Odyssey orbit). Unguided artillery (M777) keeps the marker rule. -->
+		<modExtensions>
+			<li Class="CombatExtended.OrbitalTurretExtension">
+				<isMarkMandatory>false</isMarkMandatory>
+			</li>
+		</modExtensions>
 	</ThingDef>
 
 	<!-- M777 155 mm howitzer: CE's own 155 mm shells (gravityFactor 5, world range 60 tiles). -->

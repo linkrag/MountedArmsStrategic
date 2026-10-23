@@ -8,7 +8,7 @@
 		<defName>MAS_Turret_TacticalLauncher</defName>
 		<!-- Top sprite follows the loaded missile count (LoadedTopsExtension below) -->
 		<thingClass>MountedArmsStrategic.Building_MissileLauncherCE</thingClass>
-		<label>tactical missile launcher</label>
+		<label>M270 launcher (ATACMS)</label>
 		<description>A crewed erector-launcher for two tactical ballistic missiles. It strikes the local map in a high arc, or settlements and sites up to 120 world tiles away with the "attack world tile" command. It can be uninstalled and moved. It cannot hit close targets, takes a long time to aim and reload, and needs a colonist at the controls. Loaded missiles can cook off if the launcher is destroyed.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/TacticalLauncher_Base</texPath>
@@ -89,7 +89,7 @@
 	     texture is drawn top-down and round, so the turret rotation does not show. -->
 	<ThingDef ParentName="BuildingBase">
 		<defName>MAS_Turret_ICBMSilo</defName>
-		<label>ICBM silo</label>
+		<label>Minuteman III silo</label>
 		<description>A hardened, powered silo for one intercontinental ballistic missile. It only fires on command, at settlements and sites up to 500 world tiles away, using the "attack world tile" command. Launch takes a long countdown and reloading a missile is slow. A loaded missile can cook off if the silo is destroyed.</description>
 		<thingClass>MountedArmsStrategic.Building_MissileLauncherCE</thingClass>
 		<drawerType>MapMeshAndRealTime</drawerType>
@@ -174,7 +174,7 @@
 	<!-- MLRS (HIMARS class): crewed, mobile, 6-rocket salvo. Top shows loaded rockets. -->
 	<ThingDef ParentName="TurretMannedBuildableBase">
 		<defName>MAS_Turret_MLRS</defName>
-		<label>multiple rocket launcher</label>
+		<label>M142 HIMARS</label>
 		<description>A crewed launcher for a six-cell pod of 227 mm guided rockets. Fires salvos that blanket an area on the local map, or strikes settlements up to 40 world tiles away with the "attack world tile" command (select several launchers to fire them together). The fire mode toggle switches between a full salvo and single rockets. Reloading swaps the whole pod. Can be uninstalled and moved.</description>
 		<thingClass>MountedArmsStrategic.Building_MissileLauncherCE</thingClass>
 		<graphicData>
@@ -250,7 +250,7 @@
 	     "attack world tile". FixedTopExtension pins the top so the cell block never turns. -->
 	<ThingDef ParentName="BuildingBase">
 		<defName>MAS_Turret_CruiseVLS</defName>
-		<label>cruise missile launcher</label>
+		<label>Mk 41 VLS (Tomahawk)</label>
 		<description>A powered block of four vertical launch cells for land-attack cruise missiles. It only fires on command, at settlements and sites up to 400 world tiles away, using the "attack world tile" command. Cruise missiles fly slowly but hit with great precision. A loaded missile can cook off if the launcher is destroyed.</description>
 		<thingClass>MountedArmsStrategic.Building_MissileLauncherCE</thingClass>
 		<drawerType>MapMeshAndRealTime</drawerType>
@@ -339,6 +339,7 @@
 	<ThingDef ParentName="TurretMannedBuildableBase">
 		<defName>MAS_Turret_M777_Howitzer</defName>
 		<label>M777 howitzer</label>
+		<thingClass>MountedArmsStrategic.Building_MissileLauncherCE</thingClass>
 		<description>A lightweight towed 155 mm howitzer. Fires heavy shells in a high arc over walls at the local map, or at settlements up to 60 world tiles away with the "attack world tile" command. Slow to traverse and to reload, and needs a crew and 155 mm shells. Can be uninstalled and moved.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/M777_Base</texPath>

@@ -19,7 +19,7 @@
 
 	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
 		<defName>MAS_Ammo_ICBM_Nuclear</defName>
-		<label>ICBM (nuclear)</label>
+		<label>LGM-30G Minuteman III (nuclear)</label>
 		<description>An intercontinental ballistic missile carrying a fission warhead. Its blast levels everything around the impact and leaves nuclear fallout over the map. Fired from an ICBM silo at settlements and sites anywhere within reach on the world map.</description>
 		<statBases>
 			<MaxHitPoints>600</MaxHitPoints>
@@ -36,7 +36,7 @@
 	<ThingDef ParentName="MAS_ICBMProjectileBase">
 		<defName>MAS_Bullet_ICBM_Nuclear</defName>
 		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearStrike</thingClass>
-		<label>ICBM (nuclear)</label>
+		<label>LGM-30G Minuteman III (nuclear)</label>
 		<description>A nuclear intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Bomb</damageDef>

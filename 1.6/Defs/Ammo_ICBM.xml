@@ -48,7 +48,7 @@
 
 	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
 		<defName>MAS_Ammo_ICBM_HE</defName>
-		<label>ICBM (HE)</label>
+		<label>LGM-30G Minuteman III (HE)</label>
 		<description>An intercontinental ballistic missile with a heavy high-explosive warhead. Fired from an ICBM silo at settlements and sites anywhere within reach on the world map.</description>
 		<statBases>
 			<MaxHitPoints>600</MaxHitPoints>
@@ -62,7 +62,7 @@
 
 	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
 		<defName>MAS_Ammo_ICBM_Cluster</defName>
-		<label>ICBM (cluster)</label>
+		<label>LGM-30G Minuteman III (cluster)</label>
 		<description>An intercontinental ballistic missile whose warhead blankets a huge area with bomblets. Deadly against troops in the open, weaker against fortifications.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/ICBM_Item_Cluster</texPath>
@@ -79,7 +79,7 @@
 
 	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
 		<defName>MAS_Ammo_ICBM_Thermobaric</defName>
-		<label>ICBM (thermobaric)</label>
+		<label>LGM-30G Minuteman III (thermobaric)</label>
 		<description>An intercontinental ballistic missile with a massive fuel-air warhead that levels and burns everything around the impact.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/ICBM_Item_Thermobaric</texPath>
@@ -96,7 +96,7 @@
 
 	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
 		<defName>MAS_Ammo_ICBM_EMP</defName>
-		<label>ICBM (EMP)</label>
+		<label>LGM-30G Minuteman III (emp)</label>
 		<description>An intercontinental ballistic missile with a powerful electromagnetic pulse warhead. Usually wipes out a mechanoid hive in one strike, but barely harms human settlements.</description>
 		<graphicData>
 			<texPath>MountedArmsStrategic/ICBM_Item_EMP</texPath>
@@ -162,12 +162,12 @@
 
 	<ThingDef ParentName="MAS_ICBMProjectileBase">
 		<defName>MAS_Bullet_ICBM_HE</defName>
-		<label>ICBM (HE)</label>
+		<label>LGM-30G Minuteman III (HE)</label>
 		<description>An intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Bomb</damageDef>
-			<damageAmountBase>3000</damageAmountBase>
-			<explosionRadius>14.9</explosionRadius>
+			<damageAmountBase>10000</damageAmountBase>
+			<explosionRadius>24.9</explosionRadius>
 			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<shellingProps>
 				<damage>5</damage>
@@ -186,7 +186,7 @@
 	<!-- Cluster: central charge + 60 bomblets over radius 16 -->
 	<ThingDef ParentName="MAS_ICBMProjectileBase">
 		<defName>MAS_Bullet_ICBM_Cluster</defName>
-		<label>ICBM (cluster)</label>
+		<label>LGM-30G Minuteman III (cluster)</label>
 		<description>An intercontinental ballistic missile in flight.</description>
 		<thingClass>MountedArmsStrategic.ProjectileCE_Cluster</thingClass>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
@@ -199,8 +199,8 @@
 		</projectile>
 		<modExtensions>
 			<li Class="MountedArmsStrategic.ClusterExtension">
-				<count>60</count>
-				<spreadRadius>16</spreadRadius>
+				<count>100</count>
+				<spreadRadius>26</spreadRadius>
 				<subExplosionRadius>2.4</subExplosionRadius>
 				<damageDef>Bomb</damageDef>
 				<damageAmount>120</damageAmount>
@@ -210,12 +210,12 @@
 
 	<ThingDef ParentName="MAS_ICBMProjectileBase">
 		<defName>MAS_Bullet_ICBM_Thermobaric</defName>
-		<label>ICBM (thermobaric)</label>
+		<label>LGM-30G Minuteman III (thermobaric)</label>
 		<description>An intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Thermobaric</damageDef>
-			<damageAmountBase>2500</damageAmountBase>
-			<explosionRadius>14.9</explosionRadius>
+			<damageAmountBase>6000</damageAmountBase>
+			<explosionRadius>24.9</explosionRadius>
 			<ai_IsIncendiary>true</ai_IsIncendiary>
 			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<shellingProps>
@@ -228,7 +228,7 @@
 	     hurting human settlements (CE sums 2^radius terms) while one-shotting most mechanoid hives. -->
 	<ThingDef ParentName="MAS_ICBMProjectileBase">
 		<defName>MAS_Bullet_ICBM_EMP</defName>
-		<label>ICBM (EMP)</label>
+		<label>LGM-30G Minuteman III (emp)</label>
 		<description>An intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>EMP</damageDef>

@@ -65,6 +65,14 @@
   - EMP: 400 r 6,9 / 600 r 7,9, **sem** `shellingProps.damage` → o CE calcula com o modificador EMP (1,0 contra mecanoides; 0,03–0,18 contra humanos). Estimativa: tático derruba colmeia em 1–2, ICBM em 1; humanos quase intactos.
 - Retaliação: Spacer também usa GMLRS (400 pts, peso 0,35).
 
+## Lote 5 (implementado, NÃO testado)
+- **Descarregar**: botão nas nossas torretas (`AmmoUnload.UnloadCommand` em `Building_MissileLauncherCE`/`Building_MissileInterceptorCE`); M777 passou a usar `Building_MissileLauncherCE`. Textos em `1.6/Languages/{English,PortugueseBrazilian}/Keyed`. Trocar ogiva: escolher a munição no menu do botão de recarga do CE e descarregar.
+- **Nomes reais** nos `label`: M270 (ATACMS), MGM-140 ATACMS, M142 HIMARS, M31 GMLRS, Mk 41 VLS, BGM-109 Tomahawk, Minuteman III / LGM-30G, MIM-104 Patriot, PAC-3 MSE.
+- **Salva do ATACMS com dispersão**: `recoilAmount` 1,2 no verbo; o recuo do CE é 0 no 1º tiro da rajada, então só o 2º míssil desvia (tiro único não muda). Sem DLL.
+- **Sem marcador de artilharia** para M270, HIMARS, Mk 41 e Minuteman: `CombatExtended.OrbitalTurretExtension` (`isMarkMandatory` false) na gun. Efeito colateral: podem mirar outras camadas do planeta (órbita do Odyssey). M777 continua exigindo marcador. Alternativa global: opção do CE "Require artillery marker for off-map artillery".
+- **Escala das explosões** (âncoras do CE: 81 mm r2,5 · 155 mm r5,5 · Tomahawk r19,5 ⇒ raio ≈ 2,6·kg^(1/3), dano ≈ 546·(kg/10,8)^0,7): ATACMS HE r11,9/2600 (~100 kg de explosivo), termobárico r12,9/1500, cluster 40 em r12; GMLRS r7,4/900 (~23 kg); Tomahawk r17,9/5600 (~300 kg, igual ao do CE); Minuteman HE r24,9/10000 (carga convencional fictícia ~1 t), termobárico r24,9/6000, cluster 100 em r26. EMP inalterado (o raio entra na fórmula de dano no mapa-mundo).
+- DLL precisa ser recompilada com o jogo FECHADO (`Source/build.ps1`; `-Out` para testar a compilação).
+
 ## Próximos passos
 - Vanilla: sistema próprio de tiro no mapa-mundo.
 - Remote do git.

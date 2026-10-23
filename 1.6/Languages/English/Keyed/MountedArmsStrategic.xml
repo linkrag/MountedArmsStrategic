@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+	<MAS_UnloadDesc>Remove all loaded rounds and drop them next to the launcher. Use it to empty the launcher or, after picking another ammunition type in the reload menu, to swap what is loaded.</MAS_UnloadDesc>
+	<MAS_UnloadEmpty>Nothing loaded.</MAS_UnloadEmpty>
+</LanguageData>

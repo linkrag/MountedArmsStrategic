@@ -18,6 +18,9 @@ Fonte: `CombatExtended-Continued/CombatExtended`, arquivos `Things/Building_Turr
 - Exemplos: damage 1,5 vs Industrial = 0,15–0,56 por tiro (média ~0,36 → ~3 acertos). Para destruir sempre com 1 tiro um Ultra: damage ≥ 6 / 0,4 = 15.
 - Alguns sites/facções podem ter `destroyedInstantly` ou chance de negar dano (`WorldObjectHealthExtension`).
 
+## Marcador de artilharia (mapa carregado)
+`Command_ArtilleryTarget`: se o mapa do alvo está carregado (há colonos lá), exige `ArtilleryMarker` na célula quando a opção global `RequireArtilleryMarkerForOffMapArtillery` está ligada **e** `turret.OrbitalTurretExtension?.isMarkMandatory ?? true`. A extensão fica na **gun** (`Gun.def`), padrão `isMarkMandatory = false`; ela também habilita `CanShootOtherLayers`.
+
 ## Salva
 - `Command_ArtilleryTarget` agrupa (`GroupsWith`/`MergeWith`): várias torretas selecionadas recebem a mesma ordem.
 - `Verb_ShootMortarCE.TryCastShot` usa `TryCastGlobalShot` em cada tiro da rajada; `ShiftGlobalTarget` sorteia dispersão por tiro.
