@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <ResearchTabDef>
+    <defName>MAS_Tab</defName>
+    <label>Strategic Missiles</label>
+    <generalTitle>Strategic missiles</generalTitle>
+    <generalDescription>Research ballistic missile systems able to strike the local map and targets across the world map.</generalDescription>
+  </ResearchTabDef>
+
+  <ResearchProjectDef>
+    <defName>MAS_Research_TacticalMissiles</defName>
+    <label>tactical ballistic missiles</label>
+    <description>Short-range ballistic missiles with inertial and satellite guidance, fired from a crewed launcher. Unlocks the tactical missile launcher and its missiles, which can hit settlements on the world map.</description>
+    <baseCost>3000</baseCost>
+    <techLevel>Industrial</techLevel>
+    <tab>MAS_Tab</tab>
+    <prerequisites>
+      <li>Mortars</li>
+      <li>MicroelectronicsBasics</li>
+    </prerequisites>
+    <researchViewX>0.00</researchViewX>
+    <researchViewY>0.50</researchViewY>
+  </ResearchProjectDef>
+
+</Defs>

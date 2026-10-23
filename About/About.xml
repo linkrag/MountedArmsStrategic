@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Mounted Arms: Strategic Missiles</name>
+  <author>Felipe</author>
+  <packageId>linkrag.mountedarms.strategic</packageId>
+  <supportedVersions>
+    <li>1.6</li>
+  </supportedVersions>
+  <description>Adds ballistic missile launchers that can strike targets on the world map, using Combat Extended's world shelling.
+
+- Tactical ballistic missile launcher: a crewed launcher that fires a heavy guided missile at the local map or at settlements up to 120 world tiles away.
+
+Planned: ICBM silo (conventional and nuclear warheads).
+
+Requires Combat Extended. Companion to Mounted Arms, but does not depend on it.</description>
+  <modDependencies>
+    <li>
+      <packageId>CETeam.CombatExtended</packageId>
+      <displayName>Combat Extended</displayName>
+      <steamWorkshopUrl>steam://url/CommunityFilePage/2890901044</steamWorkshopUrl>
+      <downloadUrl>https://github.com/CombatExtended-Continued/CombatExtended</downloadUrl>
+    </li>
+  </modDependencies>
+  <loadAfter>
+    <li>Ludeon.RimWorld</li>
+    <li>Ludeon.RimWorld.Royalty</li>
+    <li>Ludeon.RimWorld.Ideology</li>
+    <li>Ludeon.RimWorld.Biotech</li>
+    <li>Ludeon.RimWorld.Anomaly</li>
+    <li>Ludeon.RimWorld.Odyssey</li>
+    <li>CETeam.CombatExtended</li>
+    <li>linkrag.mountedarms</li>
+  </loadAfter>
+</ModMetaData>

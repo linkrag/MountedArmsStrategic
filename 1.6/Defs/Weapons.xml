@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- Tactical missile launcher gun. isMortar + flyOverhead projectile make the turret count as
+	     artillery, which is what makes CE show its "attack world tile" command. -->
+	<ThingDef ParentName="BaseTurretGun">
+		<defName>MAS_Gun_TacticalLauncher</defName>
+		<label>tactical missile erector</label>
+		<description>An erector-launcher rail for two tactical ballistic missiles.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/TacticalLauncher_Top</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+		</graphicData>
+		<soundInteract>Artillery_ShellLoaded</soundInteract>
+		<statBases>
+			<SightsEfficiency>1</SightsEfficiency>
+			<ShotSpread>0.05</ShotSpread>
+			<SwayFactor>0.1</SwayFactor>
+			<RangedWeapon_Cooldown>2</RangedWeapon_Cooldown>
+			<Mass>500</Mass>
+		</statBases>
+		<verbs>
+			<li Class="CombatExtended.VerbPropertiesCE">
+				<verbClass>CombatExtended.Verb_ShootMortarCE</verbClass>
+				<isMortar>true</isMortar>
+				<forceNormalTimeSpeed>false</forceNormalTimeSpeed>
+				<hasStandardCommand>true</hasStandardCommand>
+				<requireLineOfSight>false</requireLineOfSight>
+				<defaultProjectile>MAS_Bullet_TacticalMissile_HE</defaultProjectile>
+				<warmupTime>10</warmupTime>
+				<minRange>60</minRange>
+				<range>700</range>
+				<burstShotCount>1</burstShotCount>
+				<soundCast>RocketswarmLauncher_Fire</soundCast>
+				<soundCastTail>GunTail_Heavy</soundCastTail>
+				<muzzleFlashScale>30</muzzleFlashScale>
+				<circularError>3</circularError>
+				<indirectFirePenalty>0.05</indirectFirePenalty>
+				<ai_IsBuildingDestroyer>true</ai_IsBuildingDestroyer>
+				<targetParams>
+					<canTargetLocations>true</canTargetLocations>
+				</targetParams>
+			</li>
+		</verbs>
+		<comps>
+			<li Class="CombatExtended.CompProperties_Charges">
+				<chargeSpeeds>
+					<li>30</li>
+					<li>50</li>
+					<li>70</li>
+					<li>90</li>
+				</chargeSpeeds>
+			</li>
+			<li Class="CombatExtended.CompProperties_AmmoUser">
+				<magazineSize>2</magazineSize>
+				<reloadOneAtATime>true</reloadOneAtATime>
+				<reloadTime>30</reloadTime>
+				<ammoSet>MAS_AmmoSet_TacticalMissile</ammoSet>
+			</li>
+			<li Class="CombatExtended.CompProperties_FireModes">
+				<aiUseBurstMode>FALSE</aiUseBurstMode>
+				<aiAimMode>AimedShot</aiAimMode>
+			</li>
+		</comps>
+	</ThingDef>
+
+</Defs>

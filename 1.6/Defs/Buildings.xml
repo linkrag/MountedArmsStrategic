@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- Tactical missile launcher (crewed). CE's manned turret base already uses Building_TurretGunCE.
+	     Range is far beyond what the radius ring / AvoidGrid can handle, so: no ShowTurretRadius
+	     placeworker and ai_combatDangerous false (same fix as Mounted Arms' rocket battery). -->
+	<ThingDef ParentName="TurretMannedBuildableBase">
+		<defName>MAS_Turret_TacticalLauncher</defName>
+		<label>tactical missile launcher</label>
+		<description>A crewed erector-launcher for two tactical ballistic missiles. It strikes the local map in a high arc, or settlements and sites up to 120 world tiles away with the "attack world tile" command. It cannot hit close targets, takes a long time to aim and reload, and needs a colonist at the controls. Loaded missiles can cook off if the launcher is destroyed.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/TacticalLauncher_Base</texPath>
+			<drawSize>(3,3)</drawSize>
+			<shadowData>
+				<volume>(2.4,0.5,2.4)</volume>
+			</shadowData>
+		</graphicData>
+		<uiIconPath>MountedArmsStrategic/TacticalLauncher_Icon</uiIconPath>
+		<size>(3,3)</size>
+		<interactionCellOffset>(0,0,-2)</interactionCellOffset>
+		<fillPercent>0.6</fillPercent>
+		<terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+		<constructionSkillPrerequisite>8</constructionSkillPrerequisite>
+		<statBases>
+			<MaxHitPoints>600</MaxHitPoints>
+			<Flammability>0.4</Flammability>
+			<WorkToBuild>40000</WorkToBuild>
+			<Mass>2000</Mass>
+			<Bulk>2000</Bulk>
+			<AimingAccuracy>1.0</AimingAccuracy>
+			<ShootingAccuracyTurret>1.0</ShootingAccuracyTurret>
+		</statBases>
+		<costList>
+			<Steel>800</Steel>
+			<Plasteel>120</Plasteel>
+			<ComponentIndustrial>12</ComponentIndustrial>
+			<ComponentSpacer>2</ComponentSpacer>
+		</costList>
+		<comps>
+			<li Class="CompProperties_Explosive">
+				<wickTicks>240</wickTicks>
+				<explosiveRadius>5.9</explosiveRadius>
+				<explosiveDamageType>Bomb</explosiveDamageType>
+				<chanceNeverExplodeFromDamage>0.5</chanceNeverExplodeFromDamage>
+			</li>
+			<li Class="CompProperties_Stunnable">
+				<affectedDamageDefs>
+					<li>EMP</li>
+				</affectedDamageDefs>
+			</li>
+		</comps>
+		<building>
+			<turretGunDef>MAS_Gun_TacticalLauncher</turretGunDef>
+			<turretTopDrawSize>3.4</turretTopDrawSize>
+			<turretBurstCooldownTime>30</turretBurstCooldownTime>
+			<ai_combatDangerous>false</ai_combatDangerous>
+		</building>
+		<placeWorkers Inherit="False">
+			<li>PlaceWorker_TurretTop</li>
+			<li>PlaceWorker_PreventInteractionSpotOverlap</li>
+		</placeWorkers>
+		<researchPrerequisites>
+			<li>MAS_Research_TacticalMissiles</li>
+		</researchPrerequisites>
+	</ThingDef>
+
+</Defs>
