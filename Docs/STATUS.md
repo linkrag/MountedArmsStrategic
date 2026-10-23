@@ -18,6 +18,7 @@
 4. Log sem erros.
 
 ## Próximos passos
-- Silo de ICBM (convencional). Ogiva nuclear: decisão pendente por causa do Dubs Rimatomics (ver DECISIONS).
+- Silo de ICBM (convencional), depois de testar o lançador tático.
+- Ogiva nuclear integrada ao Dubs Rimatomics (`Dubwise.Rimatomics`): defs só com o mod ativo (LoadFolders `IfModActive` ou `MayRequire`), DLL nossa referenciando CE para aplicar `NuclearFallout` no impacto. Verificar a API/GameCondition do Rimatomics antes.
 - Vanilla: sistema próprio de tiro no mapa-mundo.
 - Remote do git.

@@ -3,7 +3,7 @@
 ## Do usuário (Felipe)
 - **Mod separado** do Mounted Arms (out/2026): escopo estratégico, conteúdo só-CE no início.
 - Fazer **os dois**: lançador de míssil balístico tático e silo de ICBM.
-- Ogivas do ICBM: convencional **e** nuclear (perguntou "tem como?"). Depois apontou que o **Dubs Rimatomics** já tem armas nucleares → decisão sobre a nuclear pendente.
+- Ogivas do ICBM: convencional **e** nuclear (perguntou "tem como?"). Depois apontou que o **Dubs Rimatomics** já tem armas nucleares → decidiu: **nuclear integrada ao Rimatomics** (a ogiva nuclear só existe com o Rimatomics ativo e usa o fallout dele, `NuclearFallout`). Sem Rimatomics, o ICBM só tem ogivas convencionais.
 
 ## Técnicas
 - Defs CE nativos (o mod exige CE), herdando das bases do CE.
