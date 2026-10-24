@@ -152,6 +152,11 @@ namespace MountedArmsStrategic
 
         public static void Postfix(ProjectileCE_CIWS __instance)
         {
+            if (__instance.FlightTicks == 1 && __instance.Spawned)
+            {
+                // interceptors keep CE's linear flight (its intercept maths assume it); only launch smoke/flash
+                BoostPhaseTrajectoryWorker.LaunchEffects(__instance);
+            }
             int id = __instance.thingIDNumber;
             if (__instance.Destroyed || !__instance.Spawned)
             {

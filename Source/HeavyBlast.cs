@@ -20,10 +20,11 @@ namespace MountedArmsStrategic
     }
 
     /// <summary>
-    /// Large conventional warhead done the way Dubs Rimatomics does its nuke: the work runs in a long event
-    /// ("Detonating" pause instead of a frame-rate drop) and skips CE's cell-by-cell ExplosionCE: things in the
-    /// core are destroyed directly, the rest takes one damage pass that falls off with distance.
-    /// CE's ExplosionCE at r24.9 (~1950 cells, hundreds of walls) dropped the frame rate hard.
+    /// Large conventional warhead done the way Dubs Rimatomics does its nuke: it skips CE's cell-by-cell
+    /// ExplosionCE: things in the core are destroyed directly, the rest takes one damage pass that falls off
+    /// with distance. Stored CE ammo in the blast vanishes instead of cooking off (a base full of ammo turned
+    /// one blast into thousands of fragments). Runs at once (the long-event "Detonating" screen was dropped
+    /// at the user's request). CE's ExplosionCE at r24.9 (~1950 cells, hundreds of walls) dropped the frame rate.
     /// </summary>
     public class ProjectileCE_HeavyBlast : ProjectileCE_Explosive
     {
@@ -40,7 +41,7 @@ namespace MountedArmsStrategic
             Thing instigator = launcher;
             ThingDef projectileDef = def;
             Destroy(DestroyMode.Vanish);
-            LongEventHandler.QueueLongEvent(delegate { Detonate(map, center, ext, instigator, projectileDef); }, "MAS_Detonating", false, null);
+            Detonate(map, center, ext, instigator, projectileDef);
         }
 
         private static void Detonate(Map map, IntVec3 center, HeavyBlastExtension ext, Thing instigator, ThingDef projectileDef)
@@ -81,6 +82,11 @@ namespace MountedArmsStrategic
                     Thing t = things[i];
                     if (t.Destroyed || !t.def.useHitPoints && !(t is Pawn))
                     {
+                        continue;
+                    }
+                    if (t.def is AmmoDef)
+                    {
+                        t.Destroy(DestroyMode.Vanish);   // no cook-off chain (each stack would throw fragments)
                         continue;
                     }
                     bool naturalRock = t.def.building != null && t.def.building.isNaturalRock;

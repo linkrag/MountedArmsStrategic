@@ -137,6 +137,8 @@
 			<speed>0</speed>
 			<gravityFactor>5</gravityFactor>
 			<flyOverhead>true</flyOverhead>
+			<!-- boost phase: slow climb out of the launcher, then acceleration (same path and landing) -->
+			<trajectoryWorker>MountedArmsStrategic.BoostPhaseTrajectoryWorker</trajectoryWorker>
 			<applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
 			<soundExplode>Explosion_GiantBomb</soundExplode>
 			<soundHitThickRoof>Explosion_GiantBomb</soundHitThickRoof>
@@ -170,6 +172,13 @@
 				</FleckDatas>
 			</li>
 		</comps>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.LaunchProfileExtension">
+				<boostFraction>0.05</boostFraction>
+				<launchSmoke>8</launchSmoke>
+				<launchSmokeSize>2.5</launchSmokeSize>
+			</li>
+		</modExtensions>
 	</ThingDef>
 
 	<ThingDef ParentName="MAS_TacticalProjectileBase">
@@ -187,8 +196,8 @@
 		<comps>
 			<li Class="CombatExtended.CompProperties_Fragments">
 				<fragments>
-					<Fragment_Large>20</Fragment_Large>
-					<Fragment_Small>30</Fragment_Small>
+					<Fragment_Large>8</Fragment_Large>
+					<Fragment_Small>12</Fragment_Small>
 				</fragments>
 			</li>
 		</comps>

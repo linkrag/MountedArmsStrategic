@@ -9,7 +9,16 @@ Ambiente: RimWorld 1.6, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcion
 - **Retaliação do CE**: a facção atacada revida com morteiros no mapa do jogador.
 - **Lote 5**: botão Descarregar (troca de ogiva pelo menu de recarga do CE + Descarregar), nomes reais, ataque a mapa carregado **sem marcador** nos lançadores guiados, raios de explosão em escala.
 
-## Lote 6 (implementado, NÃO testado)
+## Lote 7 (implementado, NÃO testado)
+- **Lançamento realista** (`Docs/LAUNCH.md`): `BoostPhaseTrajectoryWorker` + `LaunchProfileExtension` — sobe devagar e acelera (mesmo caminho/tempo/impacto), fumaça e brilho na saída; Tomahawk com lançamento a frio. Minuteman 0,15 · ATACMS 0,05 · GMLRS 0,03 · Tomahawk 0,10; PAC-3 só efeitos.
+- **Explosão pesada sem a tela "Detonando"** (roda na hora) e **munição estocada na área some sem cook-off** (a cadeia de cook-off do CE é o que gera milhares de fragmentos numa base com munição; paredes não têm fragmentos no CE). Minuteman HE sem comp de fragmentos (a detonação própria não usa).
+- **Menos fragmentos** nos mísseis que usam a explosão do CE: ATACMS HE 20/30 → 8/12, GMLRS 10/20 → 4/8, Tomahawk 20/40 → 8/16.
+- Texto das configurações sem a frase "That is why early on...".
+
+## Confirmado (lote 6)
+- Configurações do mod, retaliação ajustável e espoleta de proximidade dos interceptadores: funcionando. Minuteman nuclear (Rimatomics): sem tela e sem queda de frames; destruiu uma base 36x36 inteira (efeito do `NuclearStrike` do Rimatomics com Yield 55).
+
+## Lote 6 (implementado)
 - **Detonação estilo Rimatomics** (`ProjectileCE_HeavyBlast` + `HeavyBlastExtension`, `Source/HeavyBlast.cs`) no Minuteman HE (r24,9, 8000) e termobárico (r24,9, 5000, dano Thermobaric, fogo 30%): roda em `LongEventHandler.QueueLongEvent` ("Detonando"), destrói direto o núcleo (35% do raio; rocha natural fica), uma passada de `TakeDamage` com queda até 15% na borda, retira teto fino no núcleo, cratera, explosão pequena só para efeito/som, tremor de câmera. Sem `ExplosionCE` nem fragmentos. Mundo inalterado (damage manual).
 - **Configurações do mod** (Opções → Configurações de mods → "Mounted Arms: Strategic", `Source/Settings.cs`): texto explicando a retaliação; barra do orçamento 0–500% (Harmony prefix em `HostilitySheller.TryStartShelling`, multiplica `points`; vale para todos os projéteis, morteiros do CE incluídos; 0% desliga o bombardeio de retaliação, não os raides); caixa "facções podem retaliar com Minuteman nuclear" (só com Rimatomics; adiciona/remove o nuclear em CE_ShellingPreset_Spacer/Ultra/Archotech, 6000 pts, peso 0,05; o CE lê a lista ao vivo).
 - **Espoleta de proximidade nos interceptadores** (Harmony postfix em `ProjectileCE_CIWS.Tick`, todos os projéteis de interceptação do CE, inclusive os do Mounted Arms): se a distância ao alvo cresce por 3 ticks após a aproximação máxima, o interceptador se destrói e libera o alvo. Motivo: o CE não deixa outra torreta mirar um projétil que tenha interceptador em voo; um PAC-3 que errou seguia voando e o Phalanx ficava sem tempo (relato do usuário).

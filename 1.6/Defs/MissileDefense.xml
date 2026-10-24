@@ -89,6 +89,13 @@
 				</FleckDatas>
 			</li>
 		</comps>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.LaunchProfileExtension">
+				<boostFraction>0</boostFraction>
+				<launchSmoke>4</launchSmoke>
+				<launchSmokeSize>1.5</launchSmokeSize>
+			</li>
+		</modExtensions>
 	</ThingDef>
 
 	<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->

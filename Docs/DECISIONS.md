@@ -17,6 +17,9 @@
 - Retaliação ajustável pelo jogador numa tela de configurações (barra do orçamento + retaliação nuclear opcional), em vez de custos fixos.
 - Interceptação em camadas: em vez de várias torretas no mesmo alvo, o interceptador que errou se autodestrói e libera o alvo para a próxima camada.
 
+- Sem tela "Detonando" na explosão pesada; manter os specs e reduzir fragmentos. Lançamentos mais realistas (pesquisa em `LAUNCH.md`). Avenger intercepta também projéteis.
+- MDs atualizados após toda edição (regra do usuário).
+
 ## Técnicas
 - Defs CE nativos (o mod exige CE), herdando das bases do CE.
 - Projétil de artilharia: speed 0 + gravityFactor 5 (lição da bateria do Mounted Arms).

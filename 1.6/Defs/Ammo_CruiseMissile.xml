@@ -67,6 +67,8 @@
 			<speed>0</speed>
 			<gravityFactor>5</gravityFactor>
 			<flyOverhead>true</flyOverhead>
+			<!-- boost phase: slow climb out of the launcher, then acceleration (same path and landing) -->
+			<trajectoryWorker>MountedArmsStrategic.BoostPhaseTrajectoryWorker</trajectoryWorker>
 			<damageDef>Bomb</damageDef>
 			<damageAmountBase>5600</damageAmountBase>
 			<explosionRadius>17.9</explosionRadius>
@@ -87,8 +89,8 @@
 		<comps>
 			<li Class="CombatExtended.CompProperties_Fragments">
 				<fragments>
-					<Fragment_Large>20</Fragment_Large>
-					<Fragment_Small>40</Fragment_Small>
+					<Fragment_Large>8</Fragment_Large>
+					<Fragment_Small>16</Fragment_Small>
 				</fragments>
 			</li>
 			<li Class="CombatExtended.CompProperties_ProjectileFleck">
@@ -111,6 +113,15 @@
 				</FleckDatas>
 			</li>
 		</comps>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.LaunchProfileExtension">
+				<boostFraction>0.1</boostFraction>
+				<launchSmoke>5</launchSmoke>
+				<launchSmokeSize>2.0</launchSmokeSize>
+				<hotLaunch>false</hotLaunch>
+				<ignitionAt>0.03</ignitionAt>
+			</li>
+		</modExtensions>
 	</ThingDef>
 
 	<RecipeDef ParentName="AmmoRecipeBase">

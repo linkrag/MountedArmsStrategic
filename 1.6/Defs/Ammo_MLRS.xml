@@ -66,6 +66,8 @@
 			<speed>0</speed>
 			<gravityFactor>5</gravityFactor>
 			<flyOverhead>true</flyOverhead>
+			<!-- boost phase: slow climb out of the launcher, then acceleration (same path and landing) -->
+			<trajectoryWorker>MountedArmsStrategic.BoostPhaseTrajectoryWorker</trajectoryWorker>
 			<damageDef>Bomb</damageDef>
 			<damageAmountBase>900</damageAmountBase>
 			<explosionRadius>7.4</explosionRadius>
@@ -86,8 +88,8 @@
 		<comps>
 			<li Class="CombatExtended.CompProperties_Fragments">
 				<fragments>
-					<Fragment_Large>10</Fragment_Large>
-					<Fragment_Small>20</Fragment_Small>
+					<Fragment_Large>4</Fragment_Large>
+					<Fragment_Small>8</Fragment_Small>
 				</fragments>
 			</li>
 			<li Class="CombatExtended.CompProperties_ProjectileFleck">
@@ -110,6 +112,13 @@
 				</FleckDatas>
 			</li>
 		</comps>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.LaunchProfileExtension">
+				<boostFraction>0.03</boostFraction>
+				<launchSmoke>3</launchSmoke>
+				<launchSmokeSize>1.5</launchSmokeSize>
+			</li>
+		</modExtensions>
 	</ThingDef>
 
 	<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
