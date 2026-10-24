@@ -20,6 +20,7 @@
 - Lançador tático sem raio de colocação e `ai_combatDangerous` false (alcance 700).
 - `circularError` 3 e `indirectFirePenalty` 0,05: míssil guiado, mais preciso que o morteiro do CE (3 / 0,3).
 - `Verb_ShootGuidedCE` (nosso, deriva de `Verb_ShootMortarCE`) para M270, HIMARS, Mk 41 e Minuteman; explicação em `CE_WORLD_SHELLING.md`.
+- Raio máximo de explosão convencional = 19,5 (Tomahawk do CE): r24,9 derrubava o FPS no impacto.
 - Dano no mapa-mundo 1,5: ~3 acertos num assentamento industrial (cálculo em `CE_WORLD_SHELLING.md`).
 
 ## Dubs Rimatomics (verificado nos defs, workshop 1127530465)

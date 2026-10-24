@@ -166,8 +166,9 @@
 		<description>An intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Bomb</damageDef>
-			<damageAmountBase>10000</damageAmountBase>
-			<explosionRadius>24.9</explosionRadius>
+			<damageAmountBase>8000</damageAmountBase>
+			<!-- capped at CE's largest conventional blast (Tomahawk r19.5); r24.9 tanked the frame rate on impact -->
+			<explosionRadius>19.5</explosionRadius>
 			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<shellingProps>
 				<damage>5</damage>
@@ -176,8 +177,8 @@
 		<comps>
 			<li Class="CombatExtended.CompProperties_Fragments">
 				<fragments>
-					<Fragment_Large>40</Fragment_Large>
-					<Fragment_Small>60</Fragment_Small>
+					<Fragment_Large>20</Fragment_Large>
+					<Fragment_Small>30</Fragment_Small>
 				</fragments>
 			</li>
 		</comps>
@@ -214,8 +215,8 @@
 		<description>An intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Thermobaric</damageDef>
-			<damageAmountBase>6000</damageAmountBase>
-			<explosionRadius>24.9</explosionRadius>
+			<damageAmountBase>5000</damageAmountBase>
+			<explosionRadius>19.5</explosionRadius>
 			<ai_IsIncendiary>true</ai_IsIncendiary>
 			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<shellingProps>
