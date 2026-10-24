@@ -4,6 +4,7 @@
 param(
     [string]$RW = "F:\Steam\steamapps\common\RimWorld",
     [string]$CE = "F:\Steam\steamapps\workshop\content\294100\2890901044",
+    [string]$Harmony = "F:\Steam\steamapps\workshop\content\294100\2009463077\1.6\Assemblies\0Harmony.dll",
     [string]$Out = ""
 )
 $ErrorActionPreference = "Stop"
@@ -14,8 +15,8 @@ $out = if ($Out) { $Out } else { "$root\1.6\Assemblies" }
 New-Item -ItemType Directory -Force $out | Out-Null
 # /noconfig /nostdlib: compile against the game's own mscorlib/System, not the Windows ones
 & $csc /nologo /noconfig /target:library /optimize+ /debug- /nostdlib /out:"$out\MountedArmsStrategic.dll" `
-    /r:"$m\mscorlib.dll" /r:"$m\System.dll" /r:"$m\System.Core.dll" /r:"$m\Assembly-CSharp.dll" /r:"$m\UnityEngine.dll" /r:"$m\UnityEngine.CoreModule.dll" /r:"$m\netstandard.dll" `
-    /r:"$CE\Assemblies\CombatExtended.dll" `
+    /r:"$m\mscorlib.dll" /r:"$m\System.dll" /r:"$m\System.Core.dll" /r:"$m\Assembly-CSharp.dll" /r:"$m\UnityEngine.dll" /r:"$m\UnityEngine.CoreModule.dll" /r:"$m\netstandard.dll" /r:"$m\Unity.Mathematics.dll" `
+    /r:"$CE\Assemblies\CombatExtended.dll" /r:"$Harmony" `
     "$PSScriptRoot\*.cs"
 if ($LASTEXITCODE -ne 0) { throw "csc failed ($LASTEXITCODE)" }
 Get-FileHash "$out\MountedArmsStrategic.dll" -Algorithm MD5 | Select-Object Hash, Path

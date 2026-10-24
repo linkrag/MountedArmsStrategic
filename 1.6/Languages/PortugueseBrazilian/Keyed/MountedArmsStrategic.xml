@@ -2,4 +2,12 @@
 <LanguageData>
 	<MAS_UnloadDesc>Retira toda a munição carregada e a deixa ao lado do lançador. Use para esvaziar o lançador ou, depois de escolher outro tipo de munição no menu de recarga, para trocar o que está carregado.</MAS_UnloadDesc>
 	<MAS_UnloadEmpty>Nada carregado.</MAS_UnloadEmpty>
+	<MAS_Detonating>Detonando</MAS_Detonating>
+	<MAS_Settings_RetaliationHeader>Retaliação da IA (Combat Extended)</MAS_Settings_RetaliationHeader>
+	<MAS_Settings_RetaliationExplain>Quando você bombardeia um assentamento pelo mapa-mundo, o Combat Extended pode fazê-lo revidar (50% de chance por acerto em assentamentos industriais e espaciais; uma retaliação por vez). O orçamento é a pontuação de ameaça do seu mapa (metade para facções industriais e espaciais, inteira para ultra; no mínimo 500) x 3,5 x a força da facção. Cada projétil desconta seu custo (morteiro 81 mm 250, obuseiro 105 mm 1000, GMLRS 400, ATACMS 1500, Minuteman 4000, Minuteman nuclear 6000) até sobrar menos que o mais barato, com 0,5 a 4 segundos entre disparos. Por isso no começo do jogo costuma vir um míssil ou um par de morteiros. O multiplicador abaixo escala esse orçamento para todos os tipos de projétil; 0% desliga a retaliação por bombardeio (contra-ataques por raide não mudam).</MAS_Settings_RetaliationExplain>
+	<MAS_Settings_BudgetFactor>Orçamento da retaliação: {0}</MAS_Settings_BudgetFactor>
+	<MAS_Settings_RetaliationOff>desligada</MAS_Settings_RetaliationOff>
+	<MAS_Settings_AINuclear>Facções podem retaliar com Minuteman nuclear</MAS_Settings_AINuclear>
+	<MAS_Settings_AINuclearDesc>Facções espaciais, ultra e archotech podem incluir o Minuteman nuclear (custo 6000, raro) na retaliação. No seu mapa ele detona como a bomba do Dubs Rimatomics, com fallout.</MAS_Settings_AINuclearDesc>
+	<MAS_Settings_AINuclearNoRimatomics>A retaliação nuclear exige o Dubs Rimatomics ativo.</MAS_Settings_AINuclearNoRimatomics>
 </LanguageData>

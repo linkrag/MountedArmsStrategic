@@ -17,7 +17,7 @@ LoadFolders.xml          / e 1.6; 1.6/Rimatomics só com Dubwise.Rimatomics
 1.6/Defs/                Research, Ammo_*, Weapons, Buildings (defs CE nativos, sem patch)
 1.6/Textures/MountedArmsStrategic/   geradas por tools/gen_tex.py
 tools/gen_tex.py         gerador de texturas (PIL)
-Source/                  C# (DLL só-CE): Verb_ShootGuidedCE, AmmoUnload, ProjectileCE_Cluster, Building_MissileLauncherCE / Building_MissileInterceptorCE (+ LoadedTopsExtension, ManualFireOnlyExtension), ProjectileCE_NuclearStrike (+ NuclearStrikeExtension); build.ps1
+Source/                  C# (DLL só-CE, usa Harmony): Settings (MASMod, retaliação, espoleta dos interceptadores), HeavyBlast, Verb_ShootGuidedCE, AmmoUnload, ProjectileCE_Cluster, Building_MissileLauncherCE / Building_MissileInterceptorCE (+ LoadedTopsExtension, ManualFireOnlyExtension), ProjectileCE_NuclearStrike (+ NuclearStrikeExtension); build.ps1
 1.6/Patches/             ShellingResponse.xml (retaliação da IA com nossos mísseis)
 1.6/Rimatomics/          ICBM nuclear (defs + patch no AmmoSet), sem referência de compilação ao Rimatomics
 1.6/Assemblies/MountedArmsStrategic.dll  compilado (NÃO versionado)

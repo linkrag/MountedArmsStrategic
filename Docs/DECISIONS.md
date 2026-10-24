@@ -14,13 +14,16 @@
 - Mísseis guiados devem errar pouco: o erro fica só no `circularError` (CEP), sem penalidades de luz/fumaça/clima/estimativa de distância do CE.
 - Lançadores guiados atacam mapa carregado sem marcador; o M777 (não guiado) continua exigindo.
 
+- Retaliação ajustável pelo jogador numa tela de configurações (barra do orçamento + retaliação nuclear opcional), em vez de custos fixos.
+- Interceptação em camadas: em vez de várias torretas no mesmo alvo, o interceptador que errou se autodestrói e libera o alvo para a próxima camada.
+
 ## Técnicas
 - Defs CE nativos (o mod exige CE), herdando das bases do CE.
 - Projétil de artilharia: speed 0 + gravityFactor 5 (lição da bateria do Mounted Arms).
 - Lançador tático sem raio de colocação e `ai_combatDangerous` false (alcance 700).
 - `circularError` 3 e `indirectFirePenalty` 0,05: míssil guiado, mais preciso que o morteiro do CE (3 / 0,3).
 - `Verb_ShootGuidedCE` (nosso, deriva de `Verb_ShootMortarCE`) para M270, HIMARS, Mk 41 e Minuteman; explicação em `CE_WORLD_SHELLING.md`.
-- Raio máximo de explosão convencional = 19,5 (Tomahawk do CE): r24,9 derrubava o FPS no impacto.
+- Explosão convencional acima de ~r20: usar `ProjectileCE_HeavyBlast` (detonação em long event, como o Rimatomics), não a `ExplosionCE` do CE, que em r24,9 derrubava o FPS.
 - Dano no mapa-mundo 1,5: ~3 acertos num assentamento industrial (cálculo em `CE_WORLD_SHELLING.md`).
 
 ## Dubs Rimatomics (verificado nos defs, workshop 1127530465)

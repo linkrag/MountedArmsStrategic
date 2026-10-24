@@ -163,12 +163,14 @@
 	<ThingDef ParentName="MAS_ICBMProjectileBase">
 		<defName>MAS_Bullet_ICBM_HE</defName>
 		<label>LGM-30G Minuteman III (HE)</label>
+		<!-- detonation done like Rimatomics (long event, direct destruction in the core): CE's ExplosionCE at
+		     r24.9 dropped the frame rate; HeavyBlastExtension holds the real blast numbers -->
+		<thingClass>MountedArmsStrategic.ProjectileCE_HeavyBlast</thingClass>
 		<description>An intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Bomb</damageDef>
 			<damageAmountBase>8000</damageAmountBase>
-			<!-- capped at CE's largest conventional blast (Tomahawk r19.5); r24.9 tanked the frame rate on impact -->
-			<explosionRadius>19.5</explosionRadius>
+			<explosionRadius>24.9</explosionRadius>
 			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<shellingProps>
 				<damage>5</damage>
@@ -182,6 +184,13 @@
 				</fragments>
 			</li>
 		</comps>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.HeavyBlastExtension">
+				<radius>24.9</radius>
+				<damage>8000</damage>
+				<crater>CraterLarge</crater>
+			</li>
+		</modExtensions>
 	</ThingDef>
 
 	<!-- Cluster: central charge + 60 bomblets over radius 16 -->
@@ -213,10 +222,20 @@
 		<defName>MAS_Bullet_ICBM_Thermobaric</defName>
 		<label>LGM-30G Minuteman III (thermobaric)</label>
 		<description>An intercontinental ballistic missile in flight.</description>
+		<thingClass>MountedArmsStrategic.ProjectileCE_HeavyBlast</thingClass>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.HeavyBlastExtension">
+				<radius>24.9</radius>
+				<damage>5000</damage>
+				<damageDef>Thermobaric</damageDef>
+				<fireChance>0.3</fireChance>
+				<crater>CraterLarge</crater>
+			</li>
+		</modExtensions>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Thermobaric</damageDef>
 			<damageAmountBase>5000</damageAmountBase>
-			<explosionRadius>19.5</explosionRadius>
+			<explosionRadius>24.9</explosionRadius>
 			<ai_IsIncendiary>true</ai_IsIncendiary>
 			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<shellingProps>

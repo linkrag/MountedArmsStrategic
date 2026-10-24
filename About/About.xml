@@ -29,6 +29,7 @@ Requires Combat Extended. Companion to Mounted Arms, but does not depend on it.<
     </li>
   </modDependencies>
   <loadAfter>
+    <li>brrainz.harmony</li>
     <li>Ludeon.RimWorld</li>
     <li>Ludeon.RimWorld.Royalty</li>
     <li>Ludeon.RimWorld.Ideology</li>

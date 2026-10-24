@@ -27,6 +27,12 @@ Fonte: `CombatExtended-Continued/CombatExtended`, arquivos `Things/Building_Turr
 - Célula fora do mapa na chegada → `TravelingShell` sorteia uma célula aleatória.
 - Nosso `Verb_ShootGuidedCE`: zera luz/fumaça/clima (tiro local e global) e põe AimingAccuracy 1,5 no global (accuracyFactor 0 → sem erro de distância). Resta o círculo de `circularError`.
 
+## Retaliação (código do CE: `HostilityComp.TryHostilityResponse`, `HostilitySheller`)
+- Chance por acerto: `shellingPropability` do `ShellingResponseDef` da facção (assentamento industrial/espacial 0,5); só uma retaliação ativa por assentamento.
+- Pontos: `DefaultThreatPointsNow(mapa do jogador) × max(tech − 4, 1) / 2`, mínimo 500 (sem mapa: aleatório 500..500×max(tech−2, 2)).
+- Orçamento = pontos × 3,5 × força da facção (≥ 0,5). Cada disparo escolhe por peso entre os projéteis que cabem no orçamento e cujo `shellingProps.range` ≥ metade da distância; para quando o resto ≤ o mais barato. 30–240 ticks entre tiros; expira em 15000 ticks.
+- A lista `projectiles` do def é lida ao vivo (`UpdateCachedConfig`). Nosso multiplicador: prefix em `TryStartShelling(ref points)`.
+
 ## Salva
 - `Command_ArtilleryTarget` agrupa (`GroupsWith`/`MergeWith`): várias torretas selecionadas recebem a mesma ordem.
 - `Verb_ShootMortarCE.TryCastShot` usa `TryCastGlobalShot` em cada tiro da rajada; `ShiftGlobalTarget` sorteia dispersão por tiro.

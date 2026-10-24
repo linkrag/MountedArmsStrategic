@@ -2,4 +2,12 @@
 <LanguageData>
 	<MAS_UnloadDesc>Remove all loaded rounds and drop them next to the launcher. Use it to empty the launcher or, after picking another ammunition type in the reload menu, to swap what is loaded.</MAS_UnloadDesc>
 	<MAS_UnloadEmpty>Nothing loaded.</MAS_UnloadEmpty>
+	<MAS_Detonating>Detonating</MAS_Detonating>
+	<MAS_Settings_RetaliationHeader>AI retaliation (Combat Extended)</MAS_Settings_RetaliationHeader>
+	<MAS_Settings_RetaliationExplain>When you shell a settlement from the world map, Combat Extended may make it shell you back (50% chance per hit for industrial and spacer settlements; only one retaliation at a time). Its budget is your map's threat points (half for industrial and spacer factions, full for ultra; at least 500) x 3.5 x the faction's strength. Each shell spends its cost (81 mm mortar 250, 105 mm howitzer 1000, GMLRS 400, ATACMS 1500, Minuteman 4000, nuclear Minuteman 6000) until the rest cannot pay for the cheapest one, with 0.5 to 4 seconds between shots. That is why early on you usually see one missile or a couple of mortar shells. The multiplier below scales that budget for every shell type; 0% turns retaliation shelling off (counter-raids are not affected).</MAS_Settings_RetaliationExplain>
+	<MAS_Settings_BudgetFactor>Retaliation budget: {0}</MAS_Settings_BudgetFactor>
+	<MAS_Settings_RetaliationOff>off</MAS_Settings_RetaliationOff>
+	<MAS_Settings_AINuclear>Factions can retaliate with nuclear Minutemen</MAS_Settings_AINuclear>
+	<MAS_Settings_AINuclearDesc>Spacer, ultra and archotech factions may add nuclear Minutemen (cost 6000, rare) to their retaliation. On your map they detonate like a Dubs Rimatomics nuke, fallout included.</MAS_Settings_AINuclearDesc>
+	<MAS_Settings_AINuclearNoRimatomics>Nuclear retaliation needs Dubs Rimatomics active.</MAS_Settings_AINuclearNoRimatomics>
 </LanguageData>

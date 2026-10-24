@@ -9,6 +9,12 @@ Ambiente: RimWorld 1.6, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcion
 - **Retaliação do CE**: a facção atacada revida com morteiros no mapa do jogador.
 - **Lote 5**: botão Descarregar (troca de ogiva pelo menu de recarga do CE + Descarregar), nomes reais, ataque a mapa carregado **sem marcador** nos lançadores guiados, raios de explosão em escala.
 
+## Lote 6 (implementado, NÃO testado)
+- **Detonação estilo Rimatomics** (`ProjectileCE_HeavyBlast` + `HeavyBlastExtension`, `Source/HeavyBlast.cs`) no Minuteman HE (r24,9, 8000) e termobárico (r24,9, 5000, dano Thermobaric, fogo 30%): roda em `LongEventHandler.QueueLongEvent` ("Detonando"), destrói direto o núcleo (35% do raio; rocha natural fica), uma passada de `TakeDamage` com queda até 15% na borda, retira teto fino no núcleo, cratera, explosão pequena só para efeito/som, tremor de câmera. Sem `ExplosionCE` nem fragmentos. Mundo inalterado (damage manual).
+- **Configurações do mod** (Opções → Configurações de mods → "Mounted Arms: Strategic", `Source/Settings.cs`): texto explicando a retaliação; barra do orçamento 0–500% (Harmony prefix em `HostilitySheller.TryStartShelling`, multiplica `points`; vale para todos os projéteis, morteiros do CE incluídos; 0% desliga o bombardeio de retaliação, não os raides); caixa "facções podem retaliar com Minuteman nuclear" (só com Rimatomics; adiciona/remove o nuclear em CE_ShellingPreset_Spacer/Ultra/Archotech, 6000 pts, peso 0,05; o CE lê a lista ao vivo).
+- **Espoleta de proximidade nos interceptadores** (Harmony postfix em `ProjectileCE_CIWS.Tick`, todos os projéteis de interceptação do CE, inclusive os do Mounted Arms): se a distância ao alvo cresce por 3 ticks após a aproximação máxima, o interceptador se destrói e libera o alvo. Motivo: o CE não deixa outra torreta mirar um projétil que tenha interceptador em voo; um PAC-3 que errou seguia voando e o Phalanx ficava sem tempo (relato do usuário).
+- A DLL agora usa Harmony (já carregado pelo CE; `loadAfter brrainz.harmony` no About) e referencia `Unity.Mathematics.dll` no build.
+
 ## Ajustes desta rodada (NÃO testados)
 - **Minuteman convencional derrubou o FPS no impacto** (raio 24,9, ~1950 células; centenas de paredes destruídas → recálculo de regiões/teto). Raio limitado a **19,5** (= maior explosão convencional do próprio CE, o Tomahawk), dano 8000, fragmentos 20/30; termobárico 19,5 / 5000. O nuclear é do Rimatomics e não muda.
 - Log "Tried to destroy already-destroyed thing Wall..." no impacto do Minuteman e da salva do HIMARS: pilha só com código do jogo/CE (`ExplosionCE.Tick` → `ExplosionDamageThing` → `Kill`), nada nosso. Hipótese: duas explosões/fragmentos no mesmo tick atingem a mesma parede. Inofensivo; não corrigível sem patch no CE.
@@ -19,11 +25,11 @@ Ambiente: RimWorld 1.6, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcion
 ## Implementado, NÃO testado
 - **M142 HIMARS** `MAS_Turret_MLRS`: tripulado 3x3, minificável, pod de 6 (troca o pod inteiro, 30 s), rajada 6 × 25 ticks, ShotSpread 0,6, circularError 2, giro 20°/s. `MAS_Ammo_GMLRS` (M31): Bomb 900 r 7,4; mundo 40 tiles, 0,5 tiles/tick, damage 0,4.
 - **Mk 41 VLS (Tomahawk)** `MAS_Turret_CruiseVLS`: 2x2, 300 W, sem operador, `ManualFireOnlyExtension` + `FixedTopExtension` (topo não gira), mag 4, circularError 1. `MAS_Ammo_CruiseMissile`: Bomb 5600 r 17,9; mundo 400 tiles, 0,15 tiles/tick, damage 3.
-- **Minuteman III (convencional)** `MAS_Turret_ICBMSilo`: 3x3, 1000 W, sem operador, só "atacar tile do mundo", mag 1, recarga 60 s. HE: Bomb 8000 r 19,5; mundo 500 tiles, damage 5.
+- **Minuteman III (convencional)** `MAS_Turret_ICBMSilo`: 3x3, 1000 W, sem operador, só "atacar tile do mundo", mag 1, recarga 60 s. HE: detonação própria r 24,9 / 8000; mundo 500 tiles, damage 5.
 - **M777** `MAS_Turret_M777_Howitzer`: tripulado 3x3, minificável, `AmmoSet_155mmHowitzerShell` do CE (mundo 60 tiles), giro 10°/s, exige marcador em mapa carregado.
 - **Ogivas especiais** (`MAS_Research_SpecialWarheads`), ATACMS / Minuteman:
   - Cluster (`ProjectileCE_Cluster`): 40 bombas em raio 12 / 100 em raio 26; mundo 1,2 / 3,5.
-  - Termobárica (dano `Thermobaric` do CE): 1500 r 12,9 / 5000 r 19,5; mundo 1,8 / 6.
+  - Termobárica (dano `Thermobaric` do CE): 1500 r 12,9 / detonação própria 5000 r 24,9 com fogo; mundo 1,8 / 6.
   - EMP: 400 r 6,9 / 600 r 7,9, **sem** `shellingProps.damage` (o CE usa o modificador EMP: 1,0 contra mecanoides, 0,03–0,18 contra humanos).
 - **MIM-104 Patriot** `MAS_Turret_InterceptorBattery` (`Building_MissileInterceptorCE`): só interceptação (projéteis e drop pods), alcance 119, 2 por ameaça, mag 4, 400 W. PAC-3 MSE: speed 180, `impactChance` 0,85. Precisa da opção do CE "Enable CIWS" (a interceptação do CIWS do Mounted Arms foi confirmada com ela ligada).
 - **Retaliação com mísseis** (`1.6/Patches/ShellingResponse.xml`): Spacer GMLRS (400 pts) + ATACMS (1500); Ultra/Archotech ATACMS + Minuteman HE (4000). Sem nuclear para a IA.
