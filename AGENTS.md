@@ -36,7 +36,7 @@ Docs/                    status, decisões, notas do sistema de mapa-mundo do CE
 9. **Interceptação (CIWS do CE):** `Building_CIWS_CE` + verbos `VerbProperties_CIWSProjectile`/`CIWSSkyfaller` + comp `CompVerbDisabler`; alvo = `ProjectileCE` hostil com `flyOverhead` e `speed` < 80 (os nossos mísseis entram). Alcance ≤ 119 (anéis de alcance quebram em 120). Sem `PlaceWorker_ShowTurretRadius` em torreta sem verbo de chão. Detalhes em `../MountedArms/Docs/CE_NOTES.md`.
 10. **Lançador guiado** (míssil/foguete com GPS/inércia): `verbClass` `MountedArmsStrategic.Verb_ShootGuidedCE` e `CombatExtended.OrbitalTurretExtension` (`isMarkMandatory` false) na gun; precisão só pelo `circularError`. Artilharia não guiada fica no `Verb_ShootMortarCE`.
 11. Compile a DLL com o jogo **fechado** (o jogo trava o arquivo).
-12. **Explosões grandes**: nunca matar rocha natural nem derrubar paredes sob teto em massa (travou o jogo): arranque o teto antes e aplique HP direto (ver `HeavyBlast`). **Chama de foguete**: use `CompProperties_Exhaust`, não o `CompProperties_ProjectileFleck` do CE.
+12. **Explosões grandes**: nunca matar rocha (natural, alisada, desmoronada, minério) nem derrubar paredes sob teto em massa (travou o jogo): arranque o teto antes e aplique HP direto (ver `HeavyBlast`). O cook-off do CE (`AmmoThing.TryDetonate`) usa o `explosionRadius` do projétil direto: munição de ogiva grande precisa do patch de cook-off. **Chama de foguete**: use `CompProperties_Exhaust`, não o `CompProperties_ProjectileFleck` do CE.
 13. **Docs sempre atualizados:** toda edição atualiza os MDs afetados (STATUS, DECISIONS, CE_WORLD_SHELLING, LAUNCH, README, AGENTS) no mesmo commit.
 14. Replace em massa: confira a linha certa; valide o XML depois.
 

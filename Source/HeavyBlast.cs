@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CombatExtended;
+using HarmonyLib;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -31,7 +32,8 @@ namespace MountedArmsStrategic
     /// Performance (the first version hung the game): every non-thick roof in R is stripped first (game rule, so
     /// nothing caves in cascade-style), buildings/items/plants lose hit points directly (also avoids Bomb's
     /// building factor multiplying the values), natural rock is left alone, stored CE ammo vanishes (no cook-off
-    /// chain), each thing is processed once, fires are capped.
+    /// chain), anything that explodes on death (chemfuel, turrets, IEDs...) vanishes too, each thing is processed
+    /// once, fires are capped (picked at random over the whole area, so outer rings still burn).
     /// </summary>
     public class ProjectileCE_HeavyBlast : ProjectileCE_Explosive
     {
@@ -119,79 +121,37 @@ namespace MountedArmsStrategic
             }
 
             // Pass 2: damage by zone.
-            List<Thing> things = new List<Thing>();
             HashSet<Thing> processed = new HashSet<Thing>();
-            int fires = 0;
+            List<IntVec3> fireCells = new List<IntVec3>();
+            int coreCells = 0;
             for (int c = 0; c < cells.Count; c++)
             {
                 IntVec3 cell = cells[c];
                 int zone = ZoneOf(cell.DistanceTo(center) / radius, ext.thermobaric);
-                float mult = ext.thermobaric && zone > 0 && confined[c] ? 1.5f : 1f;
-
-                things.Clear();
-                things.AddRange(cell.GetThingList(map));
-                for (int i = 0; i < things.Count; i++)
+                if (zone == 0)
                 {
-                    Thing t = things[i];
-                    if (t.Destroyed || !t.Spawned || t.Map != map || !processed.Add(t))
-                    {
-                        continue;
-                    }
-                    Pawn pawn = t as Pawn;
-                    if (pawn != null)
-                    {
-                        DamagePawn(pawn, zone, mult, pawnDamage, instigator, projectileDef);
-                        continue;
-                    }
-                    if (!t.def.useHitPoints || (t.def.building != null && t.def.building.isNaturalRock))
-                    {
-                        continue;
-                    }
-                    if (t.def is AmmoDef)
-                    {
-                        t.Destroy(DestroyMode.Vanish);
-                        continue;
-                    }
-                    if (zone == 0)
-                    {
-                        t.Destroy(DestroyMode.KillFinalize);
-                        continue;
-                    }
-                    switch (t.def.category)
-                    {
-                        case ThingCategory.Building:
-                            int dmg = Mathf.RoundToInt(BuildingDamage[zone] * mult);
-                            if (zone == 4 && t is Building_Door)
-                            {
-                                dmg = Mathf.Max(dmg, Mathf.RoundToInt(t.MaxHitPoints * 0.75f));   // doors blown in at 2-3 psi
-                            }
-                            LoseHitPoints(t, dmg);
-                            break;
-                        case ThingCategory.Plant:
-                            if (Rand.Chance(PlantDestroyChance[zone]))
-                            {
-                                t.Destroy(DestroyMode.KillFinalize);
-                            }
-                            else
-                            {
-                                LoseHitPoints(t, Mathf.RoundToInt(t.MaxHitPoints * 0.7f));
-                            }
-                            break;
-                        default:
-                            if (Rand.Chance(ItemDestroyChance[zone]))
-                            {
-                                t.Destroy(DestroyMode.KillFinalize);
-                            }
-                            else
-                            {
-                                LoseHitPoints(t, Mathf.RoundToInt(t.MaxHitPoints * Rand.Range(ItemLossMin[zone], ItemLossMax[zone]) * mult));
-                            }
-                            break;
-                    }
+                    coreCells = c + 1;   // radial order: the core is a prefix of the list
                 }
+                float mult = ext.thermobaric && zone > 0 && confined[c] ? 1.5f : 1f;
+                DamageCell(map, cell, zone, mult, pawnDamage, instigator, projectileDef, processed);
 
                 float fire = ext.thermobaric ? FireThermobaric[zone] : FireHE[zone];
-                if (fires < MaxFires && fire > 0f && Rand.Chance(fire) && FireUtility.TryStartFireIn(cell, map, Rand.Range(0.3f, 0.9f), instigator))
+                if (fire > 0f && Rand.Chance(fire))
+                {
+                    fireCells.Add(cell);
+                }
+            }
+            // Pass 3: whatever appeared in the core during pass 2 (corpses, dropped gear, ejected contents).
+            for (int c = 0; c < coreCells; c++)
+            {
+                DamageCell(map, cells[c], 0, 1f, pawnDamage, instigator, projectileDef, processed);
+            }
+
+            fireCells.Shuffle();
+            int fires = 0;
+            for (int i = 0; i < fireCells.Count && fires < MaxFires; i++)
+            {
+                if (FireUtility.TryStartFireIn(fireCells[i], map, Rand.Range(0.3f, 0.9f), instigator))
                 {
                     fires++;
                 }
@@ -202,11 +162,90 @@ namespace MountedArmsStrategic
                 GenSpawn.Spawn(ext.crater, center, map, WipeMode.Vanish);
             }
             // flash + sound only (damage 1: the zones above already did the work)
-            GenExplosion.DoExplosion(center, map, ext.fxRadius, DamageDefOf.Bomb, instigator, 1, -1f, SoundDef.Named("Explosion_GiantBomb"));
+            SoundDef sound = projectileDef.projectile != null && projectileDef.projectile.soundExplode != null
+                ? projectileDef.projectile.soundExplode : SoundDef.Named("Explosion_GiantBomb");
+            GenExplosion.DoExplosion(center, map, ext.fxRadius, DamageDefOf.Bomb, instigator, 1, -1f, sound);
             if (map == Find.CurrentMap)
             {
                 Find.CameraDriver.shaker.DoShake(Mathf.Clamp(radius / 6f, 1f, 4f));
             }
+        }
+
+        private static void DamageCell(Map map, IntVec3 cell, int zone, float mult, DamageDef pawnDamage, Thing instigator,
+            ThingDef projectileDef, HashSet<Thing> processed)
+        {
+            List<Thing> things = new List<Thing>(cell.GetThingList(map));
+            for (int i = 0; i < things.Count; i++)
+            {
+                Thing t = things[i];
+                if (t.Destroyed || !t.Spawned || t.Map != map || !processed.Add(t))
+                {
+                    continue;
+                }
+                Pawn pawn = t as Pawn;
+                if (pawn != null)
+                {
+                    DamagePawn(pawn, zone, mult, pawnDamage, instigator, projectileDef);
+                    continue;
+                }
+                if (!t.def.useHitPoints || IsRock(t.def))
+                {
+                    continue;
+                }
+                if (t.def is AmmoDef || ExplodesOnDeath(t))
+                {
+                    t.Destroy(DestroyMode.Vanish);   // no cook-off / secondary explosion chain
+                    continue;
+                }
+                if (zone == 0)
+                {
+                    t.Destroy(DestroyMode.KillFinalize);
+                    continue;
+                }
+                switch (t.def.category)
+                {
+                    case ThingCategory.Building:
+                        int dmg = Mathf.RoundToInt(BuildingDamage[zone] * mult);
+                        if (zone == 4 && t is Building_Door)
+                        {
+                            dmg = Mathf.Max(dmg, Mathf.RoundToInt(t.MaxHitPoints * 0.75f));   // doors blown in at 2-3 psi
+                        }
+                        LoseHitPoints(t, dmg);
+                        break;
+                    case ThingCategory.Plant:
+                        if (Rand.Chance(PlantDestroyChance[zone]))
+                        {
+                            t.Destroy(DestroyMode.KillFinalize);
+                        }
+                        else
+                        {
+                            LoseHitPoints(t, Mathf.RoundToInt(t.MaxHitPoints * 0.7f));
+                        }
+                        break;
+                    default:
+                        if (Rand.Chance(ItemDestroyChance[zone]))
+                        {
+                            t.Destroy(DestroyMode.KillFinalize);
+                        }
+                        else
+                        {
+                            LoseHitPoints(t, Mathf.RoundToInt(t.MaxHitPoints * Rand.Range(ItemLossMin[zone], ItemLossMax[zone]) * mult));
+                        }
+                        break;
+                }
+            }
+        }
+
+        // natural, smoothed and collapsed rock and ore: they hold the mountain roof (removing them caves it in)
+        private static bool IsRock(ThingDef def)
+        {
+            return def.mineable || (def.building != null && (def.building.isNaturalRock || def.building.isResourceRock));
+        }
+
+        private static bool ExplodesOnDeath(Thing t)
+        {
+            ThingWithComps twc = t as ThingWithComps;
+            return twc != null && (twc.GetComp<CompExplosive>() != null || twc.GetComp<CompExplosiveCE>() != null);
         }
 
         private static void DamagePawn(Pawn pawn, int zone, float mult, DamageDef damageDef, Thing instigator, ThingDef projectileDef)
@@ -230,10 +269,16 @@ namespace MountedArmsStrategic
             else
             {
                 t.HitPoints = hp;
+                Building b = t as Building;
+                if (b != null && b.Spawned)
+                {
+                    b.Map.listerBuildingsRepairable.Notify_BuildingTookDamage(b);   // normally done by PostApplyDamage
+                }
             }
         }
 
-        // the crater is a multi-cell building: inside the map and not over anything that must not be wiped
+        // the crater is a multi-cell building spawned with WipeMode.Vanish: inside the map, on buildable ground,
+        // and never over rock or anything else that survived the blast (it would be deleted silently)
         private static bool CanPlaceCrater(ThingDef crater, IntVec3 center, Map map)
         {
             CellRect rect = GenAdj.OccupiedRect(center, Rot4.North, crater.size);
@@ -243,16 +288,50 @@ namespace MountedArmsStrategic
             }
             foreach (IntVec3 c in rect)
             {
+                if (c.GetEdifice(map) != null || !c.SupportsStructureType(map, crater.terrainAffordanceNeeded))
+                {
+                    return false;
+                }
                 List<Thing> list = c.GetThingList(map);
                 for (int i = 0; i < list.Count; i++)
                 {
-                    if (!list[i].def.destroyable)
+                    if (!list[i].def.destroyable || IsRock(list[i].def))
                     {
                         return false;
                     }
                 }
             }
             return true;
+        }
+    }
+
+    /// <summary>
+    /// CE's ammo cook-off (AmmoThing.TryDetonate) runs GenExplosionCE with the projectile's explosionRadius and
+    /// damage directly, never through ProjectileCE_HeavyBlast. For these warheads that would be the full-size CE
+    /// explosion that hung the game, so a burning or shot missile only blows up locally (fxRadius). The XML
+    /// explosionRadius stays because CE also uses it for the targeting ring.
+    /// </summary>
+    [HarmonyPatch(typeof(AmmoThing), "TryDetonate")]
+    public static class Patch_HeavyBlastCookOff
+    {
+        public static bool Prefix(AmmoThing __instance, ref bool __result)
+        {
+            AmmoDef ammo = __instance.def as AmmoDef;
+            ThingDef projectile = ammo != null ? ammo.detonateProjectile : null;
+            HeavyBlastExtension ext = projectile != null ? projectile.GetModExtension<HeavyBlastExtension>() : null;
+            if (ext == null || !__instance.Spawned)
+            {
+                return true;
+            }
+            // same idea as CE: the more damaged the stack, the likelier it detonates; CE destroys the stack itself
+            // afterwards (we are inside PreApplyDamage), and the stack is ignored by its own blast (no recursion)
+            __result = Rand.Chance(Mathf.Clamp01(1f - (float)__instance.HitPoints / __instance.MaxHitPoints));
+            if (__result)
+            {
+                GenExplosion.DoExplosion(__instance.Position, __instance.Map, ext.fxRadius, DamageDefOf.Bomb, null, 60, -1f,
+                    SoundDef.Named("Explosion_GiantBomb"), ignoredThings: new List<Thing> { __instance });
+            }
+            return false;
         }
     }
 }

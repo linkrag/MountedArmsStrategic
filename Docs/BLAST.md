@@ -34,7 +34,15 @@ Paredes vanilla (HP base 300 × fator do material): madeira ~195, aço 300, pedr
 ## Regras de desempenho (a primeira versão travou o jogo)
 - Todo teto não-espesso do raio é arrancado antes (regra de jogo: uma laje real de concreto resistiria a 2 psi).
 - Prédios/itens/plantas perdem HP direto (também evita o multiplicador de prédios do dano Bomb).
-- Rocha natural intocada; munição do CE na área some (sem cook-off); cada coisa processada uma vez; cratera só se couber.
+- Rocha intocada: natural, alisada, desmoronada e minério (`mineable`/`isNaturalRock`/`isResourceRock`), porque seguram o teto de montanha, que não é arrancado.
+- Munição do CE e tudo que explode ao morrer (químico, torretas, IEDs, geradores: `CompExplosive`/`CompExplosiveCE`) somem na área, sem explosões em cadeia.
+- Cada coisa é processada uma vez; uma 3ª passada no núcleo pega o que surgiu durante a 2ª (cadáveres, equipamento caído, conteúdo ejetado).
+- Fogo: as células sorteadas são embaralhadas antes do limite de 200, para os anéis externos também queimarem.
+- Prédios danificados entram na lista de reparo (`listerBuildingsRepairable`), já que o HP é alterado direto.
+- Cratera só se couber: dentro do mapa, em terreno que suporte construção, sem nenhum edifício que tenha sobrado nem rocha embaixo.
+- **Cook-off**: o `AmmoThing.TryDetonate` do CE usa direto o `explosionRadius`/dano do projétil (não passa por esta classe). Um patch troca isso, nestes mísseis, por uma explosão pequena (`fxRadius`, 60 de Bomb), com a mesma chance do CE (quanto mais danificada a pilha, mais provável). O `explosionRadius` do XML fica, porque o CE o usa para o círculo de mira.
+- Som: usa o `soundExplode` do projétil (o GMLRS toca o som de morteiro).
+- Não feito: prédios de outras facções perdem HP sem o aviso de dano à facção (`Faction.Notify_BuildingTookDamage`). Em ataque de míssil eles já são hostis, na prática.
 
 ## Mísseis com este modelo
 Minuteman III HE (R 24,9) e termobárico (24,9), ATACMS HE (11,9) e termobárico (12,9), GMLRS (7,4), Tomahawk (17,9). Não usam: cluster (submunições), EMP (fórmula do CE no mapa-mundo), nuclear (Rimatomics).
