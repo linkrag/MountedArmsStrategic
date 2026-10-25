@@ -1,5 +1,8 @@
 # Status (atualize sempre que o usuário testar algo)
 
+> **Pausa para migrar ao 1.7 (25/out/2026):** contexto completo em `MountedArmsStrategic/Docs/HANDOFF.md`.
+
+
 Ambiente: RimWorld 1.6, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcional). DLL: `Source/build.ps1` **com o jogo fechado** (o jogo trava a DLL; `-Out <pasta>` só para validar a compilação).
 
 ## Confirmado em jogo (out/2026)
