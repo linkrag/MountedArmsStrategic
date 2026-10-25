@@ -1,9 +1,9 @@
 # Status (atualize sempre que o usuário testar algo)
 
-> **RimWorld 1.7 (25/out/2026):** About/LoadFolders aceitam 1.7 reaproveitando `1.6/` e as DLLs de 1.6; **não testado em jogo**. Auditoria, riscos e toolchain: `MountedArms/Docs/MIGRATION_1_7.md`. Contexto anterior: `MountedArmsStrategic/Docs/HANDOFF.md`.
+> **RimWorld 1.7 (25/out/2026):** conteúdo comum em `1.6/`; DLL por versão em `Bin/1.6` (build antigo, do lote 10) e `Bin/1.7` (lote 11 em diante, compilada contra o CE 1.6 com `tools/unity_facades.ps1`). Auditoria, riscos e toolchain: `MountedArms/Docs/MIGRATION_1_7.md`. Contexto anterior: `MountedArmsStrategic/Docs/HANDOFF.md`.
 
 
-Ambiente: RimWorld 1.6, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcional). DLL: `Source/build.ps1` **com o jogo fechado** (o jogo trava a DLL; `-Out <pasta>` só para validar a compilação).
+Ambiente: RimWorld 1.6 ou 1.7, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcional). DLL: `Source/build.ps1` **com o jogo fechado** (o jogo trava a DLL; `-Out <pasta>` só para validar a compilação). A versão do jogo instalado decide a saída: `Bin/1.6/Assemblies` ou `Bin/1.7/Assemblies`.
 
 ## Confirmado em jogo (out/2026)
 - Carregamento sem erros, aba de pesquisa, construção, receitas no injector do CE.
@@ -11,6 +11,21 @@ Ambiente: RimWorld 1.6, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcion
 - **Minuteman III (nuclear, com Rimatomics)**: explosão nuclear e fogo do próprio Rimatomics funcionando.
 - **Retaliação do CE**: a facção atacada revida com morteiros no mapa do jogador.
 - **Lote 5**: botão Descarregar (troca de ogiva pelo menu de recarga do CE + Descarregar), nomes reais, ataque a mapa carregado **sem marcador** nos lançadores guiados, raios de explosão em escala.
+
+## Lote 11 (implementado, NÃO testado; só na DLL de 1.7)
+Relato do usuário depois do lote 10: paredes com 1 de HP sobreviviam a vários mísseis; a salva da HIMARS caía muito junta; a remoção direta nos anéis parecia "apertar Delete".
+- **Paredes com 1 HP**: causa no nosso código, não no CE (vale igual na 1.6). Toda parede, coluna ou porta a até 6,9 células de teto de montanha ficava com no mínimo 1 de HP para sempre. Agora (escolha do usuário: desabamento real) o golpe letal fica guardado e elas caem juntas no fim da onda, e o desabamento vanilla roda uma vez no tick seguinte. A cratera não sai sob teto de montanha.
+- **Dano real fora do núcleo** (decisão do usuário): o núcleo continua sendo vaporização (remoção direta + cratera); nos anéis, prédios/itens/plantas levam `TakeDamage` com o dano novo `MAS_BlastWave` (fatores 1, sem som, sem sujeira, sem fragmentos de parede do CE), prédios ±20%. O teto continua arrancado à frente da onda.
+- **Munição e explosivos** (inclusive o boomshroom do Odyssey, que explode ao morrer) só podem explodir nos últimos 3–8% do raio. Mais para dentro, itens somem, prédios explosivos viram destroços sem explodir (`destroyedThroughDetonation`) e boomshrooms morrem sem explodir. Detalhes em `Docs/BLAST.md`.
+- **Salva da HIMARS**: o CE trava a mira da rajada inteira no 1º tiro (estimativa de distância e erro circular), e só o `ShotSpread` 0,6° variava por foguete, então a salva caía num grupo apertado cujo centro variava. Fonte: `Verb_LaunchProjectileCE.ShiftTarget`/`LockRotationAndAngle`. Agora `Verb_ShootGuidedCE.ShiftTarget` manda cada míssil num alvo local para um ponto próprio, uniforme dentro do `circularError` do ponto mirado (sem spread, recuo nem erro de distância), limitado ao alcance da carga. O lead do CE em pawns em movimento continua. HIMARS `circularError` 2 → 7 (o raio da explosão do GMLRS é 7,4). Na 1.6 fica 2 (`1.6/Legacy1.6`, carregada só na 1.6), porque a DLL antiga só deslocaria a salva inteira. Vale também para M270 (3), Mk 41 (1) e Minuteman (4); o `recoilAmount`/`ShotSpread` deles só contam na DLL antiga de 1.6. O tiro no mapa-mundo não muda.
+- **Build na 1.7**: `Source/build.ps1` detecta a versão do jogo. Na 1.7 gera facades `UnityEngine.*` → `UnityStubs` (`tools/unity_facades.ps1`, em `obj/`) para o compilador aceitar o CE 1.6, e grava em `Bin/1.7/Assemblies`. A DLL de 1.6 (lote 10) foi movida para `Bin/1.6/Assemblies` e só muda quando houver um jogo 1.6 para compilar. A DLL nova referencia `UnityStubs` (só roda na 1.7).
+- Revisão independente (3 revisores + verificador por achado; 4 de 5 confirmados, todos corrigidos): boomshroom explodindo nos anéis; paredes de montanha do núcleo deixavam destroços no núcleo (agora caem antes da varredura final); `circularError` 7 piorava a 1.6; o lead em alvo móvel tinha se perdido.
+- Testar (1.7):
+  1. Carregar sem erros com o CE 16.7.4.
+  2. Base comum: anéis com dano visível, prédios danificados em vez de sumirem, núcleo vaporizado com cratera.
+  3. Base escavada em montanha: as paredes atingidas caem e a montanha desaba uma vez no fim da onda (uma carta), sem travar.
+  4. Paiol no raio: só explode na borda.
+  5. Salva da HIMARS espalhada até ~7 células do ponto.
 
 ## Lote 10 (implementado, NÃO testado)
 - Teste do lote 9: zonas OK, mas impacto travava ~1 s, sem efeito visual, e tudo aparecia destruído de uma vez (tudo era feito num tick). Agora a explosão é uma **onda de choque em ticks** (`BlastWave`, `HeavyBlastWaves`): frente de 0 a R em 6–25 ticks, até 150 coisas por tick, teto arrancado 7 células à frente, efeito de explosão vanilla em cada célula + fumaça/poeira. Ver `Docs/BLAST.md`.

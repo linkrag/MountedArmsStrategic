@@ -16,15 +16,19 @@ Pesquisa feita em out/2026 com workflow (4 trilhas de pesquisa + síntese + veri
 - ≥ ~20 psi: concreto armado pesado arrasado.
 
 ## Modelo no jogo (HE)
-| Zona | Faixa de R | Sobrepressão | Prédios (HP direto) | Pawns (dano Bomb total / golpes) | Itens | Plantas | Fogo |
+| Zona | Faixa de R | Sobrepressão | Prédios (dano `MAS_BlastWave`, ±20%) | Pawns (dano Bomb total / golpes) | Itens | Plantas | Fogo |
 |---|---|---|---|---|---|---|---|
-| Núcleo | 0–0,25 | ≥ ~22 psi | destruídos | 400–500 / 5 | destruídos | destruídas | 30% |
+| Núcleo (vaporização) | 0–0,25 | ≥ ~22 psi | removidos direto | 400–500 / 5 | removidos direto | removidas direto | 30% |
 | Severa A | 0,25–0,37 | 22–10 psi | −900 (plastaço 840 cai) | 150–250 / 4 | 90% destruídos | destruídas | 10% |
 | Severa B | 0,37–0,50 | 10–5,8 psi | −600 (plastaço sobrevive) | 80–150 / 3 | 70% destruídos | destruídas | 10% |
 | Pesada | 0,50–0,75 | 5,8–3 psi | −250 (madeira 195 cai; pedra trinca) | 30–60 / 2 | 25% destruídos | 50% | 0 |
 | Moderada | 0,75–1,0 | 3–2 psi | −100; portas −75% do HP | 10–25 / 1 | −10–20% HP | 10% | 0 |
 
 Paredes vanilla (HP base 300 × fator do material): madeira ~195, aço 300, pedra 360–510, plastaço 840.
+
+- **Núcleo = zona de vaporização** (pedido do usuário): tudo menos rocha é removido direto (`Destroy`), e a cratera fica no centro.
+- **Fora do núcleo, dano real** (pedido do usuário, out/2026: a remoção direta parecia "apertar Delete"): prédios, itens e plantas recebem `TakeDamage` com o dano próprio `MAS_BlastWave` (`1.6/Defs/DamageDefs.xml`). Todos os fatores dele ficam em 1 (o Bomb é ×4 em prédios e plantas), então o HP perdido é exatamente o da tabela. Não tem som de impacto, não gera sujeira e não solta fragmentos de parede do CE (`canCauseWallFragmentation` false). Por isso os prédios entram na lista de reparo e a facção dona é avisada normalmente. O dano em prédios varia ±20% por coisa, para o anel não sair cortado em degrau. "Destruído" nos itens e plantas = dano igual ao HP (planta deixa toco).
+- Pawns continuam levando Bomb (ou o `damageDef` da ogiva).
 
 ## Termobárico
 - Mesmo núcleo; anéis até 0,55R e 0,82R (pico de sobrepressão ao ar livre só ~1,0–1,4× TNT; raio cresce no máximo 1,4^(1/3) ≈ 1,12×).
@@ -35,18 +39,17 @@ Paredes vanilla (HP base 300 × fator do material): madeira ~195, aço 300, pedr
 - **Onda de choque espalhada no tempo** (`BlastWave` + `HeavyBlastWaves`, um MapComponent): o clarão e o som saem no impacto; a frente cresce do centro até R em 6–25 ticks (~0,1–0,4 s) e cada tick processa as células que ela passou, no máximo 150 coisas por tick (base densa deixa a frente mais lenta, não o quadro). Cada célula gera o efeito de explosão vanilla do tipo de dano (`explosionCellFleck`, cor do centro para a borda), mais fumaça/poeira sorteadas e brilho de fogo no termobárico. Antes, tudo num tick só: ~1 s de travamento, sem efeito visual, e tudo aparecia destruído de uma vez.
 - A onda não é salva: um save feito no meio dela perde o resto (dura menos de meio segundo).
 - Pawns no raio no momento do impacto são registrados; quem entrar numa célula já processada leva o dano da zona onde estava, no fim da onda.
-- Paredes, colunas e portas construídas que seguram teto de montanha (teto espesso a até 6,9 células) perdem HP, mas ficam com no mínimo 1, para a montanha não desabar.
+- Paredes, colunas e portas construídas que seguram teto de montanha (teto espesso a até 6,9 células): um golpe que não mata é aplicado na hora. Um golpe letal (sempre no núcleo) fica guardado, e elas caem todas juntas no fim da onda, antes da varredura final do núcleo (que limpa os restos delas). O desabamento vanilla roda uma vez, no tick seguinte (`MapPreTick`): rocha desmoronada cai e esmaga o que estiver embaixo, com uma carta só. Antes elas ficavam com no mínimo 1 de HP e sobreviviam a qualquer número de mísseis (relato do usuário, out/2026).
 - Todo teto não-espesso do raio é arrancado, sempre 7 células à frente da onda (a sustentação de teto vanilla alcança 6,9), então nenhuma parede cai sob teto que ainda existe (regra de jogo: uma laje real de concreto resistiria a 2 psi).
-- Prédios/itens/plantas perdem HP direto (também evita o multiplicador de prédios do dano Bomb).
 - Rocha intocada: natural, alisada, desmoronada e minério (`mineable`/`isNaturalRock`/`isResourceRock`), porque seguram o teto de montanha, que não é arrancado.
-- Munição do CE e tudo que explode ao morrer (químico, torretas, IEDs, geradores: `CompExplosive`/`CompExplosiveCE`) somem na área, sem explosões em cadeia.
+- **Munição e explosivos** (munição do CE e tudo que explode ao morrer: químico, torretas, IEDs, geradores, `CompExplosive`/`CompExplosiveCE`, também dentro de caixotes de minificado, e o boomshroom do Odyssey, cujo `Kill` solta chamas) só podem explodir nos últimos 3–8% do raio (sorteado por coisa). Ali levam o dano normal da zona e podem ou não reagir: cook-off do CE, pavio do vanilla. Mais para dentro, sem reação em cadeia: itens somem (consumidos); prédios perdem HP direto (o `TakeDamage` acenderia o pavio) e, se o golpe for letal, viram destroços sem explodir (`destroyedThroughDetonation`); boomshrooms perdem HP direto e morrem por `Destroy`, que não chama o `Kill`.
 - Cada coisa é processada uma vez; uma 3ª passada no núcleo pega o que surgiu durante a 2ª (cadáveres, equipamento caído, conteúdo ejetado).
 - Fogo: as células sorteadas são embaralhadas antes do limite de 200, para os anéis externos também queimarem.
-- Prédios danificados entram na lista de reparo (`listerBuildingsRepairable`), já que o HP é alterado direto.
-- Cratera só se couber: dentro do mapa, em terreno que suporte construção, sem nenhum edifício que tenha sobrado nem rocha embaixo.
+- Prédios explosivos que perdem HP direto entram na lista de reparo à mão (`listerBuildingsRepairable`).
+- Cratera só se couber: dentro do mapa, em terreno que suporte construção, sem nenhum edifício que tenha sobrado nem rocha embaixo, e sem teto de montanha em nenhuma célula (o desabamento cairia em cima dela).
 - **Cook-off**: o `AmmoThing.TryDetonate` do CE usa direto o `explosionRadius`/dano do projétil (não passa por esta classe). Um patch troca isso, nestes mísseis, por uma explosão pequena (`fxRadius`, 60 de Bomb), com a mesma chance do CE (quanto mais danificada a pilha, mais provável). O `explosionRadius` do XML fica, porque o CE o usa para o círculo de mira.
 - Som: usa o `soundExplode` do projétil (o GMLRS toca o som de morteiro).
-- Não feito: prédios de outras facções perdem HP sem o aviso de dano à facção (`Faction.Notify_BuildingTookDamage`). Em ataque de míssil eles já são hostis, na prática.
+- Fora do núcleo o dano em prédios passa pelo aviso normal à facção, mas **sem instigador**, para uma onda não gerar centenas de perdas de goodwill e mensagens. Uma perda única de goodwill por facção atingida ficou como ideia.
 
 ## Mísseis com este modelo
 Minuteman III HE (R 24,9) e termobárico (24,9), ATACMS HE (11,9) e termobárico (12,9), GMLRS (7,4), Tomahawk (17,9). Não usam: cluster (submunições), EMP (fórmula do CE no mapa-mundo), nuclear (Rimatomics).

@@ -1,6 +1,6 @@
 # Mounted Arms: Strategic Missiles
 
-Mod de RimWorld 1.6 com lançadores de mísseis balísticos que atacam o mapa local e assentamentos no **mapa-mundo**, usando o sistema de tiro no mapa-mundo do **Combat Extended** (requisito). Companheiro do Mounted Arms, sem depender dele.
+Mod de RimWorld 1.6 e 1.7 com lançadores de mísseis balísticos que atacam o mapa local e assentamentos no **mapa-mundo**, usando o sistema de tiro no mapa-mundo do **Combat Extended** (requisito). Companheiro do Mounted Arms, sem depender dele.
 
 - packageId: `linkrag.mountedarms.strategic` · autor: Felipe
 - Aba de pesquisa própria: "Strategic Missiles"
@@ -12,7 +12,7 @@ Mod de RimWorld 1.6 com lançadores de mísseis balísticos que atacam o mapa lo
 | MGM-140 ATACMS (HE) | Explosão por zonas reais, raio 11,9; ~3 acertos destroem um assentamento industrial |
 | Minuteman III silo (3x3, energia) | Só dispara por ordem no mapa-mundo, até 500 tiles; 1 míssil |
 | LGM-30G Minuteman III (HE) | Explosão raio 24,9 (detonação própria, sem queda de frames); dano 5 no mapa-mundo (1–2 acertos) |
-| Lançador múltiplo de foguetes (3x3, tripulado, estilo HIMARS) | Salva de 6 foguetes guiados; mapa local ou até 40 tiles |
+| Lançador múltiplo de foguetes (3x3, tripulado, estilo HIMARS) | Salva de 6 foguetes guiados espalhados até ~7 células do ponto (na 1.7); mapa local ou até 40 tiles |
 | Lançador de mísseis de cruzeiro (2x2, energia, VLS) | Só por ordem; até 400 tiles; lento e muito preciso |
 | Obuseiro M777 155 mm (3x3, tripulado) | Munição 155 mm do CE; até 60 tiles |
 | Ogivas especiais (tático e ICBM) | Cluster, termobárica, EMP (contra colmeias mecanoides) |
@@ -24,4 +24,4 @@ Configurações do mod: orçamento da retaliação da IA (0–500%) e retaliaç�
 Retaliação da IA (CE): facções espaciais podem responder com mísseis táticos; ultra/archotech também com ICBM HE (nunca nuclear).
 
 ## Desenvolvimento
-Guia para agentes: `AGENTS.md`. Texturas: `python tools/gen_tex.py 1.6/Textures/MountedArmsStrategic`.
+Guia para agentes: `AGENTS.md`. DLL: `powershell -File Source/build.ps1` (jogo fechado; gera `Bin/<versão do jogo>/Assemblies`). Texturas: `python tools/gen_tex.py 1.6/Textures/MountedArmsStrategic`.

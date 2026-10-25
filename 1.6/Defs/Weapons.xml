@@ -33,8 +33,8 @@
 				<range>700</range>
 				<!-- burst fires both missiles; the CE fire mode toggle lets the player fire one -->
 				<burstShotCount>2</burstShotCount>
-				<!-- CE recoil is 0 on the first shot of a burst, so this only spreads the 2nd missile of a
-				     salvo; single fire is unaffected (no DLL change) -->
+				<!-- recoil/ShotSpread only matter for the 1.6 DLL built before the per-missile scatter
+				     (Verb_ShootGuidedCE now lands each missile within circularError of the aim point) -->
 				<recoilAmount>1.2</recoilAmount>
 				<ticksBetweenBurstShots>90</ticksBetweenBurstShots>
 				<soundCast>RocketswarmLauncher_Fire</soundCast>
@@ -150,8 +150,9 @@
 	</ThingDef>
 
 
-	<!-- MLRS: 6-rocket pod, salvo with spread (ShotSpread spreads the burst on the local map; on the
-	     world map CE scatters every shot on arrival). Pod swap = whole magazine at once. -->
+	<!-- MLRS: 6-rocket pod, salvo with spread: Verb_ShootGuidedCE lands each rocket at its own point,
+	     uniform within circularError of the aim point (local map; world shots scatter at launch, also
+	     by circularError). Pod swap = whole magazine at once. -->
 	<ThingDef ParentName="BaseTurretGun">
 		<defName>MAS_Gun_MLRS</defName>
 		<label>HIMARS rocket pod</label>
@@ -185,7 +186,9 @@
 				<soundCast>RocketswarmLauncher_Fire</soundCast>
 				<soundCastTail>GunTail_Heavy</soundCastTail>
 				<muzzleFlashScale>25</muzzleFlashScale>
-				<circularError>2</circularError>
+				<!-- salvo radius in cells (the GMLRS blast R is 7.4); 1.6/Legacy1.6 keeps 2 on RimWorld 1.6
+				     until Bin/1.6 is rebuilt with the per-missile scatter -->
+				<circularError>7</circularError>
 				<indirectFirePenalty>0.05</indirectFirePenalty>
 				<ai_IsBuildingDestroyer>true</ai_IsBuildingDestroyer>
 				<targetParams>

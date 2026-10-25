@@ -22,13 +22,18 @@
 
 - Explosões grandes seguem zonas reais de sobrepressão (pesquisa em `BLAST.md`), mantendo as regras de desempenho (teto arrancado no raio todo).
 
+- Explosão grande (out/2026, lote 11): núcleo = vaporização (remoção direta + cratera); anéis com dano real (`TakeDamage`); munição e explosivos só reagem nos últimos 3–8% do raio. Paredes que seguram teto de montanha caem e a montanha desaba de verdade (antes ficavam com 1 de HP para sempre).
+- Salva de foguetes guiados espalhada: cada míssil cai num ponto próprio dentro do `circularError` (HIMARS 7).
+
 ## Técnicas
 - Defs CE nativos (o mod exige CE), herdando das bases do CE.
 - Projétil de artilharia: speed 0 + gravityFactor 5 (lição da bateria do Mounted Arms).
 - Lançador tático sem raio de colocação e `ai_combatDangerous` false (alcance 700).
 - `circularError` 3 e `indirectFirePenalty` 0,05: míssil guiado, mais preciso que o morteiro do CE (3 / 0,3).
 - `Verb_ShootGuidedCE` (nosso, deriva de `Verb_ShootMortarCE`) para M270, HIMARS, Mk 41 e Minuteman; explicação em `CE_WORLD_SHELLING.md`.
-- Explosão convencional acima de ~r20: usar `ProjectileCE_HeavyBlast` (detonação em long event, como o Rimatomics), não a `ExplosionCE` do CE, que em r24,9 derrubava o FPS.
+- Explosão convencional acima de ~r20: usar `ProjectileCE_HeavyBlast` (hoje uma onda de choque espalhada em ticks; ver `BLAST.md`), não a `ExplosionCE` do CE, que em r24,9 derrubava o FPS.
+- Dano da explosão grande em prédios/itens/plantas com um DamageDef próprio (`MAS_BlastWave`, fatores 1) em vez do Bomb (×4 em prédios e plantas, som de impacto, sujeira e fragmentos de parede do CE).
+- DLL por versão em `Bin/<versão>/Assemblies`, conteúdo comum em `1.6/`; na 1.7, compilar contra o CE 1.6 com facades `UnityEngine.*` → `UnityStubs`.
 - Dano no mapa-mundo 1,5: ~3 acertos num assentamento industrial (cálculo em `CE_WORLD_SHELLING.md`).
 
 ## Dubs Rimatomics (verificado nos defs, workshop 1127530465)

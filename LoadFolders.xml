@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <loadFolders>
+  <!-- Content (Defs, Textures, Patches...) is shared in 1.6/; only the DLL is per version (Source/build.ps1). -->
   <v1.6>
     <li>/</li>
     <li>1.6</li>
+    <li>Bin/1.6</li>
+    <!-- keeps 1.6 values that need the newer DLL; delete once Bin/1.6 is rebuilt -->
+    <li>1.6/Legacy1.6</li>
     <li IfModActive="Dubwise.Rimatomics">1.6/Rimatomics</li>
   </v1.6>
-  <!-- 1.7 reuses the 1.6 content and DLLs (Waylith redirects UnityEngine* to UnityStubs). -->
+  <!-- the 1.7 DLL references UnityStubs (Waylith); it is built against the 1.6 CE through tools/unity_facades.ps1 -->
   <v1.7>
     <li>/</li>
     <li>1.6</li>
+    <li>Bin/1.7</li>
     <li IfModActive="Dubwise.Rimatomics">1.6/Rimatomics</li>
   </v1.7>
 </loadFolders>

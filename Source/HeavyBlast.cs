@@ -17,23 +17,35 @@ namespace MountedArmsStrategic
         public ThingDef crater;
     }
 
+    [DefOf]
+    public static class MASDamageDefOf
+    {
+        public static DamageDef MAS_BlastWave;   // every factor 1: TakeDamage removes exactly the zone's hit points
+
+        static MASDamageDefOf()
+        {
+            DefOfHelper.EnsureInitializedInCtor(typeof(MASDamageDefOf));
+        }
+    }
+
     /// <summary>
     /// Large warhead blast with real overpressure zones (Kingery-Bulmash cube-root scaling; damage criteria from
     /// Glasstone &amp; Dolan / TM 5-1300 / OTA / FM 8-9; research in Docs/BLAST.md). The zone radii are fixed
     /// fractions of R because, under cube-root scaling, the ratios between overpressure contours do not depend on
     /// the charge mass; the per-zone damage depends only on overpressure, so it is the same for every warhead.
-    ///   core      0 - 0.25R   >= ~22 psi   everything destroyed (except natural rock)
+    ///   core      0 - 0.25R   >= ~22 psi   vaporized (everything but rock removed at once; crater)
     ///   severe A  -  0.37R    22 - 10 psi  buildings -900 hp (reinforced concrete demolished)
     ///   severe B  -  0.50R    10 - 5.8 psi buildings -600 hp (most buildings collapse)
     ///   heavy     -  0.75R    5.8 - 3 psi  buildings -250 hp (houses collapse)
     ///   moderate  -  1.0R     3 - 2 psi    buildings -100 hp, doors -75% (doors/windows/roofs blown out)
+    /// Outside the core everything takes real damage (TakeDamage with MAS_BlastWave, building damage +-20%).
     /// Thermobaric: same core, rings out to 0.55R / 0.82R, x1.5 damage in cells that were roofed (confinement,
     /// a game choice: the sources give no number), fire 100/60/60/25/5%.
-    /// Performance (the first version hung the game): every non-thick roof in R is stripped first (game rule, so
-    /// nothing caves in cascade-style), buildings/items/plants lose hit points directly (also avoids Bomb's
-    /// building factor multiplying the values), natural rock is left alone, stored CE ammo vanishes (no cook-off
-    /// chain), anything that explodes on death (chemfuel, turrets, IEDs...) vanishes too, each thing is processed
-    /// once, fires are capped (picked at random over the whole area, so outer rings still burn).
+    /// Performance (the first version hung the game): every non-thick roof in R is stripped ahead of the front
+    /// (game rule, so nothing caves in cascade-style), natural rock is left alone, ammo and explosives can only go
+    /// off in the outer 3-8% of R (inside it ammo is consumed and explosives are wrecked without exploding: no
+    /// cook-off chain), each thing is processed once, fires are capped (picked at random over the whole area).
+    /// Walls/columns/doors holding up an overhead mountain fall at the end of the wave: a single vanilla cave-in.
     /// </summary>
     public class ProjectileCE_HeavyBlast : ProjectileCE_Explosive
     {
@@ -143,6 +155,7 @@ namespace MountedArmsStrategic
             private readonly List<IntVec3> fireCells = new List<IntVec3>();
             private readonly List<Pawn> pawnsAtStart = new List<Pawn>();
             private readonly List<int> pawnZones = new List<int>();
+            private readonly List<Thing> doomedRoofHolders = new List<Thing>();
             private float front;
             private int next;
             private int roofNext;
@@ -229,7 +242,7 @@ namespace MountedArmsStrategic
                     coreCells = c + 1;   // radial order: the core is a prefix of the list
                 }
                 float mult = ext.thermobaric && zone > 0 && confined[c] ? 1.5f : 1f;
-                int handled = DamageCell(map, cell, zone, mult, pawnDamage, instigator, projectileDef, processed);
+                int handled = DamageCell(cell, zone, fraction, mult);
 
                 float fire = ext.thermobaric ? FireThermobaric[zone] : FireHE[zone];
                 if (fire > 0f && Rand.Chance(fire))
@@ -264,10 +277,21 @@ namespace MountedArmsStrategic
             private void Finish()
             {
                 Finished = true;
-                // whatever appeared in the core while the front passed (corpses, dropped gear, ejected contents)
+                // the mountain caves in once, on the next tick (vanilla roof collapse), after everything under it
+                // got its zone damage and its ammo/explosives were already dealt with
+                for (int i = 0; i < doomedRoofHolders.Count; i++)
+                {
+                    Thing t = doomedRoofHolders[i];
+                    if (!t.Destroyed && t.Spawned && t.Map == map)
+                    {
+                        t.Destroy(DestroyMode.KillFinalize);
+                    }
+                }
+                // whatever appeared in the core while the front passed (corpses, dropped gear, ejected contents,
+                // the leavings of the roof holders above)
                 for (int c = 0; c < coreCells; c++)
                 {
-                    DamageCell(map, cells[c], 0, 1f, pawnDamage, instigator, projectileDef, processed);
+                    DamageCell(cells[c], 0, dist[c] / radius, 1f);
                 }
                 for (int i = 0; i < pawnsAtStart.Count; i++)
                 {
@@ -291,85 +315,115 @@ namespace MountedArmsStrategic
                     GenSpawn.Spawn(ext.crater, center, map, WipeMode.Vanish);
                 }
             }
+
+            // returns how many things were handled (the per-tick budget)
+            private int DamageCell(IntVec3 cell, int zone, float fraction, float mult)
+            {
+                List<Thing> things = cell.GetThingList(map);
+                if (things.Count == 0)
+                {
+                    return 0;
+                }
+                things = new List<Thing>(things);
+                for (int i = 0; i < things.Count; i++)
+                {
+                    Thing t = things[i];
+                    if (t.Destroyed || !t.Spawned || t.Map != map || !processed.Add(t))
+                    {
+                        continue;
+                    }
+                    Pawn pawn = t as Pawn;
+                    if (pawn != null)
+                    {
+                        DamagePawn(pawn, zone, mult, pawnDamage, instigator, projectileDef);
+                        continue;
+                    }
+                    if (!t.def.useHitPoints || !t.def.destroyable || IsRock(t.def))
+                    {
+                        continue;
+                    }
+                    int loss = zone == 0 ? t.HitPoints : ZoneLoss(t, zone, mult);
+                    if (t.def.holdsRoof && t.def.category == ThingCategory.Building && NearThickRoof(t.Position, map))
+                    {
+                        // walls/columns/doors holding up an overhead mountain: a lethal hit waits for Finish (one cave-in)
+                        if (loss >= t.HitPoints)
+                        {
+                            doomedRoofHolders.Add(t);
+                        }
+                        else
+                        {
+                            Hit(t, loss);
+                        }
+                        continue;
+                    }
+                    // ammo and explosives only get the chance to go off in the outer 3-8% of R
+                    if ((t.def is AmmoDef || ExplodesOnDeath(t)) && fraction < 1f - Rand.Range(0.03f, 0.08f))
+                    {
+                        Defuse(t, loss);
+                        continue;
+                    }
+                    if (zone == 0)
+                    {
+                        t.Destroy(DestroyMode.KillFinalize);   // vaporized
+                        continue;
+                    }
+                    Hit(t, loss);
+                }
+                return things.Count;
+            }
+
+            private void Hit(Thing t, int amount)
+            {
+                float angle = (t.TrueCenter() - center.ToVector3Shifted()).AngleFlat();
+                t.TakeDamage(new DamageInfo(MASDamageDefOf.MAS_BlastWave, Mathf.Max(1, amount), 0f, angle, null, null,
+                    projectileDef, spawnFilth: false));
+            }
         }
 
-        // returns how many things were handled (the per-tick budget)
-        private static int DamageCell(Map map, IntVec3 cell, int zone, float mult, DamageDef pawnDamage, Thing instigator,
-            ThingDef projectileDef, HashSet<Thing> processed)
+        // hit points a thing outside the core loses in this zone (its current hit points = destroyed)
+        private static int ZoneLoss(Thing t, int zone, float mult)
         {
-            List<Thing> things = cell.GetThingList(map);
-            if (things.Count == 0)
+            switch (t.def.category)
             {
-                return 0;
+                case ThingCategory.Building:
+                    int dmg = Mathf.RoundToInt(BuildingDamage[zone] * mult * Rand.Range(0.8f, 1.2f));
+                    if (zone == 4 && t is Building_Door)
+                    {
+                        dmg = Mathf.Max(dmg, Mathf.RoundToInt(t.MaxHitPoints * 0.75f));   // doors blown in at 2-3 psi
+                    }
+                    return dmg;
+                case ThingCategory.Plant:
+                    return Rand.Chance(PlantDestroyChance[zone]) ? t.HitPoints : Mathf.RoundToInt(t.MaxHitPoints * 0.7f);
+                default:
+                    return Rand.Chance(ItemDestroyChance[zone]) ? t.HitPoints
+                        : Mathf.RoundToInt(t.MaxHitPoints * Rand.Range(ItemLossMin[zone], ItemLossMax[zone]) * mult);
             }
-            things = new List<Thing>(things);
-            for (int i = 0; i < things.Count; i++)
+        }
+
+        // ammo/explosive away from the blast's edge: no cook-off or secondary explosion chain
+        private static void Defuse(Thing t, int loss)
+        {
+            if (t.def.category == ThingCategory.Plant)
             {
-                Thing t = things[i];
-                if (t.Destroyed || !t.Spawned || t.Map != map || !processed.Add(t))
-                {
-                    continue;
-                }
-                Pawn pawn = t as Pawn;
-                if (pawn != null)
-                {
-                    DamagePawn(pawn, zone, mult, pawnDamage, instigator, projectileDef);
-                    continue;
-                }
-                if (!t.def.useHitPoints || IsRock(t.def))
-                {
-                    continue;
-                }
-                if (t.def.holdsRoof && t.def.category == ThingCategory.Building && NearThickRoof(t.Position, map))
-                {
-                    // walls/columns/doors holding up an overhead mountain: removing them caves the mountain in
-                    int loss = zone == 0 ? t.HitPoints : Mathf.RoundToInt(BuildingDamage[zone] * mult);
-                    LoseHitPoints(t, Mathf.Min(loss, t.HitPoints - 1));
-                    continue;
-                }
-                if (t.def is AmmoDef || ExplodesOnDeath(t))
-                {
-                    t.Destroy(DestroyMode.Vanish);   // no cook-off / secondary explosion chain
-                    continue;
-                }
-                if (zone == 0)
-                {
-                    t.Destroy(DestroyMode.KillFinalize);
-                    continue;
-                }
-                switch (t.def.category)
-                {
-                    case ThingCategory.Building:
-                        int dmg = Mathf.RoundToInt(BuildingDamage[zone] * mult);
-                        if (zone == 4 && t is Building_Door)
-                        {
-                            dmg = Mathf.Max(dmg, Mathf.RoundToInt(t.MaxHitPoints * 0.75f));   // doors blown in at 2-3 psi
-                        }
-                        LoseHitPoints(t, dmg);
-                        break;
-                    case ThingCategory.Plant:
-                        if (Rand.Chance(PlantDestroyChance[zone]))
-                        {
-                            t.Destroy(DestroyMode.KillFinalize);
-                        }
-                        else
-                        {
-                            LoseHitPoints(t, Mathf.RoundToInt(t.MaxHitPoints * 0.7f));
-                        }
-                        break;
-                    default:
-                        if (Rand.Chance(ItemDestroyChance[zone]))
-                        {
-                            t.Destroy(DestroyMode.KillFinalize);
-                        }
-                        else
-                        {
-                            LoseHitPoints(t, Mathf.RoundToInt(t.MaxHitPoints * Rand.Range(ItemLossMin[zone], ItemLossMax[zone]) * mult));
-                        }
-                        break;
-                }
+                LoseHitPoints(t, loss);   // boomshroom: Destroy(KillFinalize) never calls Kill, which explodes
+                return;
             }
-            return things.Count;
+            if (t.def.category != ThingCategory.Building)
+            {
+                t.Destroy(DestroyMode.Vanish);   // stored ammo, chemfuel, minified explosives: consumed by the blast
+                return;
+            }
+            if (loss < t.HitPoints)
+            {
+                LoseHitPoints(t, loss);   // directly: TakeDamage would light the wick
+                return;
+            }
+            CompExplosive comp = t.TryGetComp<CompExplosive>();
+            if (comp != null)
+            {
+                comp.destroyedThroughDetonation = true;   // wrecked (leavings) without the explosion
+            }
+            t.Destroy(DestroyMode.KillFinalize);
         }
 
         // natural, smoothed and collapsed rock and ore: they hold the mountain roof (removing them caves it in)
@@ -396,6 +450,15 @@ namespace MountedArmsStrategic
 
         private static bool ExplodesOnDeath(Thing t)
         {
+            MinifiedThing minified = t as MinifiedThing;
+            if (minified != null && minified.InnerThing != null)
+            {
+                t = minified.InnerThing;   // destroying the crate destroys what is inside it the same way
+            }
+            if (t is Plant_Boomshroom)
+            {
+                return true;   // Odyssey: its Kill sets off a flame explosion
+            }
             ThingWithComps twc = t as ThingWithComps;
             return twc != null && (twc.GetComp<CompExplosive>() != null || twc.GetComp<CompExplosiveCE>() != null);
         }
@@ -413,10 +476,6 @@ namespace MountedArmsStrategic
 
         private static void LoseHitPoints(Thing t, int amount)
         {
-            if (amount <= 0 && t.def.holdsRoof)
-            {
-                return;
-            }
             int hp = t.HitPoints - Mathf.Max(1, amount);
             if (hp <= 0)
             {
@@ -434,7 +493,8 @@ namespace MountedArmsStrategic
         }
 
         // the crater is a multi-cell building spawned with WipeMode.Vanish: inside the map, on buildable ground,
-        // and never over rock or anything else that survived the blast (it would be deleted silently)
+        // never over rock or anything else that survived the blast (it would be deleted silently), and never under
+        // an overhead mountain (the cave-in after the wave would drop rocks on it)
         private static bool CanPlaceCrater(ThingDef crater, IntVec3 center, Map map)
         {
             CellRect rect = GenAdj.OccupiedRect(center, Rot4.North, crater.size);
@@ -444,6 +504,11 @@ namespace MountedArmsStrategic
             }
             foreach (IntVec3 c in rect)
             {
+                RoofDef roof = map.roofGrid.RoofAt(c);
+                if (roof != null && roof.isThickRoof)
+                {
+                    return false;
+                }
                 if (c.GetEdifice(map) != null || !c.SupportsStructureType(map, crater.terrainAffordanceNeeded))
                 {
                     return false;

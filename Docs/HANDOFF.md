@@ -3,7 +3,8 @@
 Vale para os dois mods (**MountedArms** e **MountedArmsStrategic**). Leia este arquivo primeiro. Depois leia o `Docs/STATUS.md` de cada mod.
 
 ## Estado
-- Tudo compila e está commitado, para RimWorld 1.6 + Harmony + CE 16.7.4 (+ Rimatomics opcional). Último commit: Strategic `14e2ba5`, MountedArms `0b847dc`. Não há remote no git.
+- **Lote 11 (Strategic, 25/out/2026, não testado)**: paredes com 1 HP corrigidas (desabamento real da montanha), dano real fora do núcleo, munição e explosivos só na borda, salva da HIMARS espalhada, DLL própria da 1.7 em `Bin/1.7`. Ver `Docs/STATUS.md`.
+- Até o lote 10 tudo compilou para RimWorld 1.6 + Harmony + CE 16.7.4 (+ Rimatomics opcional); essa DLL está em `Bin/1.6`. Não há remote no git.
 - **Lote 10 (Strategic) implementado e NÃO testado**: explosão grande como onda de choque espalhada em ticks (`Source/HeavyBlast.cs`: `BlastWave` + MapComponent `HeavyBlastWaves`). Teste do lote 9: zonas, cook-off e rocha OK. O impacto travava ~1 s e não tinha efeito visual (tudo num tick), e isso motivou o lote 10. O usuário parou as correções aqui.
 - Lotes 7–8 (Strategic) e "Ajustes desta rodada" (MountedArms): não ficou registrada confirmação explícita em jogo. Itens: chama no bocal, efeitos de lançamento, espoleta de proximidade, inclinação na fase lenta. Teste quando voltar.
 
@@ -15,13 +16,13 @@ Vale para os dois mods (**MountedArms** e **MountedArmsStrategic**). Leia este a
 
 ## Ideias em aberto (nada decidido)
 - Tomahawk R 17,9 é 20–40% generoso pela física; poderia ser ~14–15.
-- Prédios de outras facções perdem HP sem `Faction.Notify_BuildingTookDamage`.
+- Prédios de outras facções: o dano passa pelo aviso à facção, mas sem instigador (sem goodwill). Ideia: uma perda única de goodwill por facção atingida.
 - Se a explosão ainda pesar: orçamento ponderado por tick (pawn ~15, prédio destruído ~3, resto 1), e fogo/cratera do `Finish` também em ticks. A revisão estimou isso como pequeno; não foi medido.
 - Na 1.7: ver se a engine nova permite algo melhor (paralelismo, efeitos nativos de explosão grande, desempenho de destruição em massa).
 - Vanilla sem CE: tiro no mapa-mundo próprio. Remote do git.
 
 ## Migração para 1.7
-**Iniciada em 25/out/2026**: About/LoadFolders aceitam 1.7 com o conteúdo e as DLLs de 1.6; auditoria completa e pendências em `../MountedArms/Docs/MIGRATION_1_7.md` (substitui a lista abaixo onde divergirem).
+**Iniciada em 25/out/2026**: About/LoadFolders aceitam 1.7. O Strategic já tem DLL própria da 1.7 (`Bin/1.7`, compilada contra o CE 1.6 com `tools/unity_facades.ps1`); o MountedArms ainda reaproveita as DLLs de 1.6. Auditoria completa e pendências em `../MountedArms/Docs/MIGRATION_1_7.md` (substitui a lista abaixo onde divergirem).
 
 ### O que se previa que fosse precisar
 Observado na pasta do jogo 1.7.4985: sem `RimWorldWin64_Data`/Unity, runtime .NET 10 (CoreCLR), Vulkan, bibliotecas `Brutal.*` (RocketWerkz). **Não verificado**: API, nome das DLLs de referência, Harmony e CE para 1.7.

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- Heavy blast damage to buildings, items and plants outside the core (ProjectileCE_HeavyBlast).
+	     Every building/plant/corpse factor stays at 1 (Bomb is x4 on buildings and plants), so TakeDamage
+	     removes exactly the zone's hit points. No impact sound and no CE wall fragments: a wave hits
+	     hundreds of things. Pawns still take Bomb (or the warhead's damageDef). -->
+	<DamageDef>
+		<defName>MAS_BlastWave</defName>
+		<label>blast wave</label>
+		<workerClass>DamageWorker</workerClass>
+		<externalViolence>true</externalViolence>
+		<isExplosive>true</isExplosive>
+		<makesBlood>false</makesBlood>
+		<canInterruptJobs>false</canInterruptJobs>
+		<deathMessage>{0} has been destroyed by a blast wave.</deathMessage>
+		<modExtensions>
+			<li Class="CombatExtended.DamageDefExtensionCE">
+				<canCauseWallFragmentation>false</canCauseWallFragmentation>
+			</li>
+		</modExtensions>
+	</DamageDef>
+
+</Defs>
