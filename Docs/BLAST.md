@@ -32,7 +32,11 @@ Paredes vanilla (HP base 300 × fator do material): madeira ~195, aço 300, pedr
 - Fogo 100/60/60/25/5% por zona, até 200 focos. Pawns levam dano `Thermobaric`.
 
 ## Regras de desempenho (a primeira versão travou o jogo)
-- Todo teto não-espesso do raio é arrancado antes (regra de jogo: uma laje real de concreto resistiria a 2 psi).
+- **Onda de choque espalhada no tempo** (`BlastWave` + `HeavyBlastWaves`, um MapComponent): o clarão e o som saem no impacto; a frente cresce do centro até R em 6–25 ticks (~0,1–0,4 s) e cada tick processa as células que ela passou, no máximo 150 coisas por tick (base densa deixa a frente mais lenta, não o quadro). Cada célula gera o efeito de explosão vanilla do tipo de dano (`explosionCellFleck`, cor do centro para a borda), mais fumaça/poeira sorteadas e brilho de fogo no termobárico. Antes, tudo num tick só: ~1 s de travamento, sem efeito visual, e tudo aparecia destruído de uma vez.
+- A onda não é salva: um save feito no meio dela perde o resto (dura menos de meio segundo).
+- Pawns no raio no momento do impacto são registrados; quem entrar numa célula já processada leva o dano da zona onde estava, no fim da onda.
+- Paredes, colunas e portas construídas que seguram teto de montanha (teto espesso a até 6,9 células) perdem HP, mas ficam com no mínimo 1, para a montanha não desabar.
+- Todo teto não-espesso do raio é arrancado, sempre 7 células à frente da onda (a sustentação de teto vanilla alcança 6,9), então nenhuma parede cai sob teto que ainda existe (regra de jogo: uma laje real de concreto resistiria a 2 psi).
 - Prédios/itens/plantas perdem HP direto (também evita o multiplicador de prédios do dano Bomb).
 - Rocha intocada: natural, alisada, desmoronada e minério (`mineable`/`isNaturalRock`/`isResourceRock`), porque seguram o teto de montanha, que não é arrancado.
 - Munição do CE e tudo que explode ao morrer (químico, torretas, IEDs, geradores: `CompExplosive`/`CompExplosiveCE`) somem na área, sem explosões em cadeia.

@@ -9,7 +9,11 @@ Ambiente: RimWorld 1.6, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcion
 - **Retaliação do CE**: a facção atacada revida com morteiros no mapa do jogador.
 - **Lote 5**: botão Descarregar (troca de ogiva pelo menu de recarga do CE + Descarregar), nomes reais, ataque a mapa carregado **sem marcador** nos lançadores guiados, raios de explosão em escala.
 
-## Lote 9 (implementado, NÃO testado)
+## Lote 10 (implementado, NÃO testado)
+- Teste do lote 9: zonas OK, mas impacto travava ~1 s, sem efeito visual, e tudo aparecia destruído de uma vez (tudo era feito num tick). Agora a explosão é uma **onda de choque em ticks** (`BlastWave`, `HeavyBlastWaves`): frente de 0 a R em 6–25 ticks, até 150 coisas por tick, teto arrancado 7 células à frente, efeito de explosão vanilla em cada célula + fumaça/poeira. Ver `Docs/BLAST.md`.
+- Revisão independente (2 revisores + verificador; 2 de 7 achados confirmados): paredes/colunas que seguram teto de montanha ficam com ≥ 1 HP (antes desabava a montanha); pawns que andam para uma célula já processada levam o dano no fim da onda.
+
+## Lote 9 (testado: zonas/cook-off/rocha OK; travamento e falta de efeito → lote 10)
 - **Explosões por zonas de sobrepressão reais** (`Docs/BLAST.md`): núcleo 0,25R destruído; anéis 0,37/0,50/0,75/1,0R com prédios −900/−600/−250/−100 HP (portas −75% na borda), dano em pawns por zona, itens/plantas por chance, fogo por zona; termobárico com anéis maiores (0,55/0,82R), 1,5× dentro de lugares cobertos e fogo 100→5%. R = contorno de 2 psi. Aplicado em Minuteman HE/termobárico, ATACMS HE/termobárico, GMLRS e Tomahawk (antes só o Minuteman usava a explosão própria; os outros usavam a do CE com fragmentos).
 - `HeavyBlastExtension` agora só tem `radius`, `thermobaric`, `damageDef`, `fxRadius`, `crater` (o dano por zona está no código, com as tabelas da pesquisa).
 - Correções da revisão independente (2 revisores + verificador; todos os achados confirmados): rocha alisada/desmoronada/minério também intocados (seguravam teto de montanha); itens que explodem ao morrer somem sem explodir; cratera não apaga rocha nem edifícios e exige terreno construível; prédios danificados entram na lista de reparo; 3ª passada no núcleo (cadáveres e equipamento); fogo embaralhado antes do limite; som do próprio projétil; **cook-off de mísseis estocados** (o CE fazia a explosão gigante do XML direto, que travava o jogo) agora é uma explosão pequena via patch em `AmmoThing.TryDetonate`.

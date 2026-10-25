@@ -96,85 +96,213 @@ namespace MountedArmsStrategic
             {
                 return;
             }
-            DamageDef pawnDamage = ext.damageDef ?? DamageDefOf.Bomb;
+            HeavyBlastWaves waves = map.GetComponent<HeavyBlastWaves>();
+            if (waves == null)
+            {
+                return;
+            }
             float radius = Mathf.Max(ext.radius, 1f);
-
-            List<IntVec3> cells = new List<IntVec3>();
-            List<bool> confined = new List<bool>();
-            foreach (IntVec3 cell in GenRadial.RadialCellsAround(center, radius, true))
+            // flash + sound at once (damage 1); the damage follows the shock front over the next ticks
+            SoundDef sound = projectileDef.projectile != null && projectileDef.projectile.soundExplode != null
+                ? projectileDef.projectile.soundExplode : SoundDef.Named("Explosion_GiantBomb");
+            GenExplosion.DoExplosion(center, map, ext.fxRadius, DamageDefOf.Bomb, instigator, 1, -1f, sound);
+            FleckMaker.Static(center.ToVector3Shifted(), map, FleckDefOf.ExplosionFlash, radius * 4f);
+            if (map == Find.CurrentMap)
             {
-                if (cell.InBounds(map))
+                Find.CameraDriver.shaker.DoShake(Mathf.Clamp(radius / 6f, 1f, 4f));
+            }
+            waves.Add(new BlastWave(map, center, radius, ext, instigator, projectileDef));
+        }
+
+        /// <summary>
+        /// One blast spread over ticks: the front grows from the center to R in ~6-25 ticks, and each tick handles the
+        /// cells it passed (at most MaxThingsPerTick things, so a dense base slows the front instead of the frame).
+        /// Roofs are stripped RoofReach cells ahead of the front, so no wall is ever destroyed under a roof that
+        /// is still there. Not saved: a save made mid-wave loses the rest of it (it lasts well under a second).
+        /// </summary>
+        public class BlastWave
+        {
+            private const int MaxThingsPerTick = 150;
+            private const float RoofReach = 7f;   // vanilla roof support distance is 6.9
+
+            private readonly Map map;
+            private readonly IntVec3 center;
+            private readonly float radius;
+            private readonly float speed;
+            private readonly HeavyBlastExtension ext;
+            private readonly Thing instigator;
+            private readonly ThingDef projectileDef;
+            private readonly DamageDef pawnDamage;
+            private readonly FleckDef cellFleck;
+            private readonly Color colorCenter;
+            private readonly Color colorEdge;
+            private readonly List<IntVec3> cells = new List<IntVec3>();
+            private readonly List<float> dist = new List<float>();
+            private readonly List<bool> confined = new List<bool>();
+            private readonly HashSet<Thing> processed = new HashSet<Thing>();
+            private readonly List<IntVec3> fireCells = new List<IntVec3>();
+            private readonly List<Pawn> pawnsAtStart = new List<Pawn>();
+            private readonly List<int> pawnZones = new List<int>();
+            private float front;
+            private int next;
+            private int roofNext;
+            private int coreCells;
+            public bool Finished;
+
+            public BlastWave(Map map, IntVec3 center, float radius, HeavyBlastExtension ext, Thing instigator, ThingDef projectileDef)
+            {
+                this.map = map;
+                this.center = center;
+                this.radius = radius;
+                this.ext = ext;
+                this.instigator = instigator;
+                this.projectileDef = projectileDef;
+                pawnDamage = ext.damageDef ?? DamageDefOf.Bomb;
+                speed = radius / Mathf.Clamp(Mathf.Round(radius), 6f, 25f);
+                DamageDef fx = pawnDamage.explosionCellFleck != null ? pawnDamage : DamageDefOf.Bomb;
+                cellFleck = fx.explosionCellFleck;
+                colorCenter = fx.explosionColorCenter;
+                colorEdge = fx.explosionColorEdge;
+                foreach (IntVec3 cell in GenRadial.RadialCellsAround(center, radius, true))   // sorted by distance
                 {
-                    cells.Add(cell);
-                    confined.Add(map.roofGrid.Roofed(cell));   // snapshot before stripping (thermobaric confinement)
+                    if (cell.InBounds(map))
+                    {
+                        cells.Add(cell);
+                        dist.Add(cell.DistanceTo(center));
+                        confined.Add(map.roofGrid.Roofed(cell));   // snapshot before stripping (thermobaric confinement)
+                    }
+                }
+                // pawns inside R at impact: one that walks into a cell the front already passed is still hit in Finish
+                List<Pawn> pawns = new List<Pawn>(map.mapPawns.AllPawnsSpawned);
+                for (int i = 0; i < pawns.Count; i++)
+                {
+                    float d = pawns[i].Position.DistanceTo(center);
+                    if (d <= radius)
+                    {
+                        pawnsAtStart.Add(pawns[i]);
+                        pawnZones.Add(ZoneOf(d / radius, ext.thermobaric));
+                    }
                 }
             }
 
-            // Pass 1: strip every non-thick roof in R (game rule; prevents cascade cave-ins).
-            for (int c = 0; c < cells.Count; c++)
+            public void Tick()
             {
-                RoofDef roof = map.roofGrid.RoofAt(cells[c]);
-                if (roof != null && !roof.isThickRoof)
+                if (Finished)
                 {
-                    map.roofGrid.SetRoof(cells[c], null);
+                    return;
+                }
+                if (!Find.Maps.Contains(map))
+                {
+                    Finished = true;
+                    return;
+                }
+                front += speed;
+                // game rule: every non-thick roof in R goes, ahead of the front (prevents cascade cave-ins)
+                while (roofNext < cells.Count && dist[roofNext] <= front + RoofReach)
+                {
+                    RoofDef roof = map.roofGrid.RoofAt(cells[roofNext]);
+                    if (roof != null && !roof.isThickRoof)
+                    {
+                        map.roofGrid.SetRoof(cells[roofNext], null);
+                    }
+                    roofNext++;
+                }
+                int budget = MaxThingsPerTick;
+                while (next < cells.Count && dist[next] <= front && budget > 0)
+                {
+                    budget -= HitCell(next);
+                    next++;
+                }
+                if (next >= cells.Count)
+                {
+                    Finish();
                 }
             }
 
-            // Pass 2: damage by zone.
-            HashSet<Thing> processed = new HashSet<Thing>();
-            List<IntVec3> fireCells = new List<IntVec3>();
-            int coreCells = 0;
-            for (int c = 0; c < cells.Count; c++)
+            private int HitCell(int c)
             {
                 IntVec3 cell = cells[c];
-                int zone = ZoneOf(cell.DistanceTo(center) / radius, ext.thermobaric);
+                float fraction = dist[c] / radius;
+                int zone = ZoneOf(fraction, ext.thermobaric);
                 if (zone == 0)
                 {
                     coreCells = c + 1;   // radial order: the core is a prefix of the list
                 }
                 float mult = ext.thermobaric && zone > 0 && confined[c] ? 1.5f : 1f;
-                DamageCell(map, cell, zone, mult, pawnDamage, instigator, projectileDef, processed);
+                int handled = DamageCell(map, cell, zone, mult, pawnDamage, instigator, projectileDef, processed);
 
                 float fire = ext.thermobaric ? FireThermobaric[zone] : FireHE[zone];
                 if (fire > 0f && Rand.Chance(fire))
                 {
                     fireCells.Add(cell);
                 }
-            }
-            // Pass 3: whatever appeared in the core during pass 2 (corpses, dropped gear, ejected contents).
-            for (int c = 0; c < coreCells; c++)
-            {
-                DamageCell(map, cells[c], 0, 1f, pawnDamage, instigator, projectileDef, processed);
-            }
-
-            fireCells.Shuffle();
-            int fires = 0;
-            for (int i = 0; i < fireCells.Count && fires < MaxFires; i++)
-            {
-                if (FireUtility.TryStartFireIn(fireCells[i], map, Rand.Range(0.3f, 0.9f), instigator))
+                if (cell.ShouldSpawnMotesAt(map))
                 {
-                    fires++;
+                    Vector3 pos = cell.ToVector3Shifted();
+                    if (cellFleck != null)
+                    {
+                        FleckCreationData data = FleckMaker.GetDataStatic(pos, map, cellFleck, 1f);
+                        data.instanceColor = Color.Lerp(colorCenter, colorEdge, fraction);
+                        map.flecks.CreateFleck(data);
+                    }
+                    if (Rand.Chance(zone <= 2 ? 0.06f : 0.02f))
+                    {
+                        FleckMaker.ThrowSmoke(pos, map, Rand.Range(1.5f, 3f));
+                    }
+                    if (Rand.Chance(0.08f))
+                    {
+                        FleckMaker.ThrowDustPuff(cell, map, Rand.Range(1f, 2f));
+                    }
+                    if (ext.thermobaric && zone <= 2 && Rand.Chance(0.2f))
+                    {
+                        FleckMaker.ThrowFireGlow(pos, map, Rand.Range(1f, 2f));
+                    }
                 }
+                return Mathf.Max(1, handled);
             }
 
-            if (ext.crater != null && CanPlaceCrater(ext.crater, center, map))
+            private void Finish()
             {
-                GenSpawn.Spawn(ext.crater, center, map, WipeMode.Vanish);
-            }
-            // flash + sound only (damage 1: the zones above already did the work)
-            SoundDef sound = projectileDef.projectile != null && projectileDef.projectile.soundExplode != null
-                ? projectileDef.projectile.soundExplode : SoundDef.Named("Explosion_GiantBomb");
-            GenExplosion.DoExplosion(center, map, ext.fxRadius, DamageDefOf.Bomb, instigator, 1, -1f, sound);
-            if (map == Find.CurrentMap)
-            {
-                Find.CameraDriver.shaker.DoShake(Mathf.Clamp(radius / 6f, 1f, 4f));
+                Finished = true;
+                // whatever appeared in the core while the front passed (corpses, dropped gear, ejected contents)
+                for (int c = 0; c < coreCells; c++)
+                {
+                    DamageCell(map, cells[c], 0, 1f, pawnDamage, instigator, projectileDef, processed);
+                }
+                for (int i = 0; i < pawnsAtStart.Count; i++)
+                {
+                    Pawn p = pawnsAtStart[i];
+                    if (p.Spawned && p.Map == map && !p.Dead && processed.Add(p))
+                    {
+                        DamagePawn(p, pawnZones[i], 1f, pawnDamage, instigator, projectileDef);
+                    }
+                }
+                fireCells.Shuffle();   // the cap must not be used up by the center alone
+                int fires = 0;
+                for (int i = 0; i < fireCells.Count && fires < MaxFires; i++)
+                {
+                    if (FireUtility.TryStartFireIn(fireCells[i], map, Rand.Range(0.3f, 0.9f), instigator))
+                    {
+                        fires++;
+                    }
+                }
+                if (ext.crater != null && CanPlaceCrater(ext.crater, center, map))
+                {
+                    GenSpawn.Spawn(ext.crater, center, map, WipeMode.Vanish);
+                }
             }
         }
 
-        private static void DamageCell(Map map, IntVec3 cell, int zone, float mult, DamageDef pawnDamage, Thing instigator,
+        // returns how many things were handled (the per-tick budget)
+        private static int DamageCell(Map map, IntVec3 cell, int zone, float mult, DamageDef pawnDamage, Thing instigator,
             ThingDef projectileDef, HashSet<Thing> processed)
         {
-            List<Thing> things = new List<Thing>(cell.GetThingList(map));
+            List<Thing> things = cell.GetThingList(map);
+            if (things.Count == 0)
+            {
+                return 0;
+            }
+            things = new List<Thing>(things);
             for (int i = 0; i < things.Count; i++)
             {
                 Thing t = things[i];
@@ -190,6 +318,13 @@ namespace MountedArmsStrategic
                 }
                 if (!t.def.useHitPoints || IsRock(t.def))
                 {
+                    continue;
+                }
+                if (t.def.holdsRoof && t.def.category == ThingCategory.Building && NearThickRoof(t.Position, map))
+                {
+                    // walls/columns/doors holding up an overhead mountain: removing them caves the mountain in
+                    int loss = zone == 0 ? t.HitPoints : Mathf.RoundToInt(BuildingDamage[zone] * mult);
+                    LoseHitPoints(t, Mathf.Min(loss, t.HitPoints - 1));
                     continue;
                 }
                 if (t.def is AmmoDef || ExplodesOnDeath(t))
@@ -234,12 +369,29 @@ namespace MountedArmsStrategic
                         break;
                 }
             }
+            return things.Count;
         }
 
         // natural, smoothed and collapsed rock and ore: they hold the mountain roof (removing them caves it in)
         private static bool IsRock(ThingDef def)
         {
             return def.mineable || (def.building != null && (def.building.isNaturalRock || def.building.isResourceRock));
+        }
+
+        private static bool NearThickRoof(IntVec3 pos, Map map)
+        {
+            foreach (IntVec3 c in GenRadial.RadialCellsAround(pos, 6.9f, true))   // vanilla roof support distance
+            {
+                if (c.InBounds(map))
+                {
+                    RoofDef roof = map.roofGrid.RoofAt(c);
+                    if (roof != null && roof.isThickRoof)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         private static bool ExplodesOnDeath(Thing t)
@@ -261,6 +413,10 @@ namespace MountedArmsStrategic
 
         private static void LoseHitPoints(Thing t, int amount)
         {
+            if (amount <= 0 && t.def.holdsRoof)
+            {
+                return;
+            }
             int hp = t.HitPoints - Mathf.Max(1, amount);
             if (hp <= 0)
             {
@@ -332,6 +488,38 @@ namespace MountedArmsStrategic
                     SoundDef.Named("Explosion_GiantBomb"), ignoredThings: new List<Thing> { __instance });
             }
             return false;
+        }
+    }
+
+    /// <summary>Ticks the heavy blast waves in progress on this map (created for every map automatically).</summary>
+    public class HeavyBlastWaves : MapComponent
+    {
+        private readonly List<ProjectileCE_HeavyBlast.BlastWave> waves = new List<ProjectileCE_HeavyBlast.BlastWave>();
+
+        public HeavyBlastWaves(Map map) : base(map)
+        {
+        }
+
+        public void Add(ProjectileCE_HeavyBlast.BlastWave wave)
+        {
+            waves.Add(wave);
+        }
+
+        public override void MapComponentTick()
+        {
+            for (int i = 0; i < waves.Count; i++)
+            {
+                try
+                {
+                    waves[i].Tick();
+                }
+                catch (System.Exception e)
+                {
+                    waves[i].Finished = true;   // one error, not one per tick
+                    Log.Error("[MountedArmsStrategic] heavy blast wave stopped: " + e);
+                }
+            }
+            waves.RemoveAll(w => w.Finished);
         }
     }
 }
