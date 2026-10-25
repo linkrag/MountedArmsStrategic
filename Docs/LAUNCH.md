@@ -22,4 +22,5 @@ Fontes: [Minuteman III test launch (relato)](https://discourse.weareopen.coop/ne
 | PAC-3 MSE | — (voo linear) | quente | 4 × 1,5 |
 
 - Interceptadores (PAC-3, Stinger, rajadas de CIWS) **não** recebem a curva: o cálculo de interceptação do CE (`CanReachPos`/previsão) assume voo linear. O PAC-3 recebe só a fumaça/brilho (pelo patch `ProjectileCE_CIWS.Tick`). O Stinger fica no Mounted Arms, que não depende do Strategic.
-- A trilha de chama/fumaça do próprio projétil (`CompProperties_ProjectileFleck`) continua; na fase lenta ela se acumula perto do lançador, formando a nuvem de saída.
+- Chama/fumaça em voo: `CompProperties_Exhaust` (nosso) no bocal, em vez do `CompProperties_ProjectileFleck` do CE (que deixava a chama no meio do sprite na fase lenta). Na fase lenta a fumaça se acumula perto do lançador, formando a nuvem de saída.
+- A inclinação do sprite acompanha a curva suavizada (postfix em `ProjectileCE.DrawRotation`).

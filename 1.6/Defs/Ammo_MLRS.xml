@@ -92,24 +92,14 @@
 					<Fragment_Small>8</Fragment_Small>
 				</fragments>
 			</li>
-			<li Class="CombatExtended.CompProperties_ProjectileFleck">
-				<FleckDatas>
-					<li>
-						<fleck>Fleck_CERocketFlame</fleck>
-						<emissionsPerTick>2</emissionsPerTick>
-						<flecksPerEmission>2</flecksPerEmission>
-						<scale>1.5</scale>
-						<cutoffTickRange>60~100</cutoffTickRange>
-						<originOffset>1</originOffset>
-					</li>
-					<li>
-						<fleck>Fleck_CERocketSmokeTrail</fleck>
-						<emissionsPerTick>2</emissionsPerTick>
-						<rotation>0~360</rotation>
-						<scale>2</scale>
-						<flecksPerEmission>1</flecksPerEmission>
-					</li>
-				</FleckDatas>
+			<!-- exhaust at the nozzle (~half the sprite length behind the drawn position); replaces CE's
+			     ProjectileFleck, whose offset scales with speed and sat mid-missile in the boost phase -->
+			<li Class="MountedArmsStrategic.CompProperties_Exhaust">
+				<flameFleck>Fleck_CERocketFlame</flameFleck>
+				<smokeFleck>Fleck_CERocketSmokeTrail</smokeFleck>
+				<nozzleDistance>0.9</nozzleDistance>
+				<flameScale>1.5</flameScale>
+				<smokeScale>2</smokeScale>
 			</li>
 		</comps>
 		<modExtensions>

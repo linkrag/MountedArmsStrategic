@@ -9,6 +9,14 @@ Ambiente: RimWorld 1.6, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcion
 - **Retaliação do CE**: a facção atacada revida com morteiros no mapa do jogador.
 - **Lote 5**: botão Descarregar (troca de ogiva pelo menu de recarga do CE + Descarregar), nomes reais, ataque a mapa carregado **sem marcador** nos lançadores guiados, raios de explosão em escala.
 
+## Lote 8 (implementado, NÃO testado)
+- **Jogo travou no Minuteman III convencional** (log: dezenas de "Tried to destroy already-destroyed thing" em paredes/móveis/Sandstone e "Tried to place thing ChunkSandstone… in a null map", sem pilha). Causa provável: a explosão destruía paredes sob teto construído (desabamento em cascata esmagando o que já estava sendo destruído) e matava rocha natural (pedaços em células já desocupadas, teto de montanha caindo). `HeavyBlast` agora: passada 1 arranca todo teto não-espesso do raio; passada 2 destrói; rocha natural intocada; prédios/itens/plantas perdem HP direto (sem o pipeline de dano do CE); só pawns tomam `TakeDamage`.
+- **Chama no meio do míssil**: o `CompProjectileFleck` do CE posiciona a chama em `DrawPos − deslocamento do último tick × originOffset` (depende da velocidade; na fase lenta fica no centro do sprite). Novo `CompProperties_Exhaust` (`Source/Exhaust.cs`) põe chama/fumaça a `nozzleDistance` (≈ meio comprimento do sprite) atrás da posição desenhada. Substitui o do CE em Minuteman (1,9), ATACMS (1,4), GMLRS (0,9), Tomahawk (1,3; chama só 40 ticks = booster) e PAC-3 (0,55).
+- **Correções da revisão independente** (workflow com 3 revisores + verificador por achado; 8 confirmados, 2 descartados):
+  - espoleta de proximidade: estado agora marcado com o `FlightTicks` da última atualização; recomeça se não for o tick seguinte (antes sobrevivia a reload do save e podia explodir interceptadores cedo);
+  - inclinação do sprite na fase lenta: postfix em `ProjectileCE.DrawRotation` recalcula pela posição desenhada suavizada;
+  - explosão pesada: cada coisa recebe dano uma vez (prédios de várias células levavam N vezes); cratera só se couber no mapa e não cobrir nada indestrutível; tremor de câmera só no mapa que está na tela.
+
 ## Lote 7 (implementado, NÃO testado)
 - **Lançamento realista** (`Docs/LAUNCH.md`): `BoostPhaseTrajectoryWorker` + `LaunchProfileExtension` — sobe devagar e acelera (mesmo caminho/tempo/impacto), fumaça e brilho na saída; Tomahawk com lançamento a frio. Minuteman 0,15 · ATACMS 0,05 · GMLRS 0,03 · Tomahawk 0,10; PAC-3 só efeitos.
 - **Explosão pesada sem a tela "Detonando"** (roda na hora) e **munição estocada na área some sem cook-off** (a cadeia de cook-off do CE é o que gera milhares de fragmentos numa base com munição; paredes não têm fragmentos no CE). Minuteman HE sem comp de fragmentos (a detonação própria não usa).
@@ -51,5 +59,6 @@ Ambiente: RimWorld 1.6, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcion
 4. Patriot interceptando a retaliação; retaliação com mísseis de facção espacial.
 
 ## Próximos passos
+- **RimWorld 1.7**: o usuário vai migrar. Observado na pasta do jogo 1.7.4985: sem `RimWorldWin64_Data`/Unity; runtime .NET 10 (CoreCLR), Vulkan, bibliotecas `Brutal.*` (RocketWerkz). As DLLs (compiladas contra a 1.6/mono) e o CE/Harmony precisarão ser portados; nada disso foi verificado ainda.
 - Vanilla: sistema próprio de tiro no mapa-mundo.
 - Remote do git.

@@ -147,8 +147,17 @@ namespace MountedArmsStrategic
     public static class Patch_InterceptorProximityFuse
     {
         private const int RecedingTicksToFuse = 3;
-        private static readonly Dictionary<int, float> closest = new Dictionary<int, float>();
-        private static readonly Dictionary<int, int> receding = new Dictionary<int, int>();
+
+        // Keyed by thingIDNumber but tagged with the FlightTicks of the last update: an entry is only trusted on
+        // the very next tick of the same flight. After a save reload (same ids, earlier positions) or an id reused
+        // by a new interceptor, FlightTicks does not follow and the entry starts over (review finding).
+        private class FuseState
+        {
+            public float closest;
+            public int receding;
+            public int lastTick;
+        }
+        private static readonly Dictionary<int, FuseState> states = new Dictionary<int, FuseState>();
 
         public static void Postfix(ProjectileCE_CIWS __instance)
         {
@@ -160,8 +169,7 @@ namespace MountedArmsStrategic
             int id = __instance.thingIDNumber;
             if (__instance.Destroyed || !__instance.Spawned)
             {
-                closest.Remove(id);
-                receding.Remove(id);
+                states.Remove(id);
                 return;
             }
             ProjectileCE target = __instance.intendedTarget.Thing as ProjectileCE;
@@ -170,23 +178,29 @@ namespace MountedArmsStrategic
                 return;   // skyfallers and vanished targets keep CE's own handling
             }
             float dist = (target.ExactPosition - __instance.ExactPosition).sqrMagnitude;
-            float best;
-            if (!closest.TryGetValue(id, out best) || dist < best)
+            int tick = __instance.FlightTicks;
+            FuseState st;
+            if (!states.TryGetValue(id, out st) || st.lastTick != tick - 1)
             {
-                closest[id] = dist;
-                receding[id] = 0;
+                st = new FuseState();
+                st.closest = dist;
+                st.lastTick = tick;
+                states[id] = st;
                 return;
             }
-            int count;
-            receding.TryGetValue(id, out count);
-            count++;
-            if (count < RecedingTicksToFuse)
+            st.lastTick = tick;
+            if (dist < st.closest)
             {
-                receding[id] = count;
+                st.closest = dist;
+                st.receding = 0;
                 return;
             }
-            closest.Remove(id);
-            receding.Remove(id);
+            st.receding++;
+            if (st.receding < RecedingTicksToFuse)
+            {
+                return;
+            }
+            states.Remove(id);
             Map map = __instance.Map;
             FleckMaker.ThrowMicroSparks(__instance.DrawPos, map);
             FleckMaker.ThrowSmoke(__instance.DrawPos, map, 1f);

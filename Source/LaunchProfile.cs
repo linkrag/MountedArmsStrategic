@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CombatExtended;
+using HarmonyLib;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -20,6 +21,18 @@ namespace MountedArmsStrategic
         public float launchSmokeSize = 2f;
         public bool hotLaunch = true;         // fire glow at launch; false = cold launch (puff, ignition later)
         public float ignitionAt = 0.02f;      // cold launch: flight fraction where the booster lights
+    }
+
+    [HarmonyPatch(typeof(ProjectileCE), "DrawRotation", MethodType.Getter)]
+    public static class Patch_BoostDrawRotation
+    {
+        public static void Postfix(ProjectileCE __instance, ref Quaternion __result)
+        {
+            if (BoostPhaseTrajectoryWorker.IsBoosted(__instance))
+            {
+                __result = BoostPhaseTrajectoryWorker.EasedDrawRotation(__instance);
+            }
+        }
     }
 
     /// <summary>
@@ -45,6 +58,32 @@ namespace MountedArmsStrategic
             {
                 yield return PositionAt(projectile, projectile.FlightTicks + i);
             }
+        }
+
+        /// <summary>True when this projectile flies the eased boost profile (launched from the map, profile set).</summary>
+        public static bool IsBoosted(ProjectileCE p)
+        {
+            LaunchProfileExtension ext = p.def.GetModExtension<LaunchProfileExtension>();
+            return ext != null && ext.boostFraction > 0f && p.startingTicksToImpact > 0f && p.shotHeight < ReentryHeight
+                && (p.def.projectile as ProjectilePropertiesCE) != null
+                && (p.def.projectile as ProjectilePropertiesCE).TrajectoryWorker is BoostPhaseTrajectoryWorker;
+        }
+
+        /// <summary>
+        /// Sprite rotation from the eased drawn motion (CE draws at (x, z + 0.84*height)); replaces CE's
+        /// DrawRotation, which assumes linear time and made the nose lead the slow boost phase.
+        /// </summary>
+        public static Quaternion EasedDrawRotation(ProjectileCE p)
+        {
+            Vector3 a = PositionAt(p, p.FlightTicks);
+            Vector3 b = PositionAt(p, p.FlightTicks + 1);
+            float dx = b.x - a.x;
+            float dz = (b.z + 0.84f * Mathf.Max(0f, b.y)) - (a.z + 0.84f * Mathf.Max(0f, a.y));
+            if (dx * dx + dz * dz < 0.0000001f)
+            {
+                dz = 0.001f;   // straight up out of the silo: point north (screen up)
+            }
+            return Quaternion.LookRotation(new Vector3(dx, 0f, dz));
         }
 
         private static Vector3 PositionAt(ProjectileCE p, int tick)
