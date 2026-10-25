@@ -173,24 +173,25 @@
 
 	<ThingDef ParentName="MAS_TacticalProjectileBase">
 		<defName>MAS_Bullet_TacticalMissile_HE</defName>
+		<thingClass>MountedArmsStrategic.ProjectileCE_HeavyBlast</thingClass>
 		<label>MGM-140 ATACMS (HE)</label>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Bomb</damageDef>
 			<damageAmountBase>2600</damageAmountBase>
 			<explosionRadius>11.9</explosionRadius>
-			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<shellingProps>
 				<damage>1.5</damage>
 			</shellingProps>
 		</projectile>
-		<comps>
-			<li Class="CombatExtended.CompProperties_Fragments">
-				<fragments>
-					<Fragment_Large>8</Fragment_Large>
-					<Fragment_Small>12</Fragment_Small>
-				</fragments>
+		<!-- overpressure zones (Docs/BLAST.md): core 0.25R destroyed, rings to 0.37/0.50/0.75/1.0R; R = the 2 psi edge.
+		     Replaces CE's ExplosionCE + fragments (frame drops, cook-off fragment storms). -->
+		<modExtensions>
+			<li Class="MountedArmsStrategic.HeavyBlastExtension">
+				<radius>11.9</radius>
+				<crater>CraterLarge</crater>
+				<fxRadius>3.9</fxRadius>
 			</li>
-		</comps>
+		</modExtensions>
 	</ThingDef>
 
 	<!-- Cluster: small central charge + 24 bomblets over radius 8 (ProjectileCE_Cluster) -->
@@ -220,17 +221,28 @@
 	<!-- Thermobaric: CE's Thermobaric damage (flame worker, x2 vs buildings) -->
 	<ThingDef ParentName="MAS_TacticalProjectileBase">
 		<defName>MAS_Bullet_TacticalMissile_Thermobaric</defName>
+		<thingClass>MountedArmsStrategic.ProjectileCE_HeavyBlast</thingClass>
 		<label>MGM-140 ATACMS (thermobaric)</label>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Thermobaric</damageDef>
 			<damageAmountBase>1500</damageAmountBase>
 			<explosionRadius>12.9</explosionRadius>
 			<ai_IsIncendiary>true</ai_IsIncendiary>
-			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<shellingProps>
 				<damage>1.8</damage>
 			</shellingProps>
 		</projectile>
+		<!-- overpressure zones (Docs/BLAST.md): core 0.25R destroyed, rings to 0.37/0.50/0.75/1.0R; R = the 2 psi edge.
+		     Replaces CE's ExplosionCE + fragments (frame drops, cook-off fragment storms). -->
+		<modExtensions>
+			<li Class="MountedArmsStrategic.HeavyBlastExtension">
+				<radius>12.9</radius>
+				<thermobaric>true</thermobaric>
+				<damageDef>Thermobaric</damageDef>
+				<crater>CraterLarge</crater>
+				<fxRadius>3.9</fxRadius>
+			</li>
+		</modExtensions>
 	</ThingDef>
 
 	<!-- EMP: no shellingProps.damage, so CE's EMP estimate is used (see header) -->

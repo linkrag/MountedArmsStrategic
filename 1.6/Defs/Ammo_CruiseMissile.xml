@@ -54,7 +54,7 @@
 
 	<ThingDef ParentName="BaseExplosiveBullet">
 		<defName>MAS_Bullet_CruiseMissile</defName>
-		<thingClass>CombatExtended.ProjectileCE_Explosive</thingClass>
+		<thingClass>MountedArmsStrategic.ProjectileCE_HeavyBlast</thingClass>
 		<label>BGM-109 Tomahawk</label>
 		<description>A cruise missile in flight.</description>
 		<graphicData>
@@ -73,7 +73,6 @@
 			<damageAmountBase>5600</damageAmountBase>
 			<explosionRadius>17.9</explosionRadius>
 			<applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
-			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<soundExplode>Explosion_GiantBomb</soundExplode>
 			<soundHitThickRoof>Explosion_GiantBomb</soundHitThickRoof>
 			<soundImpactAnticipate>MortarRound_PreImpact</soundImpactAnticipate>
@@ -87,12 +86,6 @@
 			</shellingProps>
 		</projectile>
 		<comps>
-			<li Class="CombatExtended.CompProperties_Fragments">
-				<fragments>
-					<Fragment_Large>8</Fragment_Large>
-					<Fragment_Small>16</Fragment_Small>
-				</fragments>
-			</li>
 			<!-- exhaust at the nozzle (~half the sprite length behind the drawn position); replaces CE's
 			     ProjectileFleck, whose offset scales with speed and sat mid-missile in the boost phase -->
 			<li Class="MountedArmsStrategic.CompProperties_Exhaust">
@@ -105,6 +98,11 @@
 			</li>
 		</comps>
 		<modExtensions>
+			<li Class="MountedArmsStrategic.HeavyBlastExtension">
+				<radius>17.9</radius>
+				<crater>CraterLarge</crater>
+				<fxRadius>4.9</fxRadius>
+			</li>
 			<li Class="MountedArmsStrategic.LaunchProfileExtension">
 				<boostFraction>0.1</boostFraction>
 				<launchSmoke>5</launchSmoke>

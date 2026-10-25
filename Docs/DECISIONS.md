@@ -20,6 +20,8 @@
 - Sem tela "Detonando" na explosão pesada; manter os specs e reduzir fragmentos. Lançamentos mais realistas (pesquisa em `LAUNCH.md`). Avenger intercepta também projéteis.
 - MDs atualizados após toda edição (regra do usuário).
 
+- Explosões grandes seguem zonas reais de sobrepressão (pesquisa em `BLAST.md`), mantendo as regras de desempenho (teto arrancado no raio todo).
+
 ## Técnicas
 - Defs CE nativos (o mod exige CE), herdando das bases do CE.
 - Projétil de artilharia: speed 0 + gravityFactor 5 (lição da bateria do Mounted Arms).

@@ -6,28 +6,51 @@ using Verse;
 
 namespace MountedArmsStrategic
 {
-    /// <summary>Settings for a very large conventional blast (see ProjectileCE_HeavyBlast).</summary>
+    /// <summary>Settings for a large warhead blast (see ProjectileCE_HeavyBlast and Docs/BLAST.md).</summary>
     public class HeavyBlastExtension : DefModExtension
     {
-        public float radius = 24.9f;
-        public float coreFraction = 0.35f;       // inside radius*coreFraction things are destroyed outright
-        public int damage = 8000;                 // at the core edge; falls to 15% at the rim
-        public float armorPenetration = 50f;
-        public DamageDef damageDef;               // default Bomb
-        public float fireChance = 0f;             // per cell, scaled by falloff (thermobaric)
-        public float fxRadius = 4.9f;             // small real explosion for the flash and sound
+        public float radius = 24.9f;              // R = the ~2 psi contour (outer edge of meaningful damage)
+        public bool thermobaric = false;          // wider rings, confinement x1.5, fire table
+        public DamageDef damageDef;               // damage type for pawns (default Bomb)
+        public float fxRadius = 4.9f;             // small real explosion for the flash and sound only
         public ThingDef crater;
     }
 
     /// <summary>
-    /// Large conventional warhead done the way Dubs Rimatomics does its nuke: it skips CE's cell-by-cell
-    /// ExplosionCE: things in the core are destroyed directly, the rest takes one damage pass that falls off
-    /// with distance. Stored CE ammo in the blast vanishes instead of cooking off (a base full of ammo turned
-    /// one blast into thousands of fragments). Runs at once (the long-event "Detonating" screen was dropped
-    /// at the user's request). CE's ExplosionCE at r24.9 (~1950 cells, hundreds of walls) dropped the frame rate.
+    /// Large warhead blast with real overpressure zones (Kingery-Bulmash cube-root scaling; damage criteria from
+    /// Glasstone &amp; Dolan / TM 5-1300 / OTA / FM 8-9; research in Docs/BLAST.md). The zone radii are fixed
+    /// fractions of R because, under cube-root scaling, the ratios between overpressure contours do not depend on
+    /// the charge mass; the per-zone damage depends only on overpressure, so it is the same for every warhead.
+    ///   core      0 - 0.25R   >= ~22 psi   everything destroyed (except natural rock)
+    ///   severe A  -  0.37R    22 - 10 psi  buildings -900 hp (reinforced concrete demolished)
+    ///   severe B  -  0.50R    10 - 5.8 psi buildings -600 hp (most buildings collapse)
+    ///   heavy     -  0.75R    5.8 - 3 psi  buildings -250 hp (houses collapse)
+    ///   moderate  -  1.0R     3 - 2 psi    buildings -100 hp, doors -75% (doors/windows/roofs blown out)
+    /// Thermobaric: same core, rings out to 0.55R / 0.82R, x1.5 damage in cells that were roofed (confinement,
+    /// a game choice: the sources give no number), fire 100/60/60/25/5%.
+    /// Performance (the first version hung the game): every non-thick roof in R is stripped first (game rule, so
+    /// nothing caves in cascade-style), buildings/items/plants lose hit points directly (also avoids Bomb's
+    /// building factor multiplying the values), natural rock is left alone, stored CE ammo vanishes (no cook-off
+    /// chain), each thing is processed once, fires are capped.
     /// </summary>
     public class ProjectileCE_HeavyBlast : ProjectileCE_Explosive
     {
+        private const float CoreEdge = 0.25f;
+        private const float SevereAEdge = 0.37f;
+        private const int MaxFires = 200;
+
+        // per zone (core, severe A, severe B, heavy, moderate)
+        private static readonly int[] BuildingDamage = { int.MaxValue, 900, 600, 250, 100 };
+        private static readonly int[] PawnDamageMin = { 400, 150, 80, 30, 10 };
+        private static readonly int[] PawnDamageMax = { 500, 250, 150, 60, 25 };
+        private static readonly int[] PawnHits = { 5, 4, 3, 2, 1 };
+        private static readonly float[] ItemDestroyChance = { 1f, 0.9f, 0.7f, 0.25f, 0f };
+        private static readonly float[] ItemLossMin = { 1f, 0.5f, 0.5f, 0.2f, 0.1f };
+        private static readonly float[] ItemLossMax = { 1f, 0.9f, 0.9f, 0.5f, 0.2f };
+        private static readonly float[] PlantDestroyChance = { 1f, 1f, 1f, 0.5f, 0.1f };
+        private static readonly float[] FireHE = { 0.3f, 0.1f, 0.1f, 0f, 0f };
+        private static readonly float[] FireThermobaric = { 1f, 0.6f, 0.6f, 0.25f, 0.05f };
+
         public override void Impact(Thing hitThing)
         {
             HeavyBlastExtension ext = def.GetModExtension<HeavyBlastExtension>();
@@ -44,30 +67,48 @@ namespace MountedArmsStrategic
             Detonate(map, center, ext, instigator, projectileDef);
         }
 
+        private static int ZoneOf(float fraction, bool thermobaric)
+        {
+            if (fraction <= CoreEdge)
+            {
+                return 0;
+            }
+            if (fraction <= SevereAEdge)
+            {
+                return 1;
+            }
+            if (fraction <= (thermobaric ? 0.55f : 0.50f))
+            {
+                return 2;
+            }
+            if (fraction <= (thermobaric ? 0.82f : 0.75f))
+            {
+                return 3;
+            }
+            return 4;
+        }
+
         private static void Detonate(Map map, IntVec3 center, HeavyBlastExtension ext, Thing instigator, ThingDef projectileDef)
         {
             if (map == null || !Find.Maps.Contains(map) || !center.InBounds(map))
             {
                 return;
             }
-            DamageDef damageDef = ext.damageDef ?? DamageDefOf.Bomb;
-            float radius = ext.radius;
-            float core = radius * ext.coreFraction;
-            List<Thing> things = new List<Thing>();
-            HashSet<Thing> processed = new HashSet<Thing>();   // multi-cell things are hit once (review finding)
+            DamageDef pawnDamage = ext.damageDef ?? DamageDefOf.Bomb;
+            float radius = Mathf.Max(ext.radius, 1f);
 
             List<IntVec3> cells = new List<IntVec3>();
+            List<bool> confined = new List<bool>();
             foreach (IntVec3 cell in GenRadial.RadialCellsAround(center, radius, true))
             {
                 if (cell.InBounds(map))
                 {
                     cells.Add(cell);
+                    confined.Add(map.roofGrid.Roofed(cell));   // snapshot before stripping (thermobaric confinement)
                 }
             }
 
-            // Pass 1: the blast wave strips every non-thick roof in the radius first. Destroying the walls under a
-            // roof made it cave in cascade-style (crushing things already being destroyed: "Tried to destroy
-            // already-destroyed thing" spam and a hang on the first test).
+            // Pass 1: strip every non-thick roof in R (game rule; prevents cascade cave-ins).
             for (int c = 0; c < cells.Count; c++)
             {
                 RoofDef roof = map.roofGrid.RoofAt(cells[c]);
@@ -77,16 +118,15 @@ namespace MountedArmsStrategic
                 }
             }
 
-            // Pass 2: destruction. Pawns take real damage; buildings/items/plants lose hit points directly (no CE
-            // damage pipeline per thing); natural rock is left alone (destroying it spawned chunks on despawned
-            // cells and brought mountain roofs down); stored CE ammo vanishes (no cook-off chain).
+            // Pass 2: damage by zone.
+            List<Thing> things = new List<Thing>();
+            HashSet<Thing> processed = new HashSet<Thing>();
+            int fires = 0;
             for (int c = 0; c < cells.Count; c++)
             {
                 IntVec3 cell = cells[c];
-                float dist = cell.DistanceTo(center);
-                bool inCore = dist <= core;
-                float falloff = inCore ? 1f : 1f - 0.85f * (dist - core) / Mathf.Max(radius - core, 0.1f);
-                int amount = Mathf.Max(1, Mathf.RoundToInt(ext.damage * falloff));
+                int zone = ZoneOf(cell.DistanceTo(center) / radius, ext.thermobaric);
+                float mult = ext.thermobaric && zone > 0 && confined[c] ? 1.5f : 1f;
 
                 things.Clear();
                 things.AddRange(cell.GetThingList(map));
@@ -100,7 +140,7 @@ namespace MountedArmsStrategic
                     Pawn pawn = t as Pawn;
                     if (pawn != null)
                     {
-                        pawn.TakeDamage(new DamageInfo(damageDef, amount, ext.armorPenetration, -1f, instigator, null, projectileDef));
+                        DamagePawn(pawn, zone, mult, pawnDamage, instigator, projectileDef);
                         continue;
                     }
                     if (!t.def.useHitPoints || (t.def.building != null && t.def.building.isNaturalRock))
@@ -112,27 +152,48 @@ namespace MountedArmsStrategic
                         t.Destroy(DestroyMode.Vanish);
                         continue;
                     }
-                    if (inCore)
+                    if (zone == 0)
                     {
                         t.Destroy(DestroyMode.KillFinalize);
                         continue;
                     }
-                    float factor = t.def.category == ThingCategory.Building ? damageDef.buildingDamageFactor
-                        : t.def.category == ThingCategory.Plant ? damageDef.plantDamageFactor : 1f;
-                    int hp = t.HitPoints - Mathf.RoundToInt(amount * factor);
-                    if (hp <= 0)
+                    switch (t.def.category)
                     {
-                        t.Destroy(DestroyMode.KillFinalize);
-                    }
-                    else
-                    {
-                        t.HitPoints = hp;
+                        case ThingCategory.Building:
+                            int dmg = Mathf.RoundToInt(BuildingDamage[zone] * mult);
+                            if (zone == 4 && t is Building_Door)
+                            {
+                                dmg = Mathf.Max(dmg, Mathf.RoundToInt(t.MaxHitPoints * 0.75f));   // doors blown in at 2-3 psi
+                            }
+                            LoseHitPoints(t, dmg);
+                            break;
+                        case ThingCategory.Plant:
+                            if (Rand.Chance(PlantDestroyChance[zone]))
+                            {
+                                t.Destroy(DestroyMode.KillFinalize);
+                            }
+                            else
+                            {
+                                LoseHitPoints(t, Mathf.RoundToInt(t.MaxHitPoints * 0.7f));
+                            }
+                            break;
+                        default:
+                            if (Rand.Chance(ItemDestroyChance[zone]))
+                            {
+                                t.Destroy(DestroyMode.KillFinalize);
+                            }
+                            else
+                            {
+                                LoseHitPoints(t, Mathf.RoundToInt(t.MaxHitPoints * Rand.Range(ItemLossMin[zone], ItemLossMax[zone]) * mult));
+                            }
+                            break;
                     }
                 }
 
-                if (ext.fireChance > 0f && Rand.Chance(ext.fireChance * falloff))
+                float fire = ext.thermobaric ? FireThermobaric[zone] : FireHE[zone];
+                if (fires < MaxFires && fire > 0f && Rand.Chance(fire) && FireUtility.TryStartFireIn(cell, map, Rand.Range(0.3f, 0.9f), instigator))
                 {
-                    FireUtility.TryStartFireIn(cell, map, Rand.Range(0.3f, 0.9f), instigator);
+                    fires++;
                 }
             }
 
@@ -140,10 +201,35 @@ namespace MountedArmsStrategic
             {
                 GenSpawn.Spawn(ext.crater, center, map, WipeMode.Vanish);
             }
-            GenExplosion.DoExplosion(center, map, ext.fxRadius, damageDef, instigator, Mathf.RoundToInt(ext.damage * 0.1f), -1f, SoundDef.Named("Explosion_GiantBomb"));
+            // flash + sound only (damage 1: the zones above already did the work)
+            GenExplosion.DoExplosion(center, map, ext.fxRadius, DamageDefOf.Bomb, instigator, 1, -1f, SoundDef.Named("Explosion_GiantBomb"));
             if (map == Find.CurrentMap)
             {
-                Find.CameraDriver.shaker.DoShake(4f);
+                Find.CameraDriver.shaker.DoShake(Mathf.Clamp(radius / 6f, 1f, 4f));
+            }
+        }
+
+        private static void DamagePawn(Pawn pawn, int zone, float mult, DamageDef damageDef, Thing instigator, ThingDef projectileDef)
+        {
+            int total = Mathf.RoundToInt(Rand.RangeInclusive(PawnDamageMin[zone], PawnDamageMax[zone]) * mult);
+            int hits = PawnHits[zone];
+            int perHit = Mathf.Max(1, total / hits);
+            for (int h = 0; h < hits && !pawn.Destroyed && !pawn.Dead; h++)
+            {
+                pawn.TakeDamage(new DamageInfo(damageDef, perHit, 0f, -1f, instigator, null, projectileDef));
+            }
+        }
+
+        private static void LoseHitPoints(Thing t, int amount)
+        {
+            int hp = t.HitPoints - Mathf.Max(1, amount);
+            if (hp <= 0)
+            {
+                t.Destroy(DestroyMode.KillFinalize);
+            }
+            else
+            {
+                t.HitPoints = hp;
             }
         }
 

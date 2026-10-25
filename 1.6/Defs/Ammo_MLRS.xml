@@ -53,7 +53,7 @@
 
 	<ThingDef ParentName="BaseExplosiveBullet">
 		<defName>MAS_Bullet_GMLRS</defName>
-		<thingClass>CombatExtended.ProjectileCE_Explosive</thingClass>
+		<thingClass>MountedArmsStrategic.ProjectileCE_HeavyBlast</thingClass>
 		<label>M31 GMLRS rocket</label>
 		<description>A guided artillery rocket in flight.</description>
 		<graphicData>
@@ -72,7 +72,6 @@
 			<damageAmountBase>900</damageAmountBase>
 			<explosionRadius>7.4</explosionRadius>
 			<applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
-			<preExplosionSpawnSingleThingDef>CraterMedium</preExplosionSpawnSingleThingDef>
 			<soundExplode>MortarBomb_Explode</soundExplode>
 			<soundHitThickRoof>Artillery_HitThickRoof</soundHitThickRoof>
 			<soundImpactAnticipate>MortarRound_PreImpact</soundImpactAnticipate>
@@ -86,12 +85,6 @@
 			</shellingProps>
 		</projectile>
 		<comps>
-			<li Class="CombatExtended.CompProperties_Fragments">
-				<fragments>
-					<Fragment_Large>4</Fragment_Large>
-					<Fragment_Small>8</Fragment_Small>
-				</fragments>
-			</li>
 			<!-- exhaust at the nozzle (~half the sprite length behind the drawn position); replaces CE's
 			     ProjectileFleck, whose offset scales with speed and sat mid-missile in the boost phase -->
 			<li Class="MountedArmsStrategic.CompProperties_Exhaust">
@@ -103,6 +96,11 @@
 			</li>
 		</comps>
 		<modExtensions>
+			<li Class="MountedArmsStrategic.HeavyBlastExtension">
+				<radius>7.4</radius>
+				<crater>CraterMedium</crater>
+				<fxRadius>2.9</fxRadius>
+			</li>
 			<li Class="MountedArmsStrategic.LaunchProfileExtension">
 				<boostFraction>0.03</boostFraction>
 				<launchSmoke>3</launchSmoke>

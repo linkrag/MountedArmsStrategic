@@ -53,3 +53,4 @@ Docs/                    status, decisões, notas do sistema de mapa-mundo do CE
 | `Docs/DECISIONS.md` | decisões do usuário e técnicas |
 | `Docs/CE_WORLD_SHELLING.md` | como o CE faz tiro no mapa-mundo (com fonte) |
 | `Docs/LAUNCH.md` | lançamento realista (pesquisa + perfis por míssil) |
+| `Docs/BLAST.md` | explosões por zonas de sobrepressão (pesquisa, modelo, fontes) |

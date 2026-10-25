@@ -170,7 +170,6 @@
 			<damageDef>Bomb</damageDef>
 			<damageAmountBase>8000</damageAmountBase>
 			<explosionRadius>24.9</explosionRadius>
-			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<shellingProps>
 				<damage>5</damage>
 			</shellingProps>
@@ -178,8 +177,8 @@
 		<modExtensions>
 			<li Class="MountedArmsStrategic.HeavyBlastExtension">
 				<radius>24.9</radius>
-				<damage>8000</damage>
 				<crater>CraterLarge</crater>
+				<fxRadius>5.9</fxRadius>
 			</li>
 		</modExtensions>
 	</ThingDef>
@@ -217,10 +216,10 @@
 		<modExtensions>
 			<li Class="MountedArmsStrategic.HeavyBlastExtension">
 				<radius>24.9</radius>
-				<damage>5000</damage>
+				<thermobaric>true</thermobaric>
 				<damageDef>Thermobaric</damageDef>
-				<fireChance>0.3</fireChance>
 				<crater>CraterLarge</crater>
+				<fxRadius>5.9</fxRadius>
 			</li>
 		</modExtensions>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
@@ -228,7 +227,6 @@
 			<damageAmountBase>5000</damageAmountBase>
 			<explosionRadius>24.9</explosionRadius>
 			<ai_IsIncendiary>true</ai_IsIncendiary>
-			<preExplosionSpawnSingleThingDef>CraterLarge</preExplosionSpawnSingleThingDef>
 			<shellingProps>
 				<damage>6</damage>
 			</shellingProps>
