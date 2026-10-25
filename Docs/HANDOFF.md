@@ -20,7 +20,10 @@ Vale para os dois mods (**MountedArms** e **MountedArmsStrategic**). Leia este a
 - Na 1.7: ver se a engine nova permite algo melhor (paralelismo, efeitos nativos de explosão grande, desempenho de destruição em massa).
 - Vanilla sem CE: tiro no mapa-mundo próprio. Remote do git.
 
-## Migração para 1.7: o que vai precisar
+## Migração para 1.7
+**Iniciada em 25/out/2026**: About/LoadFolders aceitam 1.7 com o conteúdo e as DLLs de 1.6; auditoria completa e pendências em `../MountedArms/Docs/MIGRATION_1_7.md` (substitui a lista abaixo onde divergirem).
+
+### O que se previa que fosse precisar
 Observado na pasta do jogo 1.7.4985: sem `RimWorldWin64_Data`/Unity, runtime .NET 10 (CoreCLR), Vulkan, bibliotecas `Brutal.*` (RocketWerkz). **Não verificado**: API, nome das DLLs de referência, Harmony e CE para 1.7.
 - **DLLs a portar (4)**:
   - `MountedArms/1.6/Assemblies/MountedArms.dll` (`Source/`, `build.sh`)

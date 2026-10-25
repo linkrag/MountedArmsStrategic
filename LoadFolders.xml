@@ -5,4 +5,10 @@
     <li>1.6</li>
     <li IfModActive="Dubwise.Rimatomics">1.6/Rimatomics</li>
   </v1.6>
+  <!-- 1.7 reuses the 1.6 content and DLLs (Waylith redirects UnityEngine* to UnityStubs). -->
+  <v1.7>
+    <li>/</li>
+    <li>1.6</li>
+    <li IfModActive="Dubwise.Rimatomics">1.6/Rimatomics</li>
+  </v1.7>
 </loadFolders>

@@ -5,6 +5,7 @@
   <packageId>linkrag.mountedarms.strategic</packageId>
   <supportedVersions>
     <li>1.6</li>
+    <li>1.7</li>
   </supportedVersions>
   <description>Adds ballistic missile launchers that can strike targets on the world map, using Combat Extended's world shelling.
 

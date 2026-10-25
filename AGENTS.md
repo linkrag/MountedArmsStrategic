@@ -3,7 +3,7 @@
 Leia este arquivo inteiro antes de mexer em qualquer coisa. Detalhes em `Docs/`.
 
 ## O que é o projeto
-Mod de RimWorld **1.6** (`packageId: linkrag.mountedarms.strategic`, autor Felipe), companheiro do **Mounted Arms** (`../MountedArms`, mas **sem depender dele**). Adiciona lançadores de mísseis balísticos que atacam o mapa local e o **mapa-mundo**, usando o sistema de tiro no mapa-mundo do **Combat Extended**. **Requer CE**; vanilla fica para depois, com sistema próprio (ver `Docs/DECISIONS.md`).
+Mod de RimWorld **1.6 e 1.7** (no 1.7 reaproveita `1.6/` e a DLL de 1.6; ver `../MountedArms/Docs/MIGRATION_1_7.md`) (`packageId: linkrag.mountedarms.strategic`, autor Felipe), companheiro do **Mounted Arms** (`../MountedArms`, mas **sem depender dele**). Adiciona lançadores de mísseis balísticos que atacam o mapa local e o **mapa-mundo**, usando o sistema de tiro no mapa-mundo do **Combat Extended**. **Requer CE**; vanilla fica para depois, com sistema próprio (ver `Docs/DECISIONS.md`).
 
 ## Quem é o usuário e como trabalhar com ele
 - Felipe, brasileiro. **Responda em português (BR)**, conciso e direto. Engenheiro Java/Spring/Kafka, modder de RimWorld; testa no jogo e envia logs.
@@ -13,7 +13,7 @@ Mod de RimWorld **1.6** (`packageId: linkrag.mountedarms.strategic`, autor Felip
 ## Estrutura
 ```
 About/About.xml          metadados (depende de CE)
-LoadFolders.xml          / e 1.6; 1.6/Rimatomics só com Dubwise.Rimatomics
+LoadFolders.xml          v1.6 e v1.7: / e 1.6; 1.6/Rimatomics só com Dubwise.Rimatomics
 1.6/Defs/                Research, Ammo_*, Weapons, Buildings (defs CE nativos, sem patch)
 1.6/Textures/MountedArmsStrategic/   geradas por tools/gen_tex.py
 tools/gen_tex.py         gerador de texturas (PIL)
@@ -32,7 +32,7 @@ Docs/                    status, decisões, notas do sistema de mapa-mundo do CE
 5. `shellingProps.damage` é dividido pelo nível tecnológico da facção alvo e multiplicado por 0,4–1,5 (ver `Docs/CE_WORLD_SHELLING.md`).
 6. Alcance grande: sem `PlaceWorker_ShowTurretRadius` e com `ai_combatDangerous` false.
 7. Receita de munição do CE: defName = `Make` + defName da munição (o injector procura por esse nome). Prédio com `thingCategories` (herdado das bases do CE) precisa ser minificável.
-8. **Compilar:** `powershell -File Source/build.ps1` (csc do .NET Framework, C# 5, contra o mscorlib do jogo com `/noconfig /nostdlib`). Não há SDK .NET nem mono na máquina. Sem recursos de C# 6+ (sem `=>` em membros, sem `?.`, sem interpolação `$""`).
+8. **Compilar** (no 1.7 o script está quebrado e a DLL depende de um CE 1.7; ver `../MountedArms/Docs/MIGRATION_1_7.md`): `powershell -File Source/build.ps1` (csc do .NET Framework, C# 5, contra o mscorlib do jogo com `/noconfig /nostdlib`). Não há SDK .NET nem mono na máquina. Sem recursos de C# 6+ (sem `=>` em membros, sem `?.`, sem interpolação `$""`).
 9. **Interceptação (CIWS do CE):** `Building_CIWS_CE` + verbos `VerbProperties_CIWSProjectile`/`CIWSSkyfaller` + comp `CompVerbDisabler`; alvo = `ProjectileCE` hostil com `flyOverhead` e `speed` < 80 (os nossos mísseis entram). Alcance ≤ 119 (anéis de alcance quebram em 120). Sem `PlaceWorker_ShowTurretRadius` em torreta sem verbo de chão. Detalhes em `../MountedArms/Docs/CE_NOTES.md`.
 10. **Lançador guiado** (míssil/foguete com GPS/inércia): `verbClass` `MountedArmsStrategic.Verb_ShootGuidedCE` e `CombatExtended.OrbitalTurretExtension` (`isMarkMandatory` false) na gun; precisão só pelo `circularError`. Artilharia não guiada fica no `Verb_ShootMortarCE`.
 11. Compile a DLL com o jogo **fechado** (o jogo trava o arquivo).
