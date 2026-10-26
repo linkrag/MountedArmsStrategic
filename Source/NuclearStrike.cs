@@ -64,16 +64,24 @@ namespace MountedArmsStrategic
     /// Fallout of our nuclear ICBM. Rimatomics only starts NuclearFallout for Yield > 150, which also runs its
     /// full blast as long events (the "Detonating" screen), so we keep Yield 55 and register the condition here.
     /// Its own fallout is constant for 10-30 days (rads only: its toxic part multiplies by the resistance, so it is
-    /// 0 for most pawns). Ours follows the 7-10 rule of real fallout instead: dose rate ~ t^-1.2 (t in hours after
-    /// the burst, full rate in the 1st hour), lethal outdoors in the first hours and about 1% of it after 2 days.
+    /// 0 for most pawns). Ours follows real local fallout instead (Docs/STATUS.md, lote 12, has the sources):
+    /// it starts falling ~30 min after the burst and builds up to the H+1 rate, then decays by the 7-10 rule
+    /// (dose rate ~ t^-1.2, t in hours: 10% at H+7, 1% at H+48). The first 2-3 days are the dangerous ones; from
+    /// day 3 the dose is below Rimatomics' natural recovery (-0.08/day), so the condition ends there.
     /// </summary>
     public static class NuclearFallout
     {
-        public const int DurationTicks = 2 * GenDate.TicksPerDay;
+        public const int DurationTicks = 3 * GenDate.TicksPerDay;
         private const int DoseInterval = 250;
-        // radiation sickness per hour outdoors at full rate: ~2 h-equivalents of dose in the first 3 h reach 0.9,
-        // where Rimatomics turns it into fatal radiation; the same pawn outdoors from day 1 to 2 only gets ~0.15
-        private const float PeakSicknessPerHour = 0.45f;
+        private const float ArrivalHours = 0.5f;
+        // radiation sickness per hour outdoors at the H+1 rate (~350 R/h; 0.9, where Rimatomics turns it into fatal
+        // radiation, is about the LD50 of 4-5 Gy): outdoors for the first 3 h reaches ~0.9, outdoors on day 2 ~0.15
+        private const float PeakSicknessPerHour = 0.7f;
+        // fraction of the outdoor dose (1 / protection factor): main floor of a house PF 2-5, an open shed less,
+        // under overhead mountain like a deep shelter (PF > 1000)
+        private const float RoomFactor = 0.2f;
+        private const float OpenRoofFactor = 0.5f;
+        private const float ThickRoofFactor = 0.001f;
         // what one strength unit of DubUtils.applyRads adds to radiation sickness (resistance 0)
         private const float SicknessPerRadStrength = 0.0028758333f;
 
@@ -102,7 +110,7 @@ namespace MountedArmsStrategic
             {
                 if (active.uniqueID == comp.conditionID)
                 {
-                    // a new burst on top of ours: back to full rate for another 2 days
+                    // a new burst on top of ours: its fallout starts over, for another 3 days
                     comp.detonationTick = Find.TickManager.TicksGame;
                     active.TicksLeft = DurationTicks;
                 }
@@ -124,7 +132,26 @@ namespace MountedArmsStrategic
                 return -1f;
             }
             float hours = (Find.TickManager.TicksGame - comp.detonationTick) / (float)GenDate.TicksPerHour;
-            return hours <= 1f ? 1f : Mathf.Pow(hours, -1.2f);
+            if (hours < ArrivalHours)
+            {
+                return 0f;
+            }
+            return hours <= 1f ? (hours - ArrivalHours) / (1f - ArrivalHours) : Mathf.Pow(hours, -1.2f);
+        }
+
+        /// <summary>Share of the outdoor dose a pawn gets where it stands (shielding by roof and walls).</summary>
+        private static float Shielding(IntVec3 c, Map map)
+        {
+            RoofDef roof = c.GetRoof(map);
+            if (roof == null)
+            {
+                return 1f;
+            }
+            if (roof.isThickRoof)
+            {
+                return ThickRoofFactor;
+            }
+            return c.UsesOutdoorTemperature(map) ? OpenRoofFactor : RoomFactor;
         }
 
         /// <summary>Replaces Rimatomics' GameConditionTick for our fallout; false = not ours.</summary>
@@ -136,7 +163,7 @@ namespace MountedArmsStrategic
                 return false;
             }
             Map map = cond.gameConditionManager.ownerMap;
-            if (applyRads != null && Find.TickManager.TicksGame % DoseInterval == 0)
+            if (applyRads != null && rate > 0f && Find.TickManager.TicksGame % DoseInterval == 0)
             {
                 float sickness = PeakSicknessPerHour * rate * DoseInterval / GenDate.TicksPerHour;
                 float strength = sickness / SicknessPerRadStrength;
@@ -144,9 +171,9 @@ namespace MountedArmsStrategic
                 for (int i = pawns.Count - 1; i >= 0; i--)
                 {
                     Pawn pawn = pawns[i];
-                    if (pawn.def.race.IsFlesh && pawn.Position.UsesOutdoorTemperature(map))
+                    if (pawn.def.race.IsFlesh)
                     {
-                        applyRads(pawn, strength);
+                        applyRads(pawn, strength * Shielding(pawn.Position, map));
                     }
                 }
             }

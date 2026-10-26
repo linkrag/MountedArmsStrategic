@@ -5,7 +5,7 @@
 	<!--  Nuclear ICBM: only loads with Dubs Rimatomics (LoadFolders).     -->
 	<!--  Built around Rimatomics' FissionWarhead. On a loaded map the     -->
 	<!--  projectile spawns Rimatomics' "ICBMStrike" (NuclearStrike) with  -->
-	<!--  Yield 55 does the blast without the long-event screen; the NuclearFallout (2 days, decaying) is started by MountedArmsStrategic.NuclearFallout, since Rimatomics only starts it above Yield 150. -->
+	<!--  Yield 55 does the blast without the long-event screen; the NuclearFallout (3 days, decaying) is started by MountedArmsStrategic.NuclearFallout, since Rimatomics only starts it above Yield 150. -->
 	<!--  On an unloaded settlement: CE world damage 20 (razes any tech    -->
 	<!--  level: 20 x 0.4 / 6 > 1).                                        -->
 	<!-- ================================================================= -->

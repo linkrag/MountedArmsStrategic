@@ -31,16 +31,21 @@ Relato do usuário depois do lote 10: paredes com 1 de HP sobreviviam a vários 
 - Relato do usuário (26/out, mapa de superfície na 1.7): a explosão do Minuteman nuclear acontece, mas a condição `NuclearFallout` não começa.
 - **Causa** (lida no IL do Rimatomics 1.6 e 1.7, que são iguais nesse ponto): o `NuclearStrike.StartStrike` só registra o `NuclearFallout`, e só faz a explosão completa em long events (tela "Detonating"), com `Yield > 150`. Com o nosso `Yield 55` (o da ogiva solta, `Item_FissionWarhead`) ele faz só o `GoBang`, sem fallout. Isso valia também na 1.6, ou seja, nunca foi problema da 1.7. O silo do próprio Rimatomics usa 250.
 - **Correção** (escolha do usuário: manter 55, sem tela, com fallout realista): `NuclearFallout.Start` registra o `NuclearFallout` no impacto e anota o `uniqueID` dele num `MapComponent_NuclearFallout`. Dois patches Harmony (por nome, ignorados sem Rimatomics) trocam o `GameConditionTick`/`DoCellSteadyEffects` **só do nosso fallout**; o do silo do Rimatomics fica como é.
-  - Dura 2 dias. Taxa de dose pela regra 7-10 do fallout real: cheia na 1ª hora, depois t^-1,2 (10% em H+7, 1% em H+48).
-  - Radiação pelo `DubUtils.applyRads` do Rimatomics (respeita a opção `RadiationStrength` dele), a cada 250 ticks, em pawns de carne em célula ao ar livre. Pico de 0,45 de radiation sickness por hora: cerca de 3 h fora no começo chega a 0,9, onde o Rimatomics passa a radiação fatal; 1 h fora dá ~0,45; ficar fora do dia 1 ao dia 2 dá só ~0,15.
+  - Formato conferido com fontes (pedido do usuário, 26/out); ajustes depois da pesquisa: chegada em ~30 min, 3 dias em vez de 2, e proteção por abrigo em vez de "dentro de casa, nada".
+  - Chegada: nada nos primeiros 30 min (o fallout local começa a cair ~30 min depois da explosão), sobe até a taxa de H+1 na 1ª hora, depois t^-1,2 pela regra 7-10 (10% em H+7, 1% em H+48).
+  - Dura 3 dias: as fontes de defesa civil dão os 2–3 primeiros dias como o período de maior perigo, e no fim do 3º dia a dose ao ar livre (~0,1/dia) é igual à recuperação natural do Rimatomics (−0,08/dia).
+  - Radiação pelo `DubUtils.applyRads` do Rimatomics (respeita a opção `RadiationStrength` dele), a cada 250 ticks, em pawns de carne. Pico de 0,7 de radiation sickness por hora ao ar livre (~350 R/h em H+1; 0,9, onde o Rimatomics passa a radiação fatal, é perto da DL50 de 4–5 Gy). Ao ar livre desde a explosão: ~0,44 em 1,5 h, ~0,86 em 3 h. Ao ar livre só no dia 2: ~0,16.
+  - Proteção (fração da dose = 1/PF): ao ar livre 1; teto sem paredes 0,5; cômodo fechado com teto construído ou de rocha fina 0,2 (térreo de casa, PF 2–5); sob teto de montanha 0,001 (abrigo profundo, PF > 1000). Cômodo fechado nos 3 dias: pico ~0,29 no 1º dia, ~0,2 no fim (radiation sickness leve). Teto sem paredes nos 3 dias: ~0,86.
   - Plantas morrendo e comida apodrecendo como no Rimatomics, escalados pela taxa. Céu escuro e cinza caindo iguais aos dele.
   - Sem toxic buildup: o do Rimatomics multiplica pela `ToxicEnvironmentResistance` (e não por 1 − ela), então já era 0 para quase todos.
-  - Outra bomba sobre o nosso fallout volta a taxa ao máximo por mais 2 dias. Se o fallout ativo for do Rimatomics (10–30 dias, constante), não mexemos. Como ele, encerra o `RadioactiveFallout` ativo.
+  - Outra bomba sobre o nosso fallout recomeça a curva (chegada em 30 min) por mais 3 dias. Se o fallout ativo for do Rimatomics (10–30 dias, constante), não mexemos. Como ele, encerra o `RadioactiveFallout` ativo.
 - Compilado nas duas versões e instalado em `Bin/1.6` e `Bin/1.7` (26/out).
+- Fontes: regra 7-10 e período de 2–3 dias ([manual de defesa civil, ORAU](https://orau.org/health-physics-museum/files/library/civil-defense/victor727.pdf)); chegada em ~30 min ([relatório de teste desclassificado](https://minddfiles.nuclearsecrecy.com/0404656.pdf)); DL50 2,5–5 Gy ([CDC](https://www.cdc.gov/nceh/radiation/emergencies/arsphysicianfactsheet.htm)); PF de casas 2–5 no térreo e 5–30 no porão ([folheto de abrigos, WA DAHP](https://dahp.wa.gov/sites/default/files/Fallout%20Protection%20Homes%20with%20Basements.pdf)). A taxa de pico é escolha de jogo dentro da faixa real (centenas a milhares de R/h perto do marco zero).
 - Teste pendente:
   1. Minuteman nuclear num mapa de superfície: fallout começa, sem tela "Detonating".
-  2. Colono fora nas primeiras horas: radiation sickness sobe rápido (contador Geiger do Rimatomics); dentro de casa, nada.
-  3. Depois de ~1 dia o ganho fica pequeno; a condição acaba em 2 dias.
+  2. Colono fora nas primeiras horas: radiation sickness sobe rápido (contador Geiger do Rimatomics).
+  3. Nos primeiros 30 min, nada; depois de ~1 dia o ganho fica pequeno; a condição acaba em 3 dias.
+  5. Dentro de um cômodo fechado a radiação sobe devagar (~0,3 no máximo); numa base sob montanha, nada.
   4. Salvar e carregar durante o fallout: continua decaindo de onde estava.
 
 ## Lote 10 (implementado, NÃO testado)
