@@ -8,7 +8,7 @@ Mod de RimWorld **1.6 e 1.7** (conteúdo comum em `1.6/`, DLL por versão em `Bi
 ## Quem é o usuário e como trabalhar com ele
 - Felipe, brasileiro. **Responda em português (BR)**, conciso e direto. Engenheiro Java/Spring/Kafka, modder de RimWorld; testa no jogo e envia logs.
 - Ele **verifica e corrige** as respostas. Separe o verificado (código, log, fonte) da hipótese; diga "não testei". Não invente comportamento do jogo/CE: leia o código (CE no GitHub: `CombatExtended-Continued/CombatExtended`) e os defs (CE local: `F:\Steam\steamapps\workshop\content\294100\2890901044`).
-- Você não roda o jogo. Entregue pronto para teste e peça o que ele observou. Log: `C:\Users\Felipe Pinto\AppData\LocalLow\Ludeon Studios\RimWorld by Ludeon Studios\Player.log` (1.6; o local no 1.7 ainda não foi confirmado, ver `../MountedArms/Docs/MIGRATION_1_7.md`).
+- Você não roda o jogo. Entregue pronto para teste e peça o que ele observou. Log: `C:\Users\Felipe Pinto\AppData\LocalLow\Ludeon Studios\RimWorld by Ludeon Studios\Player.log` (mesmo local na 1.6 e na 1.7).
 
 ## Estrutura
 ```

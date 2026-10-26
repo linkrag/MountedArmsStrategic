@@ -1,6 +1,6 @@
 # Status (atualize sempre que o usuário testar algo)
 
-> **RimWorld 1.6 e 1.7 (25/out/2026):** conteúdo comum em `1.6/`; DLL por versão em `Bin/1.6` e `Bin/1.7`, as duas com o código atual (lote 11), compiladas juntas pelo `build.ps1` (SDK .NET 10). A 1.7 compila contra o CE 1.6 com `tools/unity_facades.ps1`. Auditoria, riscos e toolchain: `MountedArms/Docs/MIGRATION_1_7.md`. Contexto anterior: `MountedArmsStrategic/Docs/HANDOFF.md`.
+> **RimWorld 1.6 e 1.7 (25/out/2026):** conteúdo comum em `1.6/`; DLL por versão em `Bin/1.6` e `Bin/1.7`, as duas com o código atual (lote 11), compiladas juntas pelo `build.ps1` (SDK .NET 10). A 1.7 compila contra o CE 1.6 com `tools/unity_facades.ps1`. Auditoria, riscos e toolchain: `MountedArms/Docs/MIGRATION_1_7.md`. Contexto anterior: `MountedArmsStrategic/Docs/HANDOFF.md`. **Confirmado em jogo (26/out): carrega e funciona no 1.7 com o CE 16.7.4.**
 
 
 Ambiente: RimWorld 1.6 ou 1.7, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcional). DLL: `build.ps1` **com o jogo fechado** (o jogo trava a DLL; `-Out <pasta>` só para validar a compilação). Gera `Bin/1.6/Assemblies` e `Bin/1.7/Assemblies` de uma vez (`-Version` para só uma).
