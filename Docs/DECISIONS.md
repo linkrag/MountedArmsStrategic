@@ -37,6 +37,8 @@
 - DLL por versão em `Bin/<versão>/Assemblies`, conteúdo comum em `1.6/`; na 1.7, compilar contra o CE 1.6 com facades `UnityEngine.*` → `UnityStubs`. Build único das duas versões com o SDK .NET 10 (`build.ps1`, alvos `net472`/`net10.0`, referências `Krafs.Rimworld.Ref`), o mesmo esquema do Mounted Arms.
 - Dano no mapa-mundo 1,5: ~3 acertos num assentamento industrial (cálculo em `CE_WORLD_SHELLING.md`).
 
+- Fallout do ICBM nuclear (26/out, escolha do usuário): manter o `Yield 55` (explosão sem a tela "Detonating" do Rimatomics) e registrar o `NuclearFallout` nós mesmos, com formato realista: letal desde o início, 2 dias, taxa de dose t^-1,2 (regra 7-10). Só o fallout do nosso míssil decai; o do silo do Rimatomics fica como é.
+
 ## Dubs Rimatomics (verificado nos defs, workshop 1127530465)
 - Tem o silo "Liberator" (`Rimatomics.MissileSilo`, 9x5, 5 mísseis, precisa de SACS), ICBM de fissão como WorldObject próprio (`WorldObject_ICBMfission`), mísseis táticos HE/químico/nuclear e os GameConditions `NuclearFallout`/`RadioactiveFallout`.
 - Usa código próprio, não o sistema de mapa-mundo do CE. O CE tem patches de compatibilidade para o Rimatomics (apparel, dano, torretas), nada dos mísseis.

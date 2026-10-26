@@ -8,7 +8,7 @@ Ambiente: RimWorld 1.6 ou 1.7, Harmony, Combat Extended 16.7.4, Dubs Rimatomics 
 ## Confirmado em jogo (out/2026)
 - Carregamento sem erros, aba de pesquisa, construção, receitas no injector do CE.
 - **M270 (ATACMS)** `MAS_Turret_TacticalLauncher`: tiro local e no mapa-mundo; salva de 2 com dispersão só no 2º míssil (`recoilAmount` 1,2; o recuo do CE é 0 no 1º tiro da rajada). Esse era o comportamento antes do lote 11; desde 25/out, nas duas versões, cada míssil cai num ponto próprio dentro do `circularError` 3.
-- **Minuteman III (nuclear, com Rimatomics)**: explosão nuclear e fogo do próprio Rimatomics funcionando.
+- **Minuteman III (nuclear, com Rimatomics)**: explosão nuclear e fogo do próprio Rimatomics funcionando (o fallout só existe desde o lote 12, ainda não testado).
 - **Retaliação do CE**: a facção atacada revida com morteiros no mapa do jogador.
 - **Lote 5**: botão Descarregar (troca de ogiva pelo menu de recarga do CE + Descarregar), nomes reais, ataque a mapa carregado **sem marcador** nos lançadores guiados, raios de explosão em escala.
 
@@ -27,17 +27,21 @@ Relato do usuário depois do lote 10: paredes com 1 de HP sobreviviam a vários 
   4. Paiol no raio só explode na borda: **pendente** (o usuário vai validar).
   5. Salva da HIMARS espalhada até ~7 células: **confirmado**.
 
-## Bug aberto (26/out): ICBM nuclear sem fallout na 1.7
-- Relato do usuário: a explosão do Minuteman nuclear (Rimatomics) acontece, mas a condição `NuclearFallout` não começa. Na 1.6 o fallout acontecia.
-- Verificado sem IL (só busca nos bytes da DLL, nos defs e no log):
-  - Os defs do Rimatomics são iguais na 1.6 e na 1.7: `ICBMStrike` = `Rimatomics.NuclearStrike`, e `NuclearFallout` = `GameCondition_NuclearFallout`.
-  - Não há opção de mod que desligue o fallout.
-  - O `Player.log` não mostra aviso de `Yield` não encontrado nem exceção do strike ou do fallout.
-- Hipótese (não verificada): na 1.7 o Rimatomics troca `BiomeDef.inVacuum` por `VacuumUtility.GetVacuum` e pode ter uma nova condição que bloqueia `MakeFallout`. Também pode ser que a 1.7 dispare o fallout por outro caminho, como o `WorldObject_ICBMfission` ou o lançador.
-- Próximo passo:
-  1. Ler no IL do `1127530465/1.7/Assemblies` quem chama `MakeFallout` e `RegisterCondition`, com que condições e com que duração, e comparar com a 1.6.
-  2. Corrigir no `ProjectileCE_NuclearStrike`: preencher o que faltar no strike ou, se preciso, registrar o `NuclearFallout` nós mesmos (`GameConditionMaker.MakeCondition` + `map.gameConditionManager.RegisterCondition`) com a duração do Rimatomics.
-  3. Perguntar ao usuário se o mapa do teste era de superfície ou de espaço/órbita.
+## Lote 12 (implementado, NÃO testado): fallout do ICBM nuclear
+- Relato do usuário (26/out, mapa de superfície na 1.7): a explosão do Minuteman nuclear acontece, mas a condição `NuclearFallout` não começa.
+- **Causa** (lida no IL do Rimatomics 1.6 e 1.7, que são iguais nesse ponto): o `NuclearStrike.StartStrike` só registra o `NuclearFallout`, e só faz a explosão completa em long events (tela "Detonating"), com `Yield > 150`. Com o nosso `Yield 55` (o da ogiva solta, `Item_FissionWarhead`) ele faz só o `GoBang`, sem fallout. Isso valia também na 1.6, ou seja, nunca foi problema da 1.7. O silo do próprio Rimatomics usa 250.
+- **Correção** (escolha do usuário: manter 55, sem tela, com fallout realista): `NuclearFallout.Start` registra o `NuclearFallout` no impacto e anota o `uniqueID` dele num `MapComponent_NuclearFallout`. Dois patches Harmony (por nome, ignorados sem Rimatomics) trocam o `GameConditionTick`/`DoCellSteadyEffects` **só do nosso fallout**; o do silo do Rimatomics fica como é.
+  - Dura 2 dias. Taxa de dose pela regra 7-10 do fallout real: cheia na 1ª hora, depois t^-1,2 (10% em H+7, 1% em H+48).
+  - Radiação pelo `DubUtils.applyRads` do Rimatomics (respeita a opção `RadiationStrength` dele), a cada 250 ticks, em pawns de carne em célula ao ar livre. Pico de 0,45 de radiation sickness por hora: cerca de 3 h fora no começo chega a 0,9, onde o Rimatomics passa a radiação fatal; 1 h fora dá ~0,45; ficar fora do dia 1 ao dia 2 dá só ~0,15.
+  - Plantas morrendo e comida apodrecendo como no Rimatomics, escalados pela taxa. Céu escuro e cinza caindo iguais aos dele.
+  - Sem toxic buildup: o do Rimatomics multiplica pela `ToxicEnvironmentResistance` (e não por 1 − ela), então já era 0 para quase todos.
+  - Outra bomba sobre o nosso fallout volta a taxa ao máximo por mais 2 dias. Se o fallout ativo for do Rimatomics (10–30 dias, constante), não mexemos. Como ele, encerra o `RadioactiveFallout` ativo.
+- Compilado nas duas versões e instalado em `Bin/1.6` e `Bin/1.7` (26/out).
+- Teste pendente:
+  1. Minuteman nuclear num mapa de superfície: fallout começa, sem tela "Detonating".
+  2. Colono fora nas primeiras horas: radiation sickness sobe rápido (contador Geiger do Rimatomics); dentro de casa, nada.
+  3. Depois de ~1 dia o ganho fica pequeno; a condição acaba em 2 dias.
+  4. Salvar e carregar durante o fallout: continua decaindo de onde estava.
 
 ## Lote 10 (implementado, NÃO testado)
 - Teste do lote 9: zonas OK, mas impacto travava ~1 s, sem efeito visual, e tudo aparecia destruído de uma vez (tudo era feito num tick). Agora a explosão é uma **onda de choque em ticks** (`BlastWave`, `HeavyBlastWaves`): frente de 0 a R em 6–25 ticks, até 150 coisas por tick, teto arrancado 7 células à frente, efeito de explosão vanilla em cada célula + fumaça/poeira. Ver `Docs/BLAST.md`.

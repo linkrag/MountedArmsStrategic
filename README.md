@@ -17,7 +17,7 @@ Mod de RimWorld 1.6 e 1.7 com lançadores de mísseis balísticos que atacam o m
 | Obuseiro M777 155 mm (3x3, tripulado) | Munição 155 mm do CE; até 60 tiles |
 | Ogivas especiais (tático e ICBM) | Cluster, termobárica, EMP (contra colmeias mecanoides) |
 | Bateria antimíssil (3x3, energia, estilo Patriot PAC-3) | Intercepta granadas de artilharia, mísseis e drop pods hostis até 119 células; 4 interceptadores, 2 por ameaça |
-| ICBM (nuclear), só com Dubs Rimatomics | Usa a ogiva de fissão e a explosão/fallout do próprio Rimatomics; destrói qualquer assentamento |
+| ICBM (nuclear), só com Dubs Rimatomics | Usa a ogiva de fissão e a explosão do próprio Rimatomics, com fallout realista de 2 dias (letal nas primeiras horas, decai pela regra 7-10); destrói qualquer assentamento |
 
 Configurações do mod: orçamento da retaliação da IA (0–500%) e retaliação nuclear opcional (com Rimatomics).
 
