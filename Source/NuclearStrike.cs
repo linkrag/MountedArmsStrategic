@@ -89,6 +89,7 @@ namespace MountedArmsStrategic
             AccessTools.TypeByName("Rimatomics.DubUtils") is System.Type t
                 ? AccessTools.MethodDelegate<System.Action<Pawn, float>>(AccessTools.Method(t, "applyRads"))
                 : null;
+        private static readonly HediffDef fatalRad = DefDatabase<HediffDef>.GetNamedSilentFail("FatalRad");
 
         public static void Start(Map map)
         {
@@ -171,7 +172,9 @@ namespace MountedArmsStrategic
                 for (int i = pawns.Count - 1; i >= 0; i--)
                 {
                     Pawn pawn = pawns[i];
-                    if (pawn.def.race.IsFlesh)
+                    // applyRads feeds every later dose straight into FatalRad, which killed pawns ~7 h after the
+                    // fatal threshold; ~7-14 Gy kills in 1-3 weeks, so after it only Rimatomics' own course runs
+                    if (pawn.def.race.IsFlesh && (fatalRad == null || !pawn.health.hediffSet.HasHediff(fatalRad)))
                     {
                         applyRads(pawn, strength * Shielding(pawn.Position, map));
                     }
