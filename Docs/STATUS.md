@@ -12,7 +12,7 @@ Ambiente: RimWorld 1.6 ou 1.7, Harmony, Combat Extended 16.7.4, Dubs Rimatomics 
 - **Retaliação do CE**: a facção atacada revida com morteiros no mapa do jogador.
 - **Lote 5**: botão Descarregar (troca de ogiva pelo menu de recarga do CE + Descarregar), nomes reais, ataque a mapa carregado **sem marcador** nos lançadores guiados, raios de explosão em escala.
 
-## Lote 11 (implementado, NÃO testado; nas DLLs de 1.6 e 1.7 desde 25/out)
+## Lote 11 (testado na 1.7 em 26/out: itens 1, 2, 3 e 5 confirmados; 4 pendente; 1.6 não testada)
 Relato do usuário depois do lote 10: paredes com 1 de HP sobreviviam a vários mísseis; a salva da HIMARS caía muito junta; a remoção direta nos anéis parecia "apertar Delete".
 - **Paredes com 1 HP**: causa no nosso código, não no CE (vale igual na 1.6). Toda parede, coluna ou porta a até 6,9 células de teto de montanha ficava com no mínimo 1 de HP para sempre. Agora (escolha do usuário: desabamento real) o golpe letal fica guardado e elas caem juntas no fim da onda, e o desabamento vanilla roda uma vez no tick seguinte. A cratera não sai sob teto de montanha.
 - **Dano real fora do núcleo** (decisão do usuário): o núcleo continua sendo vaporização (remoção direta + cratera); nos anéis, prédios/itens/plantas levam `TakeDamage` com o dano novo `MAS_BlastWave` (fatores 1, sem som, sem sujeira, sem fragmentos de parede do CE), prédios ±20%. O teto continua arrancado à frente da onda.
@@ -20,12 +20,24 @@ Relato do usuário depois do lote 10: paredes com 1 de HP sobreviviam a vários 
 - **Salva da HIMARS**: o CE trava a mira da rajada inteira no 1º tiro (estimativa de distância e erro circular), e só o `ShotSpread` 0,6° variava por foguete, então a salva caía num grupo apertado cujo centro variava. Fonte: `Verb_LaunchProjectileCE.ShiftTarget`/`LockRotationAndAngle`. Agora `Verb_ShootGuidedCE.ShiftTarget` manda cada míssil num alvo local para um ponto próprio, uniforme dentro do `circularError` do ponto mirado (sem spread, recuo nem erro de distância), limitado ao alcance da carga. O lead do CE em pawns em movimento continua. HIMARS `circularError` 2 → 7 (o raio da explosão do GMLRS é 7,4). Vale nas duas versões desde 25/out (o `Bin/1.6` foi recompilado com o SDK; a `1.6/Legacy1.6`, que mantinha 2 na 1.6, foi apagada). Vale também para M270 (3), Mk 41 (1) e Minuteman (4); o `recoilAmount`/`ShotSpread` deles não contam mais. O tiro no mapa-mundo não muda.
 - **Build (25/out)**: `build.ps1` na raiz compila as duas versões com o SDK .NET 10 (`Source/MountedArmsStrategic.csproj`, alvos `net472`/`net10.0`, `Krafs.Rimworld.Ref`). Na 1.7 gera antes as facades `UnityEngine.*` → `UnityStubs` (`tools/unity_facades.ps1`, em `obj/`) para o compilador aceitar o CE 1.6. Pelo dump de metadados, o 1.7 novo é equivalente ao que o csc gerava, e o 1.6 tem a mesma superfície do 1.7. A DLL de 1.7 referencia `UnityStubs` e só roda na 1.7.
 - Revisão independente (3 revisores + verificador por achado; 4 de 5 confirmados, todos corrigidos): boomshroom explodindo nos anéis; paredes de montanha do núcleo deixavam destroços no núcleo (agora caem antes da varredura final); `circularError` 7 piorava a 1.6; o lead em alvo móvel tinha se perdido.
-- Testar (1.7):
-  1. Carregar sem erros com o CE 16.7.4.
-  2. Base comum: anéis com dano visível, prédios danificados em vez de sumirem, núcleo vaporizado com cratera.
-  3. Base escavada em montanha: as paredes atingidas caem e a montanha desaba uma vez no fim da onda (uma carta), sem travar.
-  4. Paiol no raio: só explode na borda.
-  5. Salva da HIMARS espalhada até ~7 células do ponto.
+- Teste na 1.7 com o CE 16.7.4 (usuário, 26/out):
+  1. Carrega sem erros: **confirmado**.
+  2. Base comum (anéis com dano visível, prédios danificados em vez de sumirem, núcleo vaporizado com cratera): **confirmado**.
+  3. Base escavada em montanha (paredes caem, a montanha desaba uma vez no fim da onda, sem travar): **confirmado**.
+  4. Paiol no raio só explode na borda: **pendente** (o usuário vai validar).
+  5. Salva da HIMARS espalhada até ~7 células: **confirmado**.
+
+## Bug aberto (26/out): ICBM nuclear sem fallout na 1.7
+- Relato do usuário: a explosão do Minuteman nuclear (Rimatomics) acontece, mas a condição `NuclearFallout` não começa. Na 1.6 o fallout acontecia.
+- Verificado sem IL (só busca nos bytes da DLL, nos defs e no log):
+  - Os defs do Rimatomics são iguais na 1.6 e na 1.7: `ICBMStrike` = `Rimatomics.NuclearStrike`, e `NuclearFallout` = `GameCondition_NuclearFallout`.
+  - Não há opção de mod que desligue o fallout.
+  - O `Player.log` não mostra aviso de `Yield` não encontrado nem exceção do strike ou do fallout.
+- Hipótese (não verificada): na 1.7 o Rimatomics troca `BiomeDef.inVacuum` por `VacuumUtility.GetVacuum` e pode ter uma nova condição que bloqueia `MakeFallout`. Também pode ser que a 1.7 dispare o fallout por outro caminho, como o `WorldObject_ICBMfission` ou o lançador.
+- Próximo passo:
+  1. Ler no IL do `1127530465/1.7/Assemblies` quem chama `MakeFallout` e `RegisterCondition`, com que condições e com que duração, e comparar com a 1.6.
+  2. Corrigir no `ProjectileCE_NuclearStrike`: preencher o que faltar no strike ou, se preciso, registrar o `NuclearFallout` nós mesmos (`GameConditionMaker.MakeCondition` + `map.gameConditionManager.RegisterCondition`) com a duração do Rimatomics.
+  3. Perguntar ao usuário se o mapa do teste era de superfície ou de espaço/órbita.
 
 ## Lote 10 (implementado, NÃO testado)
 - Teste do lote 9: zonas OK, mas impacto travava ~1 s, sem efeito visual, e tudo aparecia destruído de uma vez (tudo era feito num tick). Agora a explosão é uma **onda de choque em ticks** (`BlastWave`, `HeavyBlastWaves`): frente de 0 a R em 6–25 ticks, até 150 coisas por tick, teto arrancado 7 células à frente, efeito de explosão vanilla em cada célula + fumaça/poeira. Ver `Docs/BLAST.md`.
