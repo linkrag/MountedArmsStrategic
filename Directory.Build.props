@@ -1,0 +1,69 @@
+<Project>
+  <!-- One build for both game versions (build.ps1): net472 = RimWorld 1.6 (Unity/Mono) -> Bin/1.6,
+       net10.0 = RimWorld 1.7 (Waylith/.NET 10) -> Bin/1.7. Game references come from Krafs.Rimworld.Ref
+       (no game install needed); Harmony and Combat Extended from the Steam workshop folder.
+       Identical copy in MountedArms and MountedArmsStrategic: keep both in sync. -->
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+    <TargetFrameworks>net472;net10.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!-- same source -> same DLL bytes: the SDK would otherwise stamp the git commit into the informational version -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <!-- CS1701/1702: CE and the facades ask for older corlib/Assembly-CSharp versions; CS1684: Unity.Collections (unused) -->
+    <NoWarn>$(NoWarn);CS1701;CS1702;CS1684</NoWarn>
+    <ModRoot>$(MSBuildThisFileDirectory)</ModRoot>
+    <ModBin Condition="'$(ModBin)' == ''">$(ModRoot)Bin</ModBin>
+    <!-- ModBin may come from the command line (build.ps1 -Out), and global properties cannot be reassigned -->
+    <ModBinDir>$([MSBuild]::EnsureTrailingSlash('$(ModBin)'))</ModBinDir>
+    <BaseIntermediateOutputPath>$(ModRoot)obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <!-- one intermediate folder per framework: AppendTargetFrameworkToOutputPath=false would make them share one, and a
+         build of both frameworks at once could copy the net10.0 DLL into Bin/1.6 -->
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
+    <Workshop Condition="'$(Workshop)' == ''">F:\Steam\steamapps\workshop\content\294100</Workshop>
+    <!-- One CE per game version. There is no CE 1.7 yet, so 1.7 also compiles against the 1.6 CE through the
+         facades (CEFacades). When CE 1.7 ships: build.ps1 -CE17 <its CombatExtended.dll> (sets CombatExtended17
+         and CEFacades=false). Do not pass -p:CombatExtended itself: it would apply to both versions. -->
+    <CombatExtended16 Condition="'$(CombatExtended16)' == ''">$(Workshop)\2890901044\Assemblies\CombatExtended.dll</CombatExtended16>
+    <CombatExtended17 Condition="'$(CombatExtended17)' == ''">$(CombatExtended16)</CombatExtended17>
+    <CEFacades Condition="'$(CEFacades)' == ''">true</CEFacades>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net472'">
+    <RimWorldVersion>1.6</RimWorldVersion>
+    <CombatExtended>$(CombatExtended16)</CombatExtended>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <RimWorldVersion>1.7</RimWorldVersion>
+    <CombatExtended>$(CombatExtended17)</CombatExtended>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <PackageReference Include="Krafs.Rimworld.Ref" Version="1.6.4871" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Krafs.Rimworld.Ref" Version="1.7.4985-unstable" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony" HintPath="$(Workshop)\2009463077\$(RimWorldVersion)\Assemblies\0Harmony.dll" Private="false" />
+  </ItemGroup>
+
+  <!-- Projects with <UsesCE>true</UsesCE>. Against the 1.6 CE, the 1.7 build resolves CE's UnityEngine.* references
+       through forwarders to UnityStubs (tools/unity_facades.ps1, run by build.ps1). -->
+  <ItemGroup Condition="'$(UsesCE)' == 'true'">
+    <Reference Include="CombatExtended" HintPath="$(CombatExtended)" Private="false" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UsesCE)' == 'true' and '$(TargetFramework)' == 'net10.0' and '$(CEFacades)' == 'true'">
+    <Reference Include="UnityEngine" HintPath="$(ModRoot)obj\facades\UnityEngine.dll" Private="false" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(ModRoot)obj\facades\UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="UnityEngine.IMGUIModule" HintPath="$(ModRoot)obj\facades\UnityEngine.IMGUIModule.dll" Private="false" />
+    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(ModRoot)obj\facades\UnityEngine.TextRenderingModule.dll" Private="false" />
+    <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(ModRoot)obj\facades\UnityEngine.InputLegacyModule.dll" Private="false" />
+    <Reference Include="UnityEngine.UI" HintPath="$(ModRoot)obj\facades\UnityEngine.UI.dll" Private="false" />
+  </ItemGroup>
+</Project>

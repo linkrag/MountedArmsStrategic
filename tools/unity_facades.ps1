@@ -1,3 +1,4 @@
+# Identical copy in MountedArms/tools and MountedArmsStrategic/tools (the mods do not depend on each other); keep both in sync.
 # Builds forwarder assemblies for compiling against RimWorld 1.7 while Combat Extended is still the 1.6 build.
 # CE references UnityEngine.CoreModule/IMGUIModule/...; 1.7 has no Unity and only redirects those names to
 # UnityStubs at run time (RimWorld.runtimeconfig.json AssemblyNameRedirects). The compiler does not know that

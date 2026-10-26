@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- MountedArmsStrategic.dll (CE-only; Rimatomics only by reflection, no compile reference). -->
+  <PropertyGroup>
+    <AssemblyName>MountedArmsStrategic</AssemblyName>
+    <RootNamespace>MountedArmsStrategic</RootNamespace>
+    <UsesCE>true</UsesCE>
+    <OutputPath>$(ModBinDir)$(RimWorldVersion)\Assemblies\</OutputPath>
+  </PropertyGroup>
+</Project>

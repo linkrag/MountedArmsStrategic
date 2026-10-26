@@ -33,8 +33,8 @@
 				<range>700</range>
 				<!-- burst fires both missiles; the CE fire mode toggle lets the player fire one -->
 				<burstShotCount>2</burstShotCount>
-				<!-- recoil/ShotSpread only matter for the 1.6 DLL built before the per-missile scatter
-				     (Verb_ShootGuidedCE now lands each missile within circularError of the aim point) -->
+				<!-- recoil/ShotSpread no longer matter: Verb_ShootGuidedCE lands each missile within circularError
+				     of the aim point -->
 				<recoilAmount>1.2</recoilAmount>
 				<ticksBetweenBurstShots>90</ticksBetweenBurstShots>
 				<soundCast>RocketswarmLauncher_Fire</soundCast>
@@ -186,8 +186,7 @@
 				<soundCast>RocketswarmLauncher_Fire</soundCast>
 				<soundCastTail>GunTail_Heavy</soundCastTail>
 				<muzzleFlashScale>25</muzzleFlashScale>
-				<!-- salvo radius in cells (the GMLRS blast R is 7.4); 1.6/Legacy1.6 keeps 2 on RimWorld 1.6
-				     until Bin/1.6 is rebuilt with the per-missile scatter -->
+				<!-- salvo radius in cells (the GMLRS blast R is 7.4) -->
 				<circularError>7</circularError>
 				<indirectFirePenalty>0.05</indirectFirePenalty>
 				<ai_IsBuildingDestroyer>true</ai_IsBuildingDestroyer>
