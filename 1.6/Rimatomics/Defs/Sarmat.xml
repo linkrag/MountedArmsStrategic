@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- ================================================================= -->
+	<!--  RS-28 Sarmat: heavy liquid-fuelled MIRV ICBM (only with          -->
+	<!--  Rimatomics, like every nuclear weapon here). Its own silo (the   -->
+	<!--  real missile is ~208 t against ~35 t for Minuteman III) and its  -->
+	<!--  own ammo set. Over a loaded map the bus (ProjectileCE_Mirv)      -->
+	<!--  releases 10 warheads at 20% of the re-entry flight: one at the   -->
+	<!--  aim cell, the rest spread over the whole map. Each warhead is a  -->
+	<!--  separate CE projectile, so missile defense can shoot it down.    -->
+	<!--  Warhead blast: ours (R 29.9 = 2 psi contour, core 7.5            -->
+	<!--  vaporized), not Rimatomics' (fixed r25/r55 below Yield 150, as   -->
+	<!--  big as the Minuteman). Fallout 0.25 each; a salvo adds up to     -->
+	<!--  2.5x the Minuteman's (cap 3).                                    -->
+	<!--  Unloaded settlement: CE world damage 40 (razes any tech level).  -->
+	<!-- ================================================================= -->
+
+	<CombatExtended.AmmoCategoryDef>
+		<defName>MAS_ICBMMIRV</defName>
+		<label>ICBM (MIRV)</label>
+		<labelShort>MIRV</labelShort>
+		<description>Heavy ICBM carrying multiple independently targetable nuclear re-entry vehicles.</description>
+	</CombatExtended.AmmoCategoryDef>
+
+	<CombatExtended.AmmoSetDef>
+		<defName>MAS_AmmoSet_Sarmat</defName>
+		<label>heavy MIRV ICBMs</label>
+		<ammoTypes>
+			<MAS_Ammo_Sarmat>MAS_Bullet_Sarmat</MAS_Ammo_Sarmat>
+		</ammoTypes>
+	</CombatExtended.AmmoSetDef>
+
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
+		<defName>MAS_Ammo_Sarmat</defName>
+		<label>RS-28 Sarmat (MIRV)</label>
+		<description>A heavy liquid-fuelled intercontinental ballistic missile whose bus carries ten small nuclear warheads. Over the target they separate and fall across the whole map; missile defense has to shoot each one down. Fired from a Sarmat silo at settlements and sites anywhere within reach on the world map.</description>
+		<graphicData>
+			<drawSize>(3,3)</drawSize>
+		</graphicData>
+		<statBases>
+			<MaxHitPoints>800</MaxHitPoints>
+			<Mass>5000</Mass>
+			<Bulk>12000</Bulk>
+			<MarketValue>100000</MarketValue>
+		</statBases>
+		<ammoClass>MAS_ICBMMIRV</ammoClass>
+		<!-- cook-off: the fuel and conventional charges, not the warheads -->
+		<detonateProjectile>MAS_Bullet_ICBM_HE</detonateProjectile>
+	</ThingDef>
+
+	<!-- the bus: flies like an ICBM; if it lands without splitting it detonates as one warhead -->
+	<ThingDef ParentName="MAS_ICBMProjectileBase">
+		<defName>MAS_Bullet_Sarmat</defName>
+		<thingClass>MountedArmsStrategic.ProjectileCE_Mirv</thingClass>
+		<label>RS-28 Sarmat</label>
+		<description>A heavy MIRV intercontinental ballistic missile in flight.</description>
+		<graphicData>
+			<drawSize>(2.6,5.2)</drawSize>
+		</graphicData>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>Bomb</damageDef>
+			<damageAmountBase>1000</damageAmountBase>
+			<explosionRadius>5.9</explosionRadius>
+			<shellingProps>
+				<iconPath>Things/WorldObjects/Munitions/Rocket</iconPath>
+				<tilesPerTick>0.6</tilesPerTick>
+				<range>700</range>
+				<damage>40</damage>
+			</shellingProps>
+		</projectile>
+		<comps Inherit="False">
+			<li Class="MountedArmsStrategic.CompProperties_Exhaust">
+				<flameFleck>Fleck_CERocketFlame</flameFleck>
+				<smokeFleck>Fleck_CERocketSmokeTrail</smokeFleck>
+				<nozzleDistance>2.5</nozzleDistance>
+				<flameScale>4</flameScale>
+				<smokeScale>5</smokeScale>
+			</li>
+		</comps>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.MirvExtension">
+				<warheadDef>MAS_Bullet_Sarmat_Warhead</warheadDef>
+				<warheads>10</warheads>
+				<splitAt>0.2</splitAt>
+			</li>
+			<li Class="MountedArmsStrategic.HeavyBlastExtension">
+				<radius>29.9</radius>
+				<crater>CraterLarge</crater>
+				<fxRadius>5.9</fxRadius>
+			</li>
+			<li Class="MountedArmsStrategic.NuclearFalloutExtension">
+				<scale>0.25</scale>
+			</li>
+		</modExtensions>
+	</ThingDef>
+
+	<!-- one re-entry vehicle: unpowered (no exhaust), plain lerped ballistic path from the split point -->
+	<ThingDef ParentName="BaseExplosiveBullet">
+		<defName>MAS_Bullet_Sarmat_Warhead</defName>
+		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearBlast</thingClass>
+		<label>Sarmat re-entry vehicle</label>
+		<description>A nuclear re-entry vehicle falling from a MIRV bus.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/ICBM_Projectile</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<shaderType>TransparentPostLight</shaderType>
+			<drawSize>(0.8,1.6)</drawSize>
+		</graphicData>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<speed>55</speed>
+			<gravityFactor>5</gravityFactor>
+			<flyOverhead>true</flyOverhead>
+			<trajectoryWorker>CombatExtended.LerpedTrajectoryWorker</trajectoryWorker>
+			<damageDef>Bomb</damageDef>
+			<damageAmountBase>1000</damageAmountBase>
+			<explosionRadius>5.9</explosionRadius>
+			<applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+			<soundExplode>Explosion_GiantBomb</soundExplode>
+			<soundHitThickRoof>Explosion_GiantBomb</soundHitThickRoof>
+			<soundImpactAnticipate>MortarRound_PreImpact</soundImpactAnticipate>
+			<dropsCasings>false</dropsCasings>
+		</projectile>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.HeavyBlastExtension">
+				<radius>29.9</radius>
+				<crater>CraterLarge</crater>
+				<fxRadius>5.9</fxRadius>
+			</li>
+			<li Class="MountedArmsStrategic.NuclearFalloutExtension">
+				<scale>0.25</scale>
+			</li>
+		</modExtensions>
+	</ThingDef>
+
+	<!-- 4 fission warheads re-machined into 10 small ones; liquid propellant as chemfuel -->
+	<RecipeDef ParentName="AmmoRecipeBase">
+		<defName>MakeMAS_Ammo_Sarmat</defName>
+		<label>make RS-28 Sarmat</label>
+		<description>Re-machine Rimatomics fission warheads into ten small re-entry vehicles and fit them to a heavy liquid-fuelled ICBM.</description>
+		<jobString>Assembling a MIRV ICBM.</jobString>
+		<researchPrerequisite>MAS_Research_MIRV</researchPrerequisite>
+		<workAmount>600000</workAmount>
+		<skillRequirements>
+			<Crafting>15</Crafting>
+		</skillRequirements>
+		<ingredients>
+			<li><filter><thingDefs><li>FissionWarhead</li></thingDefs></filter><count>4</count></li>
+			<li><filter><thingDefs><li>Steel</li></thingDefs></filter><count>3000</count></li>
+			<li><filter><thingDefs><li>Plasteel</li></thingDefs></filter><count>600</count></li>
+			<li><filter><thingDefs><li>Chemfuel</li></thingDefs></filter><count>1500</count></li>
+			<li><filter><thingDefs><li>FSX</li></thingDefs></filter><count>400</count></li>
+			<li><filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter><count>40</count></li>
+			<li><filter><thingDefs><li>ComponentSpacer</li></thingDefs></filter><count>15</count></li>
+		</ingredients>
+		<fixedIngredientFilter><thingDefs><li>FissionWarhead</li><li>Steel</li><li>Plasteel</li><li>Chemfuel</li><li>FSX</li><li>ComponentIndustrial</li><li>ComponentSpacer</li></thingDefs></fixedIngredientFilter>
+		<products><MAS_Ammo_Sarmat>1</MAS_Ammo_Sarmat></products>
+	</RecipeDef>
+
+	<!-- launch tube: same rules as the Minuteman tube (see Weapons.xml), longer range, slower -->
+	<ThingDef ParentName="BaseTurretGun">
+		<defName>MAS_Gun_SarmatSilo</defName>
+		<label>Sarmat launch tube</label>
+		<description>A hardened launch tube for one heavy MIRV intercontinental ballistic missile.</description>
+		<graphicData>
+			<texPath>MountedArmsStrategic/ICBMSilo_Top1</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+		</graphicData>
+		<soundInteract>Artillery_ShellLoaded</soundInteract>
+		<statBases>
+			<SightsEfficiency>1</SightsEfficiency>
+			<ShotSpread>0.05</ShotSpread>
+			<SwayFactor>0.1</SwayFactor>
+			<RangedWeapon_Cooldown>2</RangedWeapon_Cooldown>
+			<Mass>4000</Mass>
+		</statBases>
+		<verbs>
+			<li Class="CombatExtended.VerbPropertiesCE">
+				<verbClass>MountedArmsStrategic.Verb_ShootGuidedCE</verbClass>
+				<isMortar>true</isMortar>
+				<forceNormalTimeSpeed>false</forceNormalTimeSpeed>
+				<hasStandardCommand>true</hasStandardCommand>
+				<requireLineOfSight>false</requireLineOfSight>
+				<defaultProjectile>MAS_Bullet_Sarmat</defaultProjectile>
+				<warmupTime>30</warmupTime>
+				<minRange>0</minRange>
+				<range>900</range>
+				<burstShotCount>1</burstShotCount>
+				<soundCast>RocketswarmLauncher_Fire</soundCast>
+				<soundCastTail>GunTail_Heavy</soundCastTail>
+				<muzzleFlashScale>50</muzzleFlashScale>
+				<circularError>4</circularError>
+				<ai_IsBuildingDestroyer>true</ai_IsBuildingDestroyer>
+				<targetParams>
+					<canTargetLocations>true</canTargetLocations>
+				</targetParams>
+			</li>
+		</verbs>
+		<comps>
+			<li Class="CombatExtended.CompProperties_Charges">
+				<chargeSpeeds>
+					<li>30</li>
+					<li>50</li>
+					<li>70</li>
+					<li>90</li>
+				</chargeSpeeds>
+			</li>
+			<li Class="CombatExtended.CompProperties_AmmoUser">
+				<magazineSize>1</magazineSize>
+				<reloadTime>90</reloadTime>
+				<ammoSet>MAS_AmmoSet_Sarmat</ammoSet>
+			</li>
+			<li Class="CombatExtended.CompProperties_FireModes">
+				<aiUseBurstMode>FALSE</aiUseBurstMode>
+				<aiAimMode>AimedShot</aiAimMode>
+			</li>
+		</comps>
+		<modExtensions>
+			<li Class="CombatExtended.OrbitalTurretExtension">
+				<isMarkMandatory>false</isMarkMandatory>
+			</li>
+		</modExtensions>
+	</ThingDef>
+
+	<!-- silo: the Minuteman silo (Buildings.xml) at 4x4, sturdier and dearer; same textures, drawn larger -->
+	<ThingDef ParentName="BuildingBase">
+		<defName>MAS_Turret_SarmatSilo</defName>
+		<label>RS-28 Sarmat silo</label>
+		<description>A large hardened, powered silo for one heavy MIRV intercontinental ballistic missile. It only fires on command, at settlements and sites up to 700 world tiles away, using the "attack world tile" command. Over the target the missile releases ten nuclear warheads spread across the whole map. Launch takes a long countdown and reloading is very slow. A loaded missile can cook off if the silo is destroyed.</description>
+		<thingClass>MountedArmsStrategic.Building_MissileLauncherCE</thingClass>
+		<drawerType>MapMeshAndRealTime</drawerType>
+		<graphicData>
+			<texPath>MountedArmsStrategic/ICBMSilo_Base</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<drawSize>(4,4)</drawSize>
+			<damageData>
+				<rect>(0.1,0.1,0.8,0.8)</rect>
+			</damageData>
+		</graphicData>
+		<uiIconPath>MountedArmsStrategic/ICBMSilo_Icon</uiIconPath>
+		<altitudeLayer>Building</altitudeLayer>
+		<size>(4,4)</size>
+		<rotatable>false</rotatable>
+		<tickerType>Normal</tickerType>
+		<passability>PassThroughOnly</passability>
+		<pathCost>50</pathCost>
+		<fillPercent>0.3</fillPercent>
+		<castEdgeShadows>false</castEdgeShadows>
+		<hasTooltip>true</hasTooltip>
+		<terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+		<designationCategory>Security</designationCategory>
+		<techLevel>Spacer</techLevel>
+		<constructionSkillPrerequisite>12</constructionSkillPrerequisite>
+		<statBases>
+			<MaxHitPoints>2500</MaxHitPoints>
+			<Flammability>0.2</Flammability>
+			<Beauty>-40</Beauty>
+			<WorkToBuild>200000</WorkToBuild>
+			<Mass>20000</Mass>
+			<Bulk>20000</Bulk>
+			<AimingAccuracy>1.0</AimingAccuracy>
+			<ShootingAccuracyTurret>1.0</ShootingAccuracyTurret>
+		</statBases>
+		<costList>
+			<Steel>3000</Steel>
+			<Plasteel>600</Plasteel>
+			<ComponentIndustrial>40</ComponentIndustrial>
+			<ComponentSpacer>12</ComponentSpacer>
+		</costList>
+		<comps>
+			<li Class="CompProperties_Forbiddable" />
+			<li Class="CompProperties_Power">
+				<compClass>CompPowerTrader</compClass>
+				<basePowerConsumption>1500</basePowerConsumption>
+			</li>
+			<li Class="CompProperties_Flickable" />
+			<li Class="CompProperties_Breakdownable" />
+			<li Class="CompProperties_Explosive">
+				<wickTicks>240</wickTicks>
+				<explosiveRadius>12.9</explosiveRadius>
+				<explosiveDamageType>Bomb</explosiveDamageType>
+				<chanceNeverExplodeFromDamage>0.5</chanceNeverExplodeFromDamage>
+			</li>
+		</comps>
+		<building>
+			<turretGunDef>MAS_Gun_SarmatSilo</turretGunDef>
+			<turretTopDrawSize>3.4</turretTopDrawSize>
+			<turretBurstCooldownTime>60</turretBurstCooldownTime>
+			<ai_combatDangerous>false</ai_combatDangerous>
+		</building>
+		<placeWorkers>
+			<li>PlaceWorker_TurretTop</li>
+			<li>PlaceWorker_NotUnderRoof</li>
+		</placeWorkers>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.ManualFireOnlyExtension" />
+			<li Class="MountedArmsStrategic.LoadedTopsExtension">
+				<topTexPaths>
+					<li>MountedArmsStrategic/ICBMSilo_Top0</li>
+					<li>MountedArmsStrategic/ICBMSilo_Top1</li>
+				</topTexPaths>
+			</li>
+		</modExtensions>
+		<researchPrerequisites>
+			<li>MAS_Research_MIRV</li>
+		</researchPrerequisites>
+	</ThingDef>
+
+</Defs>

@@ -54,6 +54,9 @@
 				<strikeDef>ICBMStrike</strikeDef>
 				<yield>55</yield>
 			</li>
+			<li Class="MountedArmsStrategic.NuclearFalloutExtension">
+				<scale>1</scale>
+			</li>
 		</modExtensions>
 	</ThingDef>
 
@@ -107,6 +110,164 @@
 		<products>
 			<MAS_Ammo_ICBM_Nuclear>1</MAS_Ammo_ICBM_Nuclear>
 		</products>
+	</RecipeDef>
+
+
+	<!-- ================================================================= -->
+	<!--  Thermonuclear warheads (W62 / W78 class). Yield above 150 runs   -->
+	<!--  Rimatomics' full blast: damage Yield * ln(Yield / d) out to d =  -->
+	<!--  Yield cells, every constructed roof on the map stripped, flash   -->
+	<!--  over Yield/10, and its "Detonating" long-event screen. 151 is    -->
+	<!--  the lowest yield that takes that path (150 still does the fixed  -->
+	<!--  r25/r55 blast of the 55 warhead). Its own constant 10-30 day     -->
+	<!--  fallout is skipped (ours is active first): NuclearFalloutExtension -->
+	<!--  scales ours by ~sqrt(yield / 55). The fission warhead is the     -->
+	<!--  primary; depleted uranium (tamper/secondary) and plutonium are   -->
+	<!--  the extra stage.                                                 -->
+	<!-- ================================================================= -->
+
+	<CombatExtended.AmmoCategoryDef>
+		<defName>MAS_ICBMThermonuclear</defName>
+		<label>ICBM (thermonuclear)</label>
+		<labelShort>W62</labelShort>
+		<description>Two-stage thermonuclear warhead for an intercontinental ballistic missile.</description>
+	</CombatExtended.AmmoCategoryDef>
+
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
+		<defName>MAS_Ammo_ICBM_W62_Nuclear</defName>
+		<label>LGM-30G Minuteman III (W62)</label>
+		<description>An intercontinental ballistic missile with a two-stage thermonuclear warhead. Its blast reaches far across the map, strips every constructed roof and leaves heavy nuclear fallout. Fired from an ICBM silo at settlements and sites anywhere within reach on the world map.</description>
+		<statBases>
+			<MaxHitPoints>600</MaxHitPoints>
+			<Mass>1800</Mass>
+			<Bulk>5000</Bulk>
+			<MarketValue>42000</MarketValue>
+		</statBases>
+		<ammoClass>MAS_ICBMThermonuclear</ammoClass>
+		<detonateProjectile>MAS_Bullet_ICBM_HE</detonateProjectile>
+	</ThingDef>
+
+	<ThingDef ParentName="MAS_ICBMProjectileBase">
+		<defName>MAS_Bullet_ICBM_W62_Nuclear</defName>
+		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearStrike</thingClass>
+		<label>LGM-30G Minuteman III (W62)</label>
+		<description>A nuclear intercontinental ballistic missile in flight.</description>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>Bomb</damageDef>
+			<damageAmountBase>1000</damageAmountBase>
+			<explosionRadius>5.9</explosionRadius>
+			<shellingProps>
+				<iconPath>Things/WorldObjects/Munitions/Rocket</iconPath>
+				<tilesPerTick>0.6</tilesPerTick>
+				<range>500</range>
+				<damage>25</damage>
+			</shellingProps>
+		</projectile>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.NuclearStrikeExtension">
+				<strikeDef>ICBMStrike</strikeDef>
+				<yield>151</yield>
+			</li>
+			<li Class="MountedArmsStrategic.NuclearFalloutExtension">
+				<scale>1.6</scale>
+			</li>
+		</modExtensions>
+	</ThingDef>
+
+	<CombatExtended.AmmoCategoryDef>
+		<defName>MAS_ICBMThermonuclearHeavy</defName>
+		<label>ICBM (high-yield thermonuclear)</label>
+		<labelShort>W78</labelShort>
+		<description>High-yield thermonuclear warhead for an intercontinental ballistic missile.</description>
+	</CombatExtended.AmmoCategoryDef>
+
+	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
+		<defName>MAS_Ammo_ICBM_W78_Nuclear</defName>
+		<label>LGM-30G Minuteman III (W78)</label>
+		<description>An intercontinental ballistic missile with a high-yield thermonuclear warhead. Its blast sweeps the whole map, strips every constructed roof and leaves very heavy nuclear fallout. Fired from an ICBM silo at settlements and sites anywhere within reach on the world map.</description>
+		<statBases>
+			<MaxHitPoints>600</MaxHitPoints>
+			<Mass>1800</Mass>
+			<Bulk>5000</Bulk>
+			<MarketValue>55000</MarketValue>
+		</statBases>
+		<ammoClass>MAS_ICBMThermonuclearHeavy</ammoClass>
+		<detonateProjectile>MAS_Bullet_ICBM_HE</detonateProjectile>
+	</ThingDef>
+
+	<ThingDef ParentName="MAS_ICBMProjectileBase">
+		<defName>MAS_Bullet_ICBM_W78_Nuclear</defName>
+		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearStrike</thingClass>
+		<label>LGM-30G Minuteman III (W78)</label>
+		<description>A nuclear intercontinental ballistic missile in flight.</description>
+		<projectile Class="CombatExtended.ProjectilePropertiesCE">
+			<damageDef>Bomb</damageDef>
+			<damageAmountBase>1000</damageAmountBase>
+			<explosionRadius>5.9</explosionRadius>
+			<shellingProps>
+				<iconPath>Things/WorldObjects/Munitions/Rocket</iconPath>
+				<tilesPerTick>0.6</tilesPerTick>
+				<range>500</range>
+				<damage>30</damage>
+			</shellingProps>
+		</projectile>
+		<modExtensions>
+			<li Class="MountedArmsStrategic.NuclearStrikeExtension">
+				<strikeDef>ICBMStrike</strikeDef>
+				<yield>250</yield>
+			</li>
+			<li Class="MountedArmsStrategic.NuclearFalloutExtension">
+				<scale>2.1</scale>
+			</li>
+		</modExtensions>
+	</ThingDef>
+
+	<RecipeDef ParentName="AmmoRecipeBase">
+		<defName>MakeMAS_Ammo_ICBM_W62_Nuclear</defName>
+		<label>make ICBM (W62)</label>
+		<description>Build a two-stage thermonuclear warhead around a Rimatomics fission warhead and mate it to an intercontinental ballistic missile.</description>
+		<jobString>Assembling a nuclear ICBM.</jobString>
+		<researchPrerequisite>MAS_Research_ThermonuclearWarheads</researchPrerequisite>
+		<workAmount>300000</workAmount>
+		<skillRequirements>
+			<Crafting>13</Crafting>
+		</skillRequirements>
+		<ingredients>
+			<li><filter><thingDefs><li>FissionWarhead</li></thingDefs></filter><count>1</count></li>
+			<li><filter><thingDefs><li>Steel</li></thingDefs></filter><count>1000</count></li>
+			<li><filter><thingDefs><li>Plasteel</li></thingDefs></filter><count>200</count></li>
+			<li><filter><thingDefs><li>FSX</li></thingDefs></filter><count>200</count></li>
+			<li><filter><thingDefs><li>DepletedUraniumPellets</li></thingDefs></filter><count>150</count></li>
+			<li><filter><thingDefs><li>Plutonium</li></thingDefs></filter><count>60</count></li>
+			<li><filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter><count>16</count></li>
+			<li><filter><thingDefs><li>ComponentSpacer</li></thingDefs></filter><count>6</count></li>
+		</ingredients>
+		<fixedIngredientFilter><thingDefs><li>FissionWarhead</li><li>Steel</li><li>Plasteel</li><li>FSX</li><li>DepletedUraniumPellets</li><li>Plutonium</li><li>ComponentIndustrial</li><li>ComponentSpacer</li></thingDefs></fixedIngredientFilter>
+		<products><MAS_Ammo_ICBM_W62_Nuclear>1</MAS_Ammo_ICBM_W62_Nuclear></products>
+	</RecipeDef>
+
+	<RecipeDef ParentName="AmmoRecipeBase">
+		<defName>MakeMAS_Ammo_ICBM_W78_Nuclear</defName>
+		<label>make ICBM (W78)</label>
+		<description>Build a high-yield thermonuclear warhead around a Rimatomics fission warhead and mate it to an intercontinental ballistic missile.</description>
+		<jobString>Assembling a nuclear ICBM.</jobString>
+		<researchPrerequisite>MAS_Research_HighYieldWarheads</researchPrerequisite>
+		<workAmount>350000</workAmount>
+		<skillRequirements>
+			<Crafting>14</Crafting>
+		</skillRequirements>
+		<ingredients>
+			<li><filter><thingDefs><li>FissionWarhead</li></thingDefs></filter><count>1</count></li>
+			<li><filter><thingDefs><li>Steel</li></thingDefs></filter><count>1000</count></li>
+			<li><filter><thingDefs><li>Plasteel</li></thingDefs></filter><count>200</count></li>
+			<li><filter><thingDefs><li>FSX</li></thingDefs></filter><count>200</count></li>
+			<li><filter><thingDefs><li>DepletedUraniumPellets</li></thingDefs></filter><count>300</count></li>
+			<li><filter><thingDefs><li>Plutonium</li></thingDefs></filter><count>120</count></li>
+			<li><filter><thingDefs><li>ComponentIndustrial</li></thingDefs></filter><count>16</count></li>
+			<li><filter><thingDefs><li>ComponentSpacer</li></thingDefs></filter><count>8</count></li>
+		</ingredients>
+		<fixedIngredientFilter><thingDefs><li>FissionWarhead</li><li>Steel</li><li>Plasteel</li><li>FSX</li><li>DepletedUraniumPellets</li><li>Plutonium</li><li>ComponentIndustrial</li><li>ComponentSpacer</li></thingDefs></fixedIngredientFilter>
+		<products><MAS_Ammo_ICBM_W78_Nuclear>1</MAS_Ammo_ICBM_W78_Nuclear></products>
 	</RecipeDef>
 
 </Defs>

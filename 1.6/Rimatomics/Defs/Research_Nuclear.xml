@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- Nuclear research: only loads with Dubs Rimatomics (LoadFolders), like the warheads.
+	     Costs step up from the ICBM (6000): each one unlocks a weapon that hits harder than the last. -->
+
+	<ResearchProjectDef>
+		<defName>MAS_Research_ThermonuclearWarheads</defName>
+		<label>thermonuclear warheads</label>
+		<description>Two-stage warheads: a fission primary ignites a secondary of depleted uranium and fusion fuel. Unlocks the Minuteman III with a W62-class thermonuclear warhead, whose blast reaches far across the map.</description>
+		<baseCost>8000</baseCost>
+		<techLevel>Spacer</techLevel>
+		<tab>MAS_Tab</tab>
+		<prerequisites>
+			<li>MAS_Research_ICBM</li>
+		</prerequisites>
+		<requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
+		<researchViewX>2.00</researchViewX>
+		<researchViewY>1.50</researchViewY>
+	</ResearchProjectDef>
+
+	<ResearchProjectDef>
+		<defName>MAS_Research_HighYieldWarheads</defName>
+		<label>high-yield warheads</label>
+		<description>Larger secondaries and better boosting. Unlocks the Minuteman III with a W78-class warhead, whose blast sweeps the whole map.</description>
+		<baseCost>10000</baseCost>
+		<techLevel>Spacer</techLevel>
+		<tab>MAS_Tab</tab>
+		<prerequisites>
+			<li>MAS_Research_ThermonuclearWarheads</li>
+		</prerequisites>
+		<requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
+		<researchViewX>3.00</researchViewX>
+		<researchViewY>1.50</researchViewY>
+	</ResearchProjectDef>
+
+	<ResearchProjectDef>
+		<defName>MAS_Research_MIRV</defName>
+		<label>MIRV heavy ICBMs</label>
+		<description>Multiple independently targetable re-entry vehicles on a heavy liquid-fuelled ICBM. Unlocks the RS-28 Sarmat silo and missile: over the target its bus releases ten small nuclear warheads spread across the whole map, each one a separate target for missile defense.</description>
+		<baseCost>12000</baseCost>
+		<techLevel>Spacer</techLevel>
+		<tab>MAS_Tab</tab>
+		<prerequisites>
+			<li>MAS_Research_ThermonuclearWarheads</li>
+		</prerequisites>
+		<requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
+		<researchViewX>3.00</researchViewX>
+		<researchViewY>0.50</researchViewY>
+	</ResearchProjectDef>
+
+</Defs>

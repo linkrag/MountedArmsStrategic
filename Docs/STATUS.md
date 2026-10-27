@@ -27,6 +27,28 @@ Relato do usuário depois do lote 10: paredes com 1 de HP sobreviviam a vários 
   4. Paiol no raio só explode na borda: **pendente** (o usuário vai validar).
   5. Salva da HIMARS espalhada até ~7 células: **confirmado**.
 
+## Lote 13 (implementado, NÃO testado): ogivas W62/W78, RS-28 Sarmat MIRV, IA nuclear
+Pedido do usuário (27/out): mais duas ogivas (150 e 250) com custo de pesquisa/recursos e calibração da IA; um segundo míssil, o RS-28 Sarmat MIRV, com ogivas pequenas espalhadas pelo mapa todo e abatíveis uma a uma. Escolhas do usuário: 151 e 250 (150 ainda cai nos raios fixos do 55), explosão nossa nas ogivas do Sarmat, 10 ogivas, silo próprio.
+- **Minuteman W62 (yield 151) e W78 (yield 250)** (`1.6/Rimatomics/Defs/Ammo_ICBM_Nuclear.xml`): explosão completa do Rimatomics (dano `Yield × ln(Yield/d)` até d = Yield células, todo teto construído do mapa arrancado, flash em Yield/10, tela "Detonating"). O fallout constante dele (10–30 dias) não roda, porque o nosso é registrado antes do 1º tick do strike; o nosso é escalado por `NuclearFalloutExtension.scale` ≈ √(yield/55): 1,6 e 2,1. Dano no mapa-mundo 25 e 30.
+- **Fallout combinável**: explosões a menos de 1 h uma da outra somam a escala (salva MIRV); uma explosão posterior recomeça a curva com a própria escala mais o que restava; teto 3× o Minuteman (fora, letal em ~1 h).
+- **RS-28 Sarmat** (`1.6/Rimatomics/Defs/Sarmat.xml`, `Source/Mirv.cs`): silo próprio 4×4 (2500 HP, 3000 aço, 600 plasteel, 40/12 componentes, 1500 W), alcance 700 tiles no mapa-mundo, recarga 90 s. Sobre um mapa carregado, o ônibus (`ProjectileCE_Mirv`) libera 10 ogivas a 20% do voo de reentrada (o CE faz as chegadas a altura 200): uma no ponto mirado, as outras espalhadas pelo mapa todo (amostragem "best candidate": cada alvo é o mais distante dos já escolhidos entre 30 células sorteadas, margem de 10 da borda). Cada ogiva é um `ProjectileCE` separado (lançado como o `TravelingShell.LaunchProjectile` do CE), então a defesa antimíssil abate cada uma. Ogiva: a nossa explosão (`ProjectileCE_NuclearBlast` = `HeavyBlast` R 29,9, núcleo 7,5 vaporizado, cratera) + fallout 0,25 cada (salva inteira 2,5). O ônibus também pode ser abatido antes de se dividir; se cair sem se dividir, explode como uma ogiva. Mapa-mundo: dano 40.
+- **Pesquisa** (aba Mounted Arms, só com Rimatomics, todas na bancada de alta tecnologia): ogivas termonucleares 8000 (pré: ICBM 6000) → W62; ogivas de alto rendimento 10000 → W78; ICBMs pesados MIRV 12000 (pré: termonucleares) → silo e míssil Sarmat.
+- **Receitas**:
+  - Minuteman nuclear (55): ogiva de fissão + 1000 aço, 200 plasteel, 200 FSX, 16/4 componentes (inalterada).
+  - W62: igual + 150 urânio empobrecido + 60 plutônio, 6 componentes espaciais, trabalho 300000, Crafting 13. Valor 42000.
+  - W78: igual + 300 urânio empobrecido + 120 plutônio, 8 componentes espaciais, trabalho 350000, Crafting 14. Valor 55000.
+  - Sarmat: 4 ogivas de fissão (refeitas em 10 pequenas; a ogiva desmontada dá 120 plutônio), 3000 aço, 600 plasteel, 1500 chemfuel (combustível líquido), 400 FSX, 40/15 componentes, trabalho 600000, Crafting 15. Valor 100000.
+- **IA** (`NuclearRetaliation`, com a opção de retaliação nuclear ligada): Minuteman nuclear 6000 pontos peso 0,05 (espacial/ultra/archotech); W62 9000/0,03, W78 12000/0,02 e Sarmat 20000/0,01 só ultra/archotech. O CE só escolhe um projétil enquanto o orçamento (ameaça × 3,5 × força) paga por ele: com força 1, o W62 aparece a partir de ~2600 pontos de ameaça, o W78 de ~3400 e o Sarmat de ~5700.
+- Compilado nas duas versões e instalado em `Bin/1.6` e `Bin/1.7` (27/out; isso também instala a correção do `FatalRad` do lote 12 na 1.7).
+- Riscos a observar no teste: dez ondas de choque `HeavyBlast` quase juntas (cada uma limita 150 coisas por tick; chegam em ticks diferentes pela distância); aviso "[CE] Tried to fire projectile to unreachable target cell" se uma ogiva não alcançar o alvo (o código aumenta a velocidade até 3,2× antes).
+- Teste pendente:
+  1. Pesquisas aparecem na aba com os custos acima; receitas na bancada de fabricação do CE.
+  2. W62 e W78 num mapa: explosão completa do Rimatomics com tela "Detonating"; fallout nosso de 3 dias (não o de 10–30 dias do Rimatomics), mais forte que o do 55.
+  3. Sarmat: o silo 4×4 constrói e carrega; num mapa carregado o míssil se divide no ar em 10 ogivas espalhadas pelo mapa todo.
+  4. Defesa antimíssil abate ogivas individuais (a área delas fica intacta).
+  5. Desempenho com as 10 explosões.
+  6. IA com a opção ligada contra colônia grande (ou orçamento de retaliação alto): usa W62/W78/Sarmat raramente.
+
 ## Lote 12 (implementado, NÃO testado): fallout do ICBM nuclear
 - Relato do usuário (26/out, mapa de superfície na 1.7): a explosão do Minuteman nuclear acontece, mas a condição `NuclearFallout` não começa.
 - **Causa** (lida no IL do Rimatomics 1.6 e 1.7, que são iguais nesse ponto): o `NuclearStrike.StartStrike` só registra o `NuclearFallout`, e só faz a explosão completa em long events (tela "Detonating"), com `Yield > 150`. Com o nosso `Yield 55` (o da ogiva solta, `Item_FissionWarhead`) ele faz só o `GoBang`, sem fallout. Isso valia também na 1.6, ou seja, nunca foi problema da 1.7. O silo do próprio Rimatomics usa 250.
@@ -42,7 +64,7 @@ Relato do usuário depois do lote 10: paredes com 1 de HP sobreviviam a vários 
 - Compilado nas duas versões e instalado em `Bin/1.6` e `Bin/1.7` (26/out).
 - **Teste na 1.7 (usuário, 26/out):** fallout começa; base sob montanha e residência reduzem a radiação (**confirmado**). Pawns ao ar livre o tempo todo morreram em ~10 h; o contador Geiger do Rimatomics marcava 1,20 em H+10. O contador mostra a dose de cada pulso de 250 ticks, não a acumulada: em H+10 esperávamos 1,54 × (1 − resistência a ambiente tóxico) × `RadiationStrength`, coerente com ~0,2 de resistência da roupa.
 - **Morte em 10 h não é realista (corrigido, NÃO testado):** o `applyRads` converte a radiation sickness em `FatalRad` 0,1 ao chegar a 0,9 (~3 h fora), e depois joga toda a dose seguinte direto no `FatalRad` (que também sobe 0,4/dia sozinho) → morte ~7 h depois. Dez horas fora dão ~7 Gy, e 3 dias inteiros ~14 Gy: dose fatal, mas a morte real vem em 1–3 semanas (síndrome hematopoiética/gastrointestinal); morte em horas exige > 20–50 Gy. Agora o nosso fallout não dá mais dose a quem já tem `FatalRad`, e a morte segue só o curso do Rimatomics (~2,25 dias, ainda mais rápido que o real; mudar isso seria alterar o hediff dele).
-- DLL: `Bin/1.6` instalada; `Bin/1.7` **não** (o jogo estava aberto e trava a DLL). Rodar `build.ps1` com o jogo fechado.
+- DLL: `Bin/1.6` instalada; `Bin/1.7` instalada depois, no lote 13 (27/out).
 - Fontes: regra 7-10 e período de 2–3 dias ([manual de defesa civil, ORAU](https://orau.org/health-physics-museum/files/library/civil-defense/victor727.pdf)); chegada em ~30 min ([relatório de teste desclassificado](https://minddfiles.nuclearsecrecy.com/0404656.pdf)); DL50 2,5–5 Gy ([CDC](https://www.cdc.gov/nceh/radiation/emergencies/arsphysicianfactsheet.htm)); PF de casas 2–5 no térreo e 5–30 no porão ([folheto de abrigos, WA DAHP](https://dahp.wa.gov/sites/default/files/Fallout%20Protection%20Homes%20with%20Basements.pdf)). A taxa de pico é escolha de jogo dentro da faixa real (centenas a milhares de R/h perto do marco zero).
 - Teste pendente:
   1. Minuteman nuclear num mapa de superfície: fallout começa, sem tela "Detonating".

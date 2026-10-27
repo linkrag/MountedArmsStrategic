@@ -21,6 +21,12 @@ namespace MountedArmsStrategic
         public float yield = 55f;   // what Rimatomics uses for a manually armed fission warhead
     }
 
+    /// <summary>Fallout strength of a nuclear warhead, relative to the 55-yield Minuteman (NuclearFallout).</summary>
+    public class NuclearFalloutExtension : DefModExtension
+    {
+        public float scale = 1f;
+    }
+
     /// <summary>
     /// Explosive CE projectile that also starts a Rimatomics nuclear strike where it lands.
     /// No compile-time reference to Rimatomics: the strike def and its field are looked up by name,
@@ -53,7 +59,9 @@ namespace MountedArmsStrategic
                         Log.WarningOnce("[Mounted Arms: Strategic] Field '" + ext.yieldField + "' not found on " + strike.GetType().FullName + "; using its default yield.", 0x4D415332);
                     }
                     GenSpawn.Spawn(strike, cell, map);
-                    NuclearFallout.Start(map);
+                    // before the strike's first tick: above Yield 150 Rimatomics would start its own constant
+                    // fallout, but it skips that when a NuclearFallout is already active
+                    NuclearFallout.Start(map, def.GetModExtension<NuclearFalloutExtension>()?.scale ?? 1f);
                 }
             }
             base.Impact(hitThing);
@@ -82,6 +90,8 @@ namespace MountedArmsStrategic
         private const float RoomFactor = 0.2f;
         private const float OpenRoofFactor = 0.5f;
         private const float ThickRoofFactor = 0.001f;
+        // a salvo or a big warhead never goes past 3x the Minuteman (outdoors lethal in ~1 h)
+        private const float MaxScale = 3f;
         // what one strength unit of DubUtils.applyRads adds to radiation sickness (resistance 0)
         private const float SicknessPerRadStrength = 0.0028758333f;
 
@@ -91,7 +101,12 @@ namespace MountedArmsStrategic
                 : null;
         private static readonly HediffDef fatalRad = DefDatabase<HediffDef>.GetNamedSilentFail("FatalRad");
 
-        public static void Start(Map map)
+        /// <summary>
+        /// Starts (or adds to) our fallout on the map. scale multiplies the dose rate (1 = the 55-yield Minuteman).
+        /// Bursts less than an hour apart (a MIRV salvo) add up, capped at MaxScale; a later burst restarts the curve
+        /// with its own scale plus what is left of the old one.
+        /// </summary>
+        public static void Start(Map map, float scale)
         {
             GameConditionDef falloutDef = DefDatabase<GameConditionDef>.GetNamedSilentFail("NuclearFallout");
             if (falloutDef == null)
@@ -111,9 +126,18 @@ namespace MountedArmsStrategic
             {
                 if (active.uniqueID == comp.conditionID)
                 {
-                    // a new burst on top of ours: its fallout starts over, for another 3 days
-                    comp.detonationTick = Find.TickManager.TicksGame;
-                    active.TicksLeft = DurationTicks;
+                    int now = Find.TickManager.TicksGame;
+                    if (now - comp.detonationTick < GenDate.TicksPerHour)
+                    {
+                        comp.scale = Mathf.Min(MaxScale, comp.scale + scale);
+                    }
+                    else
+                    {
+                        // a new burst on top of ours: its fallout starts over, for another 3 days
+                        comp.scale = Mathf.Min(MaxScale, scale + Rate(active));
+                        comp.detonationTick = now;
+                        active.TicksLeft = DurationTicks;
+                    }
                 }
                 // otherwise it is Rimatomics' own (stronger, 10-30 days): leave it
                 return;
@@ -122,9 +146,10 @@ namespace MountedArmsStrategic
             manager.RegisterCondition(cond);
             comp.conditionID = cond.uniqueID;
             comp.detonationTick = Find.TickManager.TicksGame;
+            comp.scale = Mathf.Min(MaxScale, scale);
         }
 
-        /// <summary>Dose rate relative to the 1st hour, or -1 when the condition is not from our missile.</summary>
+        /// <summary>Dose rate relative to the 55-yield Minuteman's 1st hour, or -1 when the condition is not ours.</summary>
         public static float Rate(GameCondition cond)
         {
             MapComponent_NuclearFallout comp = cond.gameConditionManager?.ownerMap?.GetComponent<MapComponent_NuclearFallout>();
@@ -137,7 +162,8 @@ namespace MountedArmsStrategic
             {
                 return 0f;
             }
-            return hours <= 1f ? (hours - ArrivalHours) / (1f - ArrivalHours) : Mathf.Pow(hours, -1.2f);
+            float curve = hours <= 1f ? (hours - ArrivalHours) / (1f - ArrivalHours) : Mathf.Pow(hours, -1.2f);
+            return curve * comp.scale;
         }
 
         /// <summary>Share of the outdoor dose a pawn gets where it stands (shielding by roof and walls).</summary>
@@ -231,6 +257,7 @@ namespace MountedArmsStrategic
     {
         public int conditionID = -1;
         public int detonationTick = -1;
+        public float scale = 1f;
 
         public MapComponent_NuclearFallout(Map map) : base(map)
         {
@@ -240,6 +267,7 @@ namespace MountedArmsStrategic
         {
             Scribe_Values.Look(ref conditionID, "conditionID", -1);
             Scribe_Values.Look(ref detonationTick, "detonationTick", -1);
+            Scribe_Values.Look(ref scale, "scale", 1f);
         }
     }
 

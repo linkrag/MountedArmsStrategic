@@ -6,6 +6,8 @@
 		<xpath>Defs/CombatExtended.AmmoSetDef[defName="MAS_AmmoSet_ICBM"]/ammoTypes</xpath>
 		<value>
 			<MAS_Ammo_ICBM_Nuclear>MAS_Bullet_ICBM_Nuclear</MAS_Ammo_ICBM_Nuclear>
+			<MAS_Ammo_ICBM_W62_Nuclear>MAS_Bullet_ICBM_W62_Nuclear</MAS_Ammo_ICBM_W62_Nuclear>
+			<MAS_Ammo_ICBM_W78_Nuclear>MAS_Bullet_ICBM_W78_Nuclear</MAS_Ammo_ICBM_W78_Nuclear>
 		</value>
 	</Operation>
 

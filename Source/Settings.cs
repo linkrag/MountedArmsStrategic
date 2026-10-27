@@ -73,15 +73,36 @@ namespace MountedArmsStrategic
     }
 
     /// <summary>
-    /// Adds/removes the nuclear Minuteman from the AI retaliation lists (CE ShellingResponseDefs) according to
+    /// Adds/removes the nuclear missiles from the AI retaliation lists (CE ShellingResponseDefs) according to
     /// the setting. HostilityComp reads shellingResponseDef.projectiles live, so editing the list works in-game.
+    /// CE's HostilitySheller: budget = threat points x 3.5 x faction strength; it picks by weight among shells whose
+    /// points are below what is left of the budget, so a costly weapon only shows up against big colonies.
     /// </summary>
     [StaticConstructorOnStartup]
     public static class NuclearRetaliation
     {
-        private static readonly string[] Presets = { "CE_ShellingPreset_Spacer", "CE_ShellingPreset_Ultra", "CE_ShellingPreset_Archotech" };
-        private const float NukePoints = 6000f;   // CE antigrain shell is 7000
-        private const float NukeWeight = 0.05f;
+        private const string Spacer = "CE_ShellingPreset_Spacer";
+        private const string Ultra = "CE_ShellingPreset_Ultra";
+        private const string Archotech = "CE_ShellingPreset_Archotech";
+
+        private class Entry
+        {
+            public string projectile;
+            public float points;
+            public float weight;
+            public string[] presets;
+        }
+
+        // CE antigrain shell: 7000 points, weight 0.001 (ultra) / 0.01 (archotech). Bigger warheads cost more and
+        // are rarer; the thermonuclear ones and the Sarmat need ultra/archotech factions. Budget needed for one
+        // shot: 9000 points ~ 2600 threat points, 12000 ~ 3400, 20000 ~ 5700 (at faction strength 1).
+        private static readonly Entry[] Entries =
+        {
+            new Entry { projectile = "MAS_Bullet_ICBM_Nuclear", points = 6000f, weight = 0.05f, presets = new[] { Spacer, Ultra, Archotech } },
+            new Entry { projectile = "MAS_Bullet_ICBM_W62_Nuclear", points = 9000f, weight = 0.03f, presets = new[] { Ultra, Archotech } },
+            new Entry { projectile = "MAS_Bullet_ICBM_W78_Nuclear", points = 12000f, weight = 0.02f, presets = new[] { Ultra, Archotech } },
+            new Entry { projectile = "MAS_Bullet_Sarmat", points = 20000f, weight = 0.01f, presets = new[] { Ultra, Archotech } },
+        };
 
         static NuclearRetaliation()
         {
@@ -95,30 +116,37 @@ namespace MountedArmsStrategic
 
         public static void Apply()
         {
-            ThingDef nuke = NukeDef;
-            if (nuke == null || MASMod.Settings == null)
+            if (NukeDef == null || MASMod.Settings == null)
             {
                 return;
             }
-            foreach (string name in Presets)
+            foreach (Entry entry in Entries)
             {
-                ShellingResponseDef preset = DefDatabase<ShellingResponseDef>.GetNamedSilentFail(name);
-                if (preset == null)
+                ThingDef nuke = DefDatabase<ThingDef>.GetNamedSilentFail(entry.projectile);
+                if (nuke == null)
                 {
                     continue;
                 }
-                if (preset.projectiles == null)
+                foreach (string name in new[] { Spacer, Ultra, Archotech })
                 {
-                    preset.projectiles = new List<ShellingResponseDef.ShellingResponsePart_Projectile>();
-                }
-                preset.projectiles.RemoveAll(p => p.projectile == nuke);
-                if (MASMod.Settings.aiNuclearRetaliation)
-                {
-                    ShellingResponseDef.ShellingResponsePart_Projectile part = new ShellingResponseDef.ShellingResponsePart_Projectile();
-                    part.projectile = nuke;
-                    part.points = NukePoints;
-                    part.weight = NukeWeight;
-                    preset.projectiles.Add(part);
+                    ShellingResponseDef preset = DefDatabase<ShellingResponseDef>.GetNamedSilentFail(name);
+                    if (preset == null)
+                    {
+                        continue;
+                    }
+                    if (preset.projectiles == null)
+                    {
+                        preset.projectiles = new List<ShellingResponseDef.ShellingResponsePart_Projectile>();
+                    }
+                    preset.projectiles.RemoveAll(p => p.projectile == nuke);
+                    if (MASMod.Settings.aiNuclearRetaliation && System.Array.IndexOf(entry.presets, name) >= 0)
+                    {
+                        ShellingResponseDef.ShellingResponsePart_Projectile part = new ShellingResponseDef.ShellingResponsePart_Projectile();
+                        part.projectile = nuke;
+                        part.points = entry.points;
+                        part.weight = entry.weight;
+                        preset.projectiles.Add(part);
+                    }
                 }
             }
         }

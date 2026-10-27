@@ -39,6 +39,8 @@
 
 - Fallout do ICBM nuclear (26/out, escolha do usuário): manter o `Yield 55` (explosão sem a tela "Detonating" do Rimatomics) e registrar o `NuclearFallout` nós mesmos, com formato realista, conferido com fontes: chegada em ~30 min, 3 dias, taxa de dose t^-1,2 (regra 7-10), letal ao ar livre nas primeiras horas e proteção por abrigo (cômodo 1/5, sob montanha quase total). Só o fallout do nosso míssil decai; o do silo do Rimatomics fica como é.
 
+- Ogivas maiores e MIRV (27/out, escolhas do usuário): Minuteman W62 (yield 151, o mínimo da explosão completa do Rimatomics) e W78 (250), com o nosso fallout escalado; RS-28 Sarmat com 10 ogivas pequenas da nossa explosão (as do Rimatomics abaixo de 150 têm raio fixo, grande), espalhadas pelo mapa todo e abatíveis uma a uma, em silo próprio. A IA usa as quatro armas nucleares com custos crescentes, as maiores só em facções ultra/archotech.
+
 ## Dubs Rimatomics (verificado nos defs, workshop 1127530465)
 - Tem o silo "Liberator" (`Rimatomics.MissileSilo`, 9x5, 5 mísseis, precisa de SACS), ICBM de fissão como WorldObject próprio (`WorldObject_ICBMfission`), mísseis táticos HE/químico/nuclear e os GameConditions `NuclearFallout`/`RadioactiveFallout`.
 - Usa código próprio, não o sistema de mapa-mundo do CE. O CE tem patches de compatibilidade para o Rimatomics (apparel, dano, torretas), nada dos mísseis.

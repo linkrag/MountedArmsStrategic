@@ -8,7 +8,7 @@
 	<!--  whose shellingProps.range >= half the distance are picked.       -->
 	<!--  CE reference points: 81 mm 250, 105 mm 1000, antigrain 7000.     -->
 	<!--  Spacer: GMLRS + tactical. Ultra/Archotech: tactical + ICBM HE.   -->
-	<!--  No nuclear for the AI (decision).                                -->
+	<!--  Nuclear shells: added in code (NuclearRetaliation, setting).     -->
 	<!--  Children that lack <projectiles> get the node; list inheritance  -->
 	<!--  then appends ours to the parent's shells.                        -->
 	<!-- ================================================================= -->
