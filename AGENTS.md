@@ -18,9 +18,9 @@ LoadFolders.xml          v1.6: /, 1.6, Bin/1.6; v1.7: /, 1.6, Bin/1.7; 1.6/Rimat
 1.6/Textures/MountedArmsStrategic/   geradas por tools/gen_tex.py
 tools/gen_tex.py         gerador de texturas (PIL)
 tools/unity_facades.ps1  facades UnityEngine.* → UnityStubs para compilar na 1.7 contra o CE 1.6 (saída em obj/, não versionada)
-Source/                  C# (DLL só-CE, usa Harmony): Settings (MASMod, retaliação, espoleta dos interceptadores), HeavyBlast, Verb_ShootGuidedCE, AmmoUnload, ProjectileCE_Cluster, Building_MissileLauncherCE / Building_MissileInterceptorCE (+ LoadedTopsExtension, ManualFireOnlyExtension), ProjectileCE_NuclearStrike (+ NuclearStrikeExtension); MountedArmsStrategic.csproj
+Source/                  C# (DLL só-CE, usa Harmony): Settings (MASMod, retaliação, espoleta dos interceptadores), HeavyBlast, Verb_ShootGuidedCE, AmmoUnload, ProjectileCE_Cluster, Building_MissileLauncherCE / Building_MissileInterceptorCE (+ LoadedTopsExtension, ManualFireOnlyExtension), Nuclear (ProjectileCE_NuclearBlast, NuclearFallout + patches do fallout do Rimatomics por nome), Mirv (ProjectileCE_Mirv); MountedArmsStrategic.csproj
 1.6/Patches/             ShellingResponse.xml (retaliação da IA com nossos mísseis)
-1.6/Rimatomics/          ICBM nuclear (defs + patch no AmmoSet), sem referência de compilação ao Rimatomics
+1.6/Rimatomics/          nucleares (Minuteman 55/W62/W78, Sarmat e silo, pesquisas, patch no AmmoSet), sem referência de compilação ao Rimatomics
 Bin/1.6/Assemblies/, Bin/1.7/Assemblies/  MountedArmsStrategic.dll compilada por versão (NÃO versionada; build.ps1)
 build.ps1, Directory.Build.props   build das duas versões (SDK .NET 10; ver ../MountedArms/Docs/TOOLING.md)
 Docs/                    status, decisões, notas do sistema de mapa-mundo do CE
@@ -42,7 +42,7 @@ Docs/                    status, decisões, notas do sistema de mapa-mundo do CE
 9. **Interceptação (CIWS do CE):** `Building_CIWS_CE` + verbos `VerbProperties_CIWSProjectile`/`CIWSSkyfaller` + comp `CompVerbDisabler`; alvo = `ProjectileCE` hostil com `flyOverhead` e `speed` < 80 (os nossos mísseis entram). Alcance ≤ 119 (anéis de alcance quebram em 120). Sem `PlaceWorker_ShowTurretRadius` em torreta sem verbo de chão. Detalhes em `../MountedArms/Docs/CE_NOTES.md`.
 10. **Lançador guiado** (míssil/foguete com GPS/inércia): `verbClass` `MountedArmsStrategic.Verb_ShootGuidedCE` e `CombatExtended.OrbitalTurretExtension` (`isMarkMandatory` false) na gun; precisão só pelo `circularError`: no mapa local cada míssil cai num ponto próprio, uniforme dentro dele (o CE travaria a rajada na mira do 1º tiro); `ShotSpread`/`recoilAmount` não contam. Artilharia não guiada fica no `Verb_ShootMortarCE`.
 11. Compile a DLL com o jogo **fechado** (o jogo trava o arquivo).
-12. **Explosões grandes**: nunca matar rocha (natural, alisada, desmoronada, minério) nem derrubar paredes sob teto em massa (travou o jogo): arranque o teto antes (ver `HeavyBlast`). Núcleo = remoção direta; anéis = `TakeDamage` com `MAS_BlastWave` (fatores 1). Paredes sob teto de montanha só caem no fim da onda (um desabamento). Munição/explosivos só reagem nos últimos 3–8% do raio. Trabalho de explosão grande vai em ticks (`BlastWave`), nunca num tick só. O cook-off do CE (`AmmoThing.TryDetonate`) usa o `explosionRadius` do projétil direto: munição de ogiva grande precisa do patch de cook-off. **Chama de foguete**: use `CompProperties_Exhaust`, não o `CompProperties_ProjectileFleck` do CE.
+12. **Explosões grandes**: nunca matar rocha (natural, alisada, desmoronada, minério) nem derrubar paredes sob teto em massa (travou o jogo): arranque o teto antes (ver `HeavyBlast`). Núcleo = remoção direta; anéis = `TakeDamage` com `MAS_BlastWave` (fatores 1). Paredes sob teto de montanha só caem no fim da onda (um desabamento). Munição/explosivos só reagem nos últimos 3–8% do raio. Trabalho de explosão grande vai em ticks (`BlastWave`), nunca num tick só; as nucleares também usam a `HeavyBlast` (nunca o `NuclearStrike` do Rimatomics). `GenRadial` só vai até ~r120. O cook-off do CE (`AmmoThing.TryDetonate`) usa o `explosionRadius` do projétil direto: munição de ogiva grande precisa do patch de cook-off. **Chama de foguete**: use `CompProperties_Exhaust`, não o `CompProperties_ProjectileFleck` do CE.
 13. **Docs sempre atualizados:** toda edição atualiza os MDs afetados (STATUS, DECISIONS, CE_WORLD_SHELLING, LAUNCH, BLAST, HANDOFF, README, AGENTS) no mesmo commit. Mudança de build atualiza também `../MountedArms/Docs/TOOLING.md`/`MIGRATION_1_7.md`, commitados no repositório do Mounted Arms.
 14. Replace em massa: confira a linha certa; valide o XML depois.
 
@@ -59,7 +59,7 @@ Docs/                    status, decisões, notas do sistema de mapa-mundo do CE
 | `Docs/DECISIONS.md` | decisões do usuário e técnicas |
 | `Docs/CE_WORLD_SHELLING.md` | como o CE faz tiro no mapa-mundo (com fonte) |
 | `Docs/LAUNCH.md` | lançamento realista (pesquisa + perfis por míssil) |
-| `Docs/HANDOFF.md` | **onde paramos** antes da migração para 1.7 (ler primeiro) |
+| `Docs/HANDOFF.md` | **onde paramos** (ler primeiro) |
 | `Docs/BLAST.md` | explosões por zonas de sobrepressão (pesquisa, modelo, fontes) |
 | `../MountedArms/Docs/TOOLING.md` | build das DLLs (SDK .NET 10, `build.ps1`; vale para os dois mods) |
 | `../MountedArms/Docs/MIGRATION_1_7.md` | migração para 1.7: auditoria, riscos, testes (vale para os dois mods) |

@@ -1,137 +1,54 @@
 # Status (atualize sempre que o usuário testar algo)
 
-> **RimWorld 1.6 e 1.7 (25/out/2026):** conteúdo comum em `1.6/`; DLL por versão em `Bin/1.6` e `Bin/1.7`, as duas com o código atual (lote 11), compiladas juntas pelo `build.ps1` (SDK .NET 10). A 1.7 compila contra o CE 1.6 com `tools/unity_facades.ps1`. Auditoria, riscos e toolchain: `MountedArms/Docs/MIGRATION_1_7.md`. Contexto anterior: `MountedArmsStrategic/Docs/HANDOFF.md`. **Confirmado em jogo (26/out): carrega e funciona no 1.7 com o CE 16.7.4.**
+Ambiente: RimWorld 1.6 e 1.7, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcional; todo o conteúdo nuclear só carrega com ele). Conteúdo comum em `1.6/`; DLL por versão em `Bin/1.6` e `Bin/1.7`, compiladas juntas pelo `build.ps1` (SDK .NET 10) **com o jogo fechado** (o jogo trava a DLL; `-Out <pasta>` só valida a compilação). A 1.7 compila contra o CE 1.6 com `tools/unity_facades.ps1`. Migração, riscos e toolchain: `../MountedArms/Docs/MIGRATION_1_7.md`.
 
+Testes do usuário nesta fase: na 1.7 com o CE 16.7.4. A 1.6 não é testada desde o lote 10 (compila igual).
 
-Ambiente: RimWorld 1.6 ou 1.7, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcional). DLL: `build.ps1` **com o jogo fechado** (o jogo trava a DLL; `-Out <pasta>` só para validar a compilação). Gera `Bin/1.6/Assemblies` e `Bin/1.7/Assemblies` de uma vez (`-Version` para só uma).
+## Lote 14 (27/out, implementado, NÃO testado): explosão nuclear própria
+- Teste do lote 13: o W62/W78 funcionou, mas a explosão do Rimatomics (`NuclearStrike.BlastWaveThing`, em long events) encheu o log de "Tried to destroy already-destroyed thing", "Tried to place thing Chunk… in a null map" e fragmentos do CE fora do mapa, e o usuário a achou menos balanceada que a nossa. Pedido: trocar pela nossa nas mesmas proporções.
+- Agora as três ogivas do Minuteman usam a nossa explosão por zonas (`ProjectileCE_NuclearBlast` = `HeavyBlast`, `Source/Nuclear.cs`) com **R = o yield antigo do Rimatomics**, que era o raio onde o dano dele chegava a zero (`Yield × ln(Yield / d)`): 55 (núcleo vaporizado 13,8), W62 151 (37,8) e W78 250 (62,5; do centro cobre um mapa 250×250 inteiro). Sem tela "Detonating". Mantidos do Rimatomics: o cogumelo (`Mote_NukeCloud`, escala 1,2 / 1,8 / 2,2), o som `nuclearBlastInMap` e a condição `NuclearFallout` com o nosso controle. As ogivas do Sarmat usam a mesma classe (R 29,9, cogumelo 0,7). O `ProjectileCE_NuclearStrike` foi removido.
+- `HeavyBlast` passou a listar as células por um retângulo recortado pelo mapa e ordenado por distância (o `GenRadial` vai só até ~r120) e limita a frente a 600 células e 150 coisas por tick: com R 250 o mapa inteiro leva ~100 ticks (mais numa base densa).
+- O que muda em relação ao Rimatomics: núcleo vaporizado menor no 55 (13,8 contra destruição total em 25), anéis com dano real em vez de remoção, rocha natural intocada, teto de montanha só cai se os sustentadores caírem.
+- Testar:
+  1. Minuteman nuclear, W62 e W78 num mapa: sem tela, sem os erros acima no log, cogumelo e som nucleares, zonas proporcionais ao raio.
+  2. W78 num mapa grande e denso: duração da onda e queda de frames.
+  3. Fallout de 3 dias continua igual (mais forte no W62/W78).
 
-## Confirmado em jogo (out/2026)
-- Carregamento sem erros, aba de pesquisa, construção, receitas no injector do CE.
-- **M270 (ATACMS)** `MAS_Turret_TacticalLauncher`: tiro local e no mapa-mundo; salva de 2 com dispersão só no 2º míssil (`recoilAmount` 1,2; o recuo do CE é 0 no 1º tiro da rajada). Esse era o comportamento antes do lote 11; desde 25/out, nas duas versões, cada míssil cai num ponto próprio dentro do `circularError` 3.
-- **Minuteman III (nuclear, com Rimatomics)**: explosão nuclear e fogo do próprio Rimatomics funcionando (o fallout só existe desde o lote 12, ainda não testado).
-- **Retaliação do CE**: a facção atacada revida com morteiros no mapa do jogador.
-- **Lote 5**: botão Descarregar (troca de ogiva pelo menu de recarga do CE + Descarregar), nomes reais, ataque a mapa carregado **sem marcador** nos lançadores guiados, raios de explosão em escala.
+## Confirmado em jogo
+- Carregamento sem erros (1.6 e 1.7), aba de pesquisa, construção, receitas no injector do CE.
+- Tiro local e no mapa-mundo dos lançadores guiados; ataque a mapa carregado sem marcador; botão Descarregar e troca de ogiva; nomes reais.
+- Retaliação do CE no mapa do jogador; configurações do mod; espoleta de proximidade dos interceptadores.
+- Explosão grande por zonas (lote 11): anéis com dano visível, núcleo vaporizado com cratera, base escavada em montanha desaba uma vez sem travar. Salva da HIMARS espalhada até ~7 células.
+- Fallout (lote 12): começa no impacto; residência e base sob montanha reduzem a radiação.
+- Lote 13: pesquisas e receitas novas; Sarmat (silo 4×4, divisão no ar em 10 ogivas espalhadas pelo mapa todo, todas alcançam o alvo, desempenho normal, sem tela).
 
-## Lote 11 (testado na 1.7 em 26/out: itens 1, 2, 3 e 5 confirmados; 4 pendente; 1.6 não testada)
-Relato do usuário depois do lote 10: paredes com 1 de HP sobreviviam a vários mísseis; a salva da HIMARS caía muito junta; a remoção direta nos anéis parecia "apertar Delete".
-- **Paredes com 1 HP**: causa no nosso código, não no CE (vale igual na 1.6). Toda parede, coluna ou porta a até 6,9 células de teto de montanha ficava com no mínimo 1 de HP para sempre. Agora (escolha do usuário: desabamento real) o golpe letal fica guardado e elas caem juntas no fim da onda, e o desabamento vanilla roda uma vez no tick seguinte. A cratera não sai sob teto de montanha.
-- **Dano real fora do núcleo** (decisão do usuário): o núcleo continua sendo vaporização (remoção direta + cratera); nos anéis, prédios/itens/plantas levam `TakeDamage` com o dano novo `MAS_BlastWave` (fatores 1, sem som, sem sujeira, sem fragmentos de parede do CE), prédios ±20%. O teto continua arrancado à frente da onda.
-- **Munição e explosivos** (inclusive o boomshroom do Odyssey, que explode ao morrer) só podem explodir nos últimos 3–8% do raio. Mais para dentro, itens somem, prédios explosivos viram destroços sem explodir (`destroyedThroughDetonation`) e boomshrooms morrem sem explodir. Detalhes em `Docs/BLAST.md`.
-- **Salva da HIMARS**: o CE trava a mira da rajada inteira no 1º tiro (estimativa de distância e erro circular), e só o `ShotSpread` 0,6° variava por foguete, então a salva caía num grupo apertado cujo centro variava. Fonte: `Verb_LaunchProjectileCE.ShiftTarget`/`LockRotationAndAngle`. Agora `Verb_ShootGuidedCE.ShiftTarget` manda cada míssil num alvo local para um ponto próprio, uniforme dentro do `circularError` do ponto mirado (sem spread, recuo nem erro de distância), limitado ao alcance da carga. O lead do CE em pawns em movimento continua. HIMARS `circularError` 2 → 7 (o raio da explosão do GMLRS é 7,4). Vale nas duas versões desde 25/out (o `Bin/1.6` foi recompilado com o SDK; a `1.6/Legacy1.6`, que mantinha 2 na 1.6, foi apagada). Vale também para M270 (3), Mk 41 (1) e Minuteman (4); o `recoilAmount`/`ShotSpread` deles não contam mais. O tiro no mapa-mundo não muda.
-- **Build (25/out)**: `build.ps1` na raiz compila as duas versões com o SDK .NET 10 (`Source/MountedArmsStrategic.csproj`, alvos `net472`/`net10.0`, `Krafs.Rimworld.Ref`). Na 1.7 gera antes as facades `UnityEngine.*` → `UnityStubs` (`tools/unity_facades.ps1`, em `obj/`) para o compilador aceitar o CE 1.6. Pelo dump de metadados, o 1.7 novo é equivalente ao que o csc gerava, e o 1.6 tem a mesma superfície do 1.7. A DLL de 1.7 referencia `UnityStubs` e só roda na 1.7.
-- Revisão independente (3 revisores + verificador por achado; 4 de 5 confirmados, todos corrigidos): boomshroom explodindo nos anéis; paredes de montanha do núcleo deixavam destroços no núcleo (agora caem antes da varredura final); `circularError` 7 piorava a 1.6; o lead em alvo móvel tinha se perdido.
-- Teste na 1.7 com o CE 16.7.4 (usuário, 26/out):
-  1. Carrega sem erros: **confirmado**.
-  2. Base comum (anéis com dano visível, prédios danificados em vez de sumirem, núcleo vaporizado com cratera): **confirmado**.
-  3. Base escavada em montanha (paredes caem, a montanha desaba uma vez no fim da onda, sem travar): **confirmado**.
-  4. Paiol no raio só explode na borda: **pendente** (o usuário vai validar).
-  5. Salva da HIMARS espalhada até ~7 células: **confirmado**.
+## Testes pendentes
+- Paiol no raio de uma explosão grande só explode na borda (lote 11).
+- Fallout (lote 12): nos primeiros 30 min nada; colono ao virar "Fatal Radiation Exposure" (~3 h fora) deixa de receber dose e morre em ~2 dias, não em horas; depois de ~1 dia o ganho fica pequeno; a condição acaba em 3 dias; salvar e carregar no meio continua o decaimento.
+- Defesa antimíssil abatendo ogivas individuais do Sarmat (a área delas fica intacta) e o ônibus antes da divisão (lote 13; o usuário achou difícil de testar).
+- IA com a retaliação nuclear ligada contra colônia grande (ou orçamento de retaliação alto): usa W62/W78/Sarmat raramente (lote 13).
+- Precisão no mapa-mundo (erro ≤ `circularError`); M270 sem energia não dispara; Mk 41 com topo fixo; M777 com marcador; cluster/termobárica/EMP (colmeia mecanoide e assentamento humano); Patriot interceptando retaliação; efeitos de lançamento e chama no bocal.
 
-## Lote 13 (implementado, NÃO testado): ogivas W62/W78, RS-28 Sarmat MIRV, IA nuclear
-Pedido do usuário (27/out): mais duas ogivas (150 e 250) com custo de pesquisa/recursos e calibração da IA; um segundo míssil, o RS-28 Sarmat MIRV, com ogivas pequenas espalhadas pelo mapa todo e abatíveis uma a uma. Escolhas do usuário: 151 e 250 (150 ainda cai nos raios fixos do 55), explosão nossa nas ogivas do Sarmat, 10 ogivas, silo próprio.
-- **Minuteman W62 (yield 151) e W78 (yield 250)** (`1.6/Rimatomics/Defs/Ammo_ICBM_Nuclear.xml`): explosão completa do Rimatomics (dano `Yield × ln(Yield/d)` até d = Yield células, todo teto construído do mapa arrancado, flash em Yield/10, tela "Detonating"). O fallout constante dele (10–30 dias) não roda, porque o nosso é registrado antes do 1º tick do strike; o nosso é escalado por `NuclearFalloutExtension.scale` ≈ √(yield/55): 1,6 e 2,1. Dano no mapa-mundo 25 e 30.
-- **Fallout combinável**: explosões a menos de 1 h uma da outra somam a escala (salva MIRV); uma explosão posterior recomeça a curva com a própria escala mais o que restava; teto 3× o Minuteman (fora, letal em ~1 h).
-- **RS-28 Sarmat** (`1.6/Rimatomics/Defs/Sarmat.xml`, `Source/Mirv.cs`): silo próprio 4×4 (2500 HP, 3000 aço, 600 plasteel, 40/12 componentes, 1500 W), alcance 700 tiles no mapa-mundo, recarga 90 s. Sobre um mapa carregado, o ônibus (`ProjectileCE_Mirv`) libera 10 ogivas a 20% do voo de reentrada (o CE faz as chegadas a altura 200): uma no ponto mirado, as outras espalhadas pelo mapa todo (amostragem "best candidate": cada alvo é o mais distante dos já escolhidos entre 30 células sorteadas, margem de 10 da borda). Cada ogiva é um `ProjectileCE` separado (lançado como o `TravelingShell.LaunchProjectile` do CE), então a defesa antimíssil abate cada uma. Ogiva: a nossa explosão (`ProjectileCE_NuclearBlast` = `HeavyBlast` R 29,9, núcleo 7,5 vaporizado, cratera) + fallout 0,25 cada (salva inteira 2,5). O ônibus também pode ser abatido antes de se dividir; se cair sem se dividir, explode como uma ogiva. Mapa-mundo: dano 40.
-- **Pesquisa** (aba Mounted Arms, só com Rimatomics, todas na bancada de alta tecnologia): ogivas termonucleares 8000 (pré: ICBM 6000) → W62; ogivas de alto rendimento 10000 → W78; ICBMs pesados MIRV 12000 (pré: termonucleares) → silo e míssil Sarmat.
-- **Receitas**:
-  - Minuteman nuclear (55): ogiva de fissão + 1000 aço, 200 plasteel, 200 FSX, 16/4 componentes (inalterada).
-  - W62: igual + 150 urânio empobrecido + 60 plutônio, 6 componentes espaciais, trabalho 300000, Crafting 13. Valor 42000.
-  - W78: igual + 300 urânio empobrecido + 120 plutônio, 8 componentes espaciais, trabalho 350000, Crafting 14. Valor 55000.
-  - Sarmat: 4 ogivas de fissão (refeitas em 10 pequenas; a ogiva desmontada dá 120 plutônio), 3000 aço, 600 plasteel, 1500 chemfuel (combustível líquido), 400 FSX, 40/15 componentes, trabalho 600000, Crafting 15. Valor 100000.
-- **IA** (`NuclearRetaliation`, com a opção de retaliação nuclear ligada): Minuteman nuclear 6000 pontos peso 0,05 (espacial/ultra/archotech); W62 9000/0,03, W78 12000/0,02 e Sarmat 20000/0,01 só ultra/archotech. O CE só escolhe um projétil enquanto o orçamento (ameaça × 3,5 × força) paga por ele: com força 1, o W62 aparece a partir de ~2600 pontos de ameaça, o W78 de ~3400 e o Sarmat de ~5700.
-- Compilado nas duas versões e instalado em `Bin/1.6` e `Bin/1.7` (27/out; isso também instala a correção do `FatalRad` do lote 12 na 1.7).
-- Riscos a observar no teste: dez ondas de choque `HeavyBlast` quase juntas (cada uma limita 150 coisas por tick; chegam em ticks diferentes pela distância); aviso "[CE] Tried to fire projectile to unreachable target cell" se uma ogiva não alcançar o alvo (o código aumenta a velocidade até 3,2× antes).
-- Teste pendente:
-  1. Pesquisas aparecem na aba com os custos acima; receitas na bancada de fabricação do CE.
-  2. W62 e W78 num mapa: explosão completa do Rimatomics com tela "Detonating"; fallout nosso de 3 dias (não o de 10–30 dias do Rimatomics), mais forte que o do 55.
-  3. Sarmat: o silo 4×4 constrói e carrega; num mapa carregado o míssil se divide no ar em 10 ogivas espalhadas pelo mapa todo.
-  4. Defesa antimíssil abate ogivas individuais (a área delas fica intacta).
-  5. Desempenho com as 10 explosões.
-  6. IA com a opção ligada contra colônia grande (ou orçamento de retaliação alto): usa W62/W78/Sarmat raramente.
-
-## Lote 12 (implementado, NÃO testado): fallout do ICBM nuclear
-- Relato do usuário (26/out, mapa de superfície na 1.7): a explosão do Minuteman nuclear acontece, mas a condição `NuclearFallout` não começa.
-- **Causa** (lida no IL do Rimatomics 1.6 e 1.7, que são iguais nesse ponto): o `NuclearStrike.StartStrike` só registra o `NuclearFallout`, e só faz a explosão completa em long events (tela "Detonating"), com `Yield > 150`. Com o nosso `Yield 55` (o da ogiva solta, `Item_FissionWarhead`) ele faz só o `GoBang`, sem fallout. Isso valia também na 1.6, ou seja, nunca foi problema da 1.7. O silo do próprio Rimatomics usa 250.
-- **Correção** (escolha do usuário: manter 55, sem tela, com fallout realista): `NuclearFallout.Start` registra o `NuclearFallout` no impacto e anota o `uniqueID` dele num `MapComponent_NuclearFallout`. Dois patches Harmony (por nome, ignorados sem Rimatomics) trocam o `GameConditionTick`/`DoCellSteadyEffects` **só do nosso fallout**; o do silo do Rimatomics fica como é.
-  - Formato conferido com fontes (pedido do usuário, 26/out); ajustes depois da pesquisa: chegada em ~30 min, 3 dias em vez de 2, e proteção por abrigo em vez de "dentro de casa, nada".
-  - Chegada: nada nos primeiros 30 min (o fallout local começa a cair ~30 min depois da explosão), sobe até a taxa de H+1 na 1ª hora, depois t^-1,2 pela regra 7-10 (10% em H+7, 1% em H+48).
-  - Dura 3 dias: as fontes de defesa civil dão os 2–3 primeiros dias como o período de maior perigo, e no fim do 3º dia a dose ao ar livre (~0,1/dia) é igual à recuperação natural do Rimatomics (−0,08/dia).
-  - Radiação pelo `DubUtils.applyRads` do Rimatomics (respeita a opção `RadiationStrength` dele), a cada 250 ticks, em pawns de carne. Pico de 0,7 de radiation sickness por hora ao ar livre (~350 R/h em H+1; 0,9, onde o Rimatomics passa a radiação fatal, é perto da DL50 de 4–5 Gy). Ao ar livre desde a explosão: ~0,44 em 1,5 h, ~0,86 em 3 h. Ao ar livre só no dia 2: ~0,16.
-  - Proteção (fração da dose = 1/PF): ao ar livre 1; teto sem paredes 0,5; cômodo fechado com teto construído ou de rocha fina 0,2 (térreo de casa, PF 2–5); sob teto de montanha 0,001 (abrigo profundo, PF > 1000). Cômodo fechado nos 3 dias: pico ~0,29 no 1º dia, ~0,2 no fim (radiation sickness leve). Teto sem paredes nos 3 dias: ~0,86.
-  - Plantas morrendo e comida apodrecendo como no Rimatomics, escalados pela taxa. Céu escuro e cinza caindo iguais aos dele.
-  - Sem toxic buildup: o do Rimatomics multiplica pela `ToxicEnvironmentResistance` (e não por 1 − ela), então já era 0 para quase todos.
-  - Outra bomba sobre o nosso fallout recomeça a curva (chegada em 30 min) por mais 3 dias. Se o fallout ativo for do Rimatomics (10–30 dias, constante), não mexemos. Como ele, encerra o `RadioactiveFallout` ativo.
-- Compilado nas duas versões e instalado em `Bin/1.6` e `Bin/1.7` (26/out).
-- **Teste na 1.7 (usuário, 26/out):** fallout começa; base sob montanha e residência reduzem a radiação (**confirmado**). Pawns ao ar livre o tempo todo morreram em ~10 h; o contador Geiger do Rimatomics marcava 1,20 em H+10. O contador mostra a dose de cada pulso de 250 ticks, não a acumulada: em H+10 esperávamos 1,54 × (1 − resistência a ambiente tóxico) × `RadiationStrength`, coerente com ~0,2 de resistência da roupa.
-- **Morte em 10 h não é realista (corrigido, NÃO testado):** o `applyRads` converte a radiation sickness em `FatalRad` 0,1 ao chegar a 0,9 (~3 h fora), e depois joga toda a dose seguinte direto no `FatalRad` (que também sobe 0,4/dia sozinho) → morte ~7 h depois. Dez horas fora dão ~7 Gy, e 3 dias inteiros ~14 Gy: dose fatal, mas a morte real vem em 1–3 semanas (síndrome hematopoiética/gastrointestinal); morte em horas exige > 20–50 Gy. Agora o nosso fallout não dá mais dose a quem já tem `FatalRad`, e a morte segue só o curso do Rimatomics (~2,25 dias, ainda mais rápido que o real; mudar isso seria alterar o hediff dele).
-- DLL: `Bin/1.6` instalada; `Bin/1.7` instalada depois, no lote 13 (27/out).
-- Fontes: regra 7-10 e período de 2–3 dias ([manual de defesa civil, ORAU](https://orau.org/health-physics-museum/files/library/civil-defense/victor727.pdf)); chegada em ~30 min ([relatório de teste desclassificado](https://minddfiles.nuclearsecrecy.com/0404656.pdf)); DL50 2,5–5 Gy ([CDC](https://www.cdc.gov/nceh/radiation/emergencies/arsphysicianfactsheet.htm)); PF de casas 2–5 no térreo e 5–30 no porão ([folheto de abrigos, WA DAHP](https://dahp.wa.gov/sites/default/files/Fallout%20Protection%20Homes%20with%20Basements.pdf)). A taxa de pico é escolha de jogo dentro da faixa real (centenas a milhares de R/h perto do marco zero).
-- Teste pendente:
-  1. Minuteman nuclear num mapa de superfície: fallout começa, sem tela "Detonating".
-  2. Colono fora nas primeiras horas: radiation sickness sobe rápido; ao virar "Fatal Radiation Exposure" (~3 h) a dose para e ele morre em ~2 dias, não em horas.
-  3. Nos primeiros 30 min, nada; depois de ~1 dia o ganho fica pequeno; a condição acaba em 3 dias.
-  5. Dentro de um cômodo fechado a radiação sobe devagar (~0,3 no máximo); numa base sob montanha, nada.
-  4. Salvar e carregar durante o fallout: continua decaindo de onde estava.
-
-## Lote 10 (implementado, NÃO testado)
-- Teste do lote 9: zonas OK, mas impacto travava ~1 s, sem efeito visual, e tudo aparecia destruído de uma vez (tudo era feito num tick). Agora a explosão é uma **onda de choque em ticks** (`BlastWave`, `HeavyBlastWaves`): frente de 0 a R em 6–25 ticks, até 150 coisas por tick, teto arrancado 7 células à frente, efeito de explosão vanilla em cada célula + fumaça/poeira. Ver `Docs/BLAST.md`.
-- Revisão independente (2 revisores + verificador; 2 de 7 achados confirmados): paredes/colunas que seguram teto de montanha ficam com ≥ 1 HP (antes desabava a montanha); pawns que andam para uma célula já processada levam o dano no fim da onda.
-
-## Lote 9 (testado: zonas/cook-off/rocha OK; travamento e falta de efeito → lote 10)
-- **Explosões por zonas de sobrepressão reais** (`Docs/BLAST.md`): núcleo 0,25R destruído; anéis 0,37/0,50/0,75/1,0R com prédios −900/−600/−250/−100 HP (portas −75% na borda), dano em pawns por zona, itens/plantas por chance, fogo por zona; termobárico com anéis maiores (0,55/0,82R), 1,5× dentro de lugares cobertos e fogo 100→5%. R = contorno de 2 psi. Aplicado em Minuteman HE/termobárico, ATACMS HE/termobárico, GMLRS e Tomahawk (antes só o Minuteman usava a explosão própria; os outros usavam a do CE com fragmentos).
-- `HeavyBlastExtension` agora só tem `radius`, `thermobaric`, `damageDef`, `fxRadius`, `crater` (o dano por zona está no código, com as tabelas da pesquisa).
-- Correções da revisão independente (2 revisores + verificador; todos os achados confirmados): rocha alisada/desmoronada/minério também intocados (seguravam teto de montanha); itens que explodem ao morrer somem sem explodir; cratera não apaga rocha nem edifícios e exige terreno construível; prédios danificados entram na lista de reparo; 3ª passada no núcleo (cadáveres e equipamento); fogo embaralhado antes do limite; som do próprio projétil; **cook-off de mísseis estocados** (o CE fazia a explosão gigante do XML direto, que travava o jogo) agora é uma explosão pequena via patch em `AmmoThing.TryDetonate`.
-
-## Lote 8 (implementado, NÃO testado)
-- **Jogo travou no Minuteman III convencional** (log: dezenas de "Tried to destroy already-destroyed thing" em paredes/móveis/Sandstone e "Tried to place thing ChunkSandstone… in a null map", sem pilha). Causa provável: a explosão destruía paredes sob teto construído (desabamento em cascata esmagando o que já estava sendo destruído) e matava rocha natural (pedaços em células já desocupadas, teto de montanha caindo). `HeavyBlast` agora: passada 1 arranca todo teto não-espesso do raio; passada 2 destrói; rocha natural intocada; prédios/itens/plantas perdem HP direto (sem o pipeline de dano do CE); só pawns tomam `TakeDamage`.
-- **Chama no meio do míssil**: o `CompProjectileFleck` do CE posiciona a chama em `DrawPos − deslocamento do último tick × originOffset` (depende da velocidade; na fase lenta fica no centro do sprite). Novo `CompProperties_Exhaust` (`Source/Exhaust.cs`) põe chama/fumaça a `nozzleDistance` (≈ meio comprimento do sprite) atrás da posição desenhada. Substitui o do CE em Minuteman (1,9), ATACMS (1,4), GMLRS (0,9), Tomahawk (1,3; chama só 40 ticks = booster) e PAC-3 (0,55).
-- **Correções da revisão independente** (workflow com 3 revisores + verificador por achado; 8 confirmados, 2 descartados):
-  - espoleta de proximidade: estado agora marcado com o `FlightTicks` da última atualização; recomeça se não for o tick seguinte (antes sobrevivia a reload do save e podia explodir interceptadores cedo);
-  - inclinação do sprite na fase lenta: postfix em `ProjectileCE.DrawRotation` recalcula pela posição desenhada suavizada;
-  - explosão pesada: cada coisa recebe dano uma vez (prédios de várias células levavam N vezes); cratera só se couber no mapa e não cobrir nada indestrutível; tremor de câmera só no mapa que está na tela.
-
-## Lote 7 (implementado, NÃO testado)
-- **Lançamento realista** (`Docs/LAUNCH.md`): `BoostPhaseTrajectoryWorker` + `LaunchProfileExtension` — sobe devagar e acelera (mesmo caminho/tempo/impacto), fumaça e brilho na saída; Tomahawk com lançamento a frio. Minuteman 0,15 · ATACMS 0,05 · GMLRS 0,03 · Tomahawk 0,10; PAC-3 só efeitos.
-- **Explosão pesada sem a tela "Detonando"** (roda na hora) e **munição estocada na área some sem cook-off** (a cadeia de cook-off do CE é o que gera milhares de fragmentos numa base com munição; paredes não têm fragmentos no CE). Minuteman HE sem comp de fragmentos (a detonação própria não usa).
-- **Menos fragmentos** nos mísseis que usam a explosão do CE: ATACMS HE 20/30 → 8/12, GMLRS 10/20 → 4/8, Tomahawk 20/40 → 8/16.
-- Texto das configurações sem a frase "That is why early on...".
-
-## Confirmado (lote 6)
-- Configurações do mod, retaliação ajustável e espoleta de proximidade dos interceptadores: funcionando. Minuteman nuclear (Rimatomics): sem tela e sem queda de frames; destruiu uma base 36x36 inteira (efeito do `NuclearStrike` do Rimatomics com Yield 55).
-
-## Lote 6 (implementado)
-- **Detonação estilo Rimatomics** (`ProjectileCE_HeavyBlast` + `HeavyBlastExtension`, `Source/HeavyBlast.cs`) no Minuteman HE (r24,9, 8000) e termobárico (r24,9, 5000, dano Thermobaric, fogo 30%): roda em `LongEventHandler.QueueLongEvent` ("Detonando"), destrói direto o núcleo (35% do raio; rocha natural fica), uma passada de `TakeDamage` com queda até 15% na borda, retira teto fino no núcleo, cratera, explosão pequena só para efeito/som, tremor de câmera. Sem `ExplosionCE` nem fragmentos. Mundo inalterado (damage manual).
-- **Configurações do mod** (Opções → Configurações de mods → "Mounted Arms: Strategic", `Source/Settings.cs`): texto explicando a retaliação; barra do orçamento 0–500% (Harmony prefix em `HostilitySheller.TryStartShelling`, multiplica `points`; vale para todos os projéteis, morteiros do CE incluídos; 0% desliga o bombardeio de retaliação, não os raides); caixa "facções podem retaliar com Minuteman nuclear" (só com Rimatomics; adiciona/remove o nuclear em CE_ShellingPreset_Spacer/Ultra/Archotech, 6000 pts, peso 0,05; o CE lê a lista ao vivo).
-- **Espoleta de proximidade nos interceptadores** (Harmony postfix em `ProjectileCE_CIWS.Tick`, todos os projéteis de interceptação do CE, inclusive os do Mounted Arms): se a distância ao alvo cresce por 3 ticks após a aproximação máxima, o interceptador se destrói e libera o alvo. Motivo: o CE não deixa outra torreta mirar um projétil que tenha interceptador em voo; um PAC-3 que errou seguia voando e o Phalanx ficava sem tempo (relato do usuário).
-- A DLL agora usa Harmony (já carregado pelo CE; `loadAfter brrainz.harmony` no About) e referencia `Unity.Mathematics.dll` no build.
-
-## Ajustes desta rodada (NÃO testados)
-- **Minuteman convencional derrubou o FPS no impacto** (raio 24,9, ~1950 células; centenas de paredes destruídas → recálculo de regiões/teto). Raio limitado a **19,5** (= maior explosão convencional do próprio CE, o Tomahawk), dano 8000, fragmentos 20/30; termobárico 19,5 / 5000. O nuclear é do Rimatomics e não muda.
-- Log "Tried to destroy already-destroyed thing Wall..." no impacto do Minuteman e da salva do HIMARS: pilha só com código do jogo/CE (`ExplosionCE.Tick` → `ExplosionDamageThing` → `Kill`), nada nosso. Hipótese: duas explosões/fragmentos no mesmo tick atingem a mesma parede. Inofensivo; não corrigível sem patch no CE.
-- **Patriot interceptou o ATACMS e o Phalanx não**: comportamento do CE (`VerbCIWS.TryFindNewTarget`): uma torreta ignora projéteis que outra CIWS já mira ou que já têm interceptador a caminho. O Patriot (alcance 119) engaja antes do Phalanx (90). Com vários projéteis, cada torreta pega um.
-- **M270 consome energia** (300 W) além do operador.
-- **Minuteman errava ~30+ células**. Causa (código do CE, `Verb_LaunchProjectileCE.ShiftVecReportFor(GlobalTargetInfo)` e `Verb_ShootMortarCE`): no tiro pelo mapa-mundo o CE trata a distância como ≥ 44% do alcance máximo (Minuteman: ≥ 1100 "células"), soma iluminação fixa 1 e fumaça fixa 10 e um erro de estimativa de distância proporcional à precisão; se o desvio sai do mapa, sorteia célula aleatória. Correção: verbo próprio `MountedArmsStrategic.Verb_ShootGuidedCE` (`Source/GuidedVerb.cs`) que zera luz/fumaça/clima e usa AimingAccuracy 1,5 no tiro global (sem erro de distância). Sobra só o `circularError` (≈ CEP). Aplicado em M270, HIMARS, Mk 41 e Minuteman; Minuteman `circularError` 6 → 4. M777 continua com a física de artilharia comum.
-
-## Implementado, NÃO testado
-- **M142 HIMARS** `MAS_Turret_MLRS`: tripulado 3x3, minificável, pod de 6 (troca o pod inteiro, 30 s), rajada 6 × 25 ticks, circularError 7 (era 2 até o lote 11; o ShotSpread 0,6 continua no XML, mas não conta mais), giro 20°/s. `MAS_Ammo_GMLRS` (M31): Bomb 900 r 7,4; mundo 40 tiles, 0,5 tiles/tick, damage 0,4.
-- **Mk 41 VLS (Tomahawk)** `MAS_Turret_CruiseVLS`: 2x2, 300 W, sem operador, `ManualFireOnlyExtension` + `FixedTopExtension` (topo não gira), mag 4, circularError 1. `MAS_Ammo_CruiseMissile`: Bomb 5600 r 17,9; mundo 400 tiles, 0,15 tiles/tick, damage 3.
-- **Minuteman III (convencional)** `MAS_Turret_ICBMSilo`: 3x3, 1000 W, sem operador, só "atacar tile do mundo", mag 1, recarga 60 s. HE: detonação própria r 24,9 / 8000; mundo 500 tiles, damage 5.
-- **M777** `MAS_Turret_M777_Howitzer`: tripulado 3x3, minificável, `AmmoSet_155mmHowitzerShell` do CE (mundo 60 tiles), giro 10°/s, exige marcador em mapa carregado.
-- **Ogivas especiais** (`MAS_Research_SpecialWarheads`), ATACMS / Minuteman:
-  - Cluster (`ProjectileCE_Cluster`): 40 bombas em raio 12 / 100 em raio 26; mundo 1,2 / 3,5.
-  - Termobárica (dano `Thermobaric` do CE): 1500 r 12,9 / detonação própria 5000 r 24,9 com fogo; mundo 1,8 / 6.
-  - EMP: 400 r 6,9 / 600 r 7,9, **sem** `shellingProps.damage` (o CE usa o modificador EMP: 1,0 contra mecanoides, 0,03–0,18 contra humanos).
-- **MIM-104 Patriot** `MAS_Turret_InterceptorBattery` (`Building_MissileInterceptorCE`): só interceptação (projéteis e drop pods), alcance 119, 2 por ameaça, mag 4, 400 W. PAC-3 MSE: speed 180, `impactChance` 0,85. Precisa da opção do CE "Enable CIWS" (a interceptação do CIWS do Mounted Arms foi confirmada com ela ligada).
-- **Retaliação com mísseis** (`1.6/Patches/ShellingResponse.xml`): Spacer GMLRS (400 pts) + ATACMS (1500); Ultra/Archotech ATACMS + Minuteman HE (4000). Sem nuclear para a IA.
-- Sprites por munição (M270 0–2, HIMARS 0–6, Mk 41 0–4, silo 0–1, Patriot 0–4).
-
-## O que testar
-1. Minuteman/ATACMS/HIMARS/Tomahawk acertando perto do alvo no mapa-mundo (erro ≤ circularError).
-2. M270 sem energia não dispara.
-3. HIMARS (salva, sprite), Mk 41 (topo fixo), M777 (com marcador), ogivas cluster/termobárica/EMP (colmeia mecanoide e assentamento humano).
-4. Patriot interceptando a retaliação; retaliação com mísseis de facção espacial.
+## Como cada sistema funciona (resumo; detalhes nos docs)
+- **Explosões grandes** (`Source/HeavyBlast.cs`, `Docs/BLAST.md`): zonas reais de sobrepressão por frações de R (R = contorno de 2 psi): núcleo 0,25R vaporizado + cratera; anéis 0,37/0,50/0,75/1,0R com dano real (`MAS_BlastWave`, fatores 1); termobárico com anéis maiores, confinamento ×1,5 e mais fogo. Onda de choque espalhada em ticks; todo teto não-espesso no raio arrancado à frente; rocha natural intocada; munição e explosivos só reagem nos últimos 3–8% do raio; sustentadores de teto de montanha caem juntos no fim e a montanha desaba uma vez. Usada por Minuteman HE/termobárico, ATACMS HE/termobárico, GMLRS, Tomahawk e todas as nucleares.
+- **Mira** (`Source/GuidedVerb.cs`, `Docs/CE_WORLD_SHELLING.md`): `Verb_ShootGuidedCE` zera luz/fumaça/clima/erro de distância do CE; sobra só o `circularError`. Cada míssil de uma salva local cai num ponto próprio dentro dele (o CE travava a mira da rajada no 1º tiro).
+- **Lançamento** (`Source/LaunchProfile.cs`, `Docs/LAUNCH.md`): fase de impulso lenta e depois acelerada no mesmo caminho; chama e fumaça no bocal (`Source/Exhaust.cs`).
+- **Defesa antimíssil**: Patriot sobre o CIWS do CE (exige a opção "Enable CIWS" do CE); interceptador que errou se autodestrói e libera o alvo para a próxima camada.
+- **Retaliação da IA** (`1.6/Patches/ShellingResponse.xml`, `Source/Settings.cs`): espacial GMLRS (400) + ATACMS (1500); ultra/archotech ATACMS + Minuteman HE (4000). Com a opção nuclear: Minuteman nuclear 6000/peso 0,05 (espacial em diante), W62 9000/0,03, W78 12000/0,02 e Sarmat 20000/0,01 (só ultra/archotech). O CE só escolhe um projétil enquanto o orçamento (ameaça × 3,5 × força × barra das configurações) paga por ele: com força 1, W62 a partir de ~2600 pontos de ameaça, W78 ~3400, Sarmat ~5700.
+- **Nucleares** (só com Rimatomics, `1.6/Rimatomics/`):
+  - Minuteman nuclear (R 55), W62 (R 151) e W78 (R 250); mapa-mundo 20 / 25 / 30 (arrasa qualquer nível tecnológico).
+  - Sarmat (`Source/Mirv.cs`): silo 4×4 próprio (2500 HP, 1500 W, alcance 700 tiles, recarga 90 s). Sobre um mapa carregado o ônibus libera 10 ogivas a 20% do voo de reentrada (o CE faz as chegadas a altura 200): uma no ponto mirado e as outras espalhadas pelo mapa todo (amostragem "best candidate", margem 10 da borda). Cada ogiva é um `ProjectileCE` próprio (lançado como o `TravelingShell` do CE), abatível pela defesa; se o ônibus cair sem se dividir, explode como uma ogiva. Mapa-mundo 40.
+  - Pesquisas (bancada de alta tecnologia): ogivas termonucleares 8000 (pré: ICBM 6000) → W62; alto rendimento 10000 → W78; ICBMs pesados MIRV 12000 (pré: termonucleares) → Sarmat.
+  - Receitas: nuclear = ogiva de fissão do Rimatomics + 1000 aço, 200 plasteel, 200 FSX, 16/4 componentes. W62 = o mesmo + 150 urânio empobrecido + 60 plutônio, 6 componentes espaciais, Crafting 13. W78 = + 300 urânio empobrecido + 120 plutônio, 8 componentes espaciais, Crafting 14. Sarmat = 4 ogivas de fissão, 3000 aço, 600 plasteel, 1500 chemfuel, 400 FSX, 40/15 componentes, Crafting 15.
+- **Fallout** (`Source/Nuclear.cs`): a condição `NuclearFallout` do Rimatomics, registrada e controlada por nós (dois patches Harmony por nome, só no nosso fallout; o do silo do próprio Rimatomics, constante por 10–30 dias, fica como é). Formato conferido com fontes:
+  - chegada em ~30 min, taxa de H+1 na 1ª hora, depois t^-1,2 (regra 7-10: 10% em H+7, 1% em H+48); dura 3 dias (os 2–3 primeiros são os perigosos; no fim do 3º a dose empata com a recuperação do Rimatomics, −0,08/dia);
+  - radiação pelo `DubUtils.applyRads` do Rimatomics a cada 250 ticks em pawns de carne; pico de 0,7 de radiation sickness por hora ao ar livre no Minuteman (~350 R/h; 0,9 vira radiação fatal, ~DL50 4–5 Gy): ~0,86 em 3 h fora;
+  - proteção 1/PF: ao ar livre 1, teto sem paredes 0,5, cômodo fechado 0,2 (térreo de casa, PF 2–5), sob montanha 0,001 (PF > 1000);
+  - quem já tem `FatalRad` não recebe mais dose (o `applyRads` jogava toda dose seguinte nele e matava em horas; a morte real com 7–14 Gy vem em semanas; fica o curso do Rimatomics, ~2,25 dias);
+  - escala por ogiva (`NuclearFalloutExtension.scale`): 1 / 1,6 / 2,1, Sarmat 0,25 por ogiva; explosões a menos de 1 h uma da outra somam, uma posterior recomeça a curva com o que restava; teto 3×;
+  - sem toxic buildup (o do Rimatomics multiplica pela resistência e dá 0 para quase todos); plantas e comida como no Rimatomics, escalados pela taxa; encerra o `RadioactiveFallout` ativo;
+  - fontes: [manual de defesa civil, ORAU](https://orau.org/health-physics-museum/files/library/civil-defense/victor727.pdf) (regra 7-10, 2–3 dias); [relatório de teste desclassificado](https://minddfiles.nuclearsecrecy.com/0404656.pdf) (chegada ~30 min); [CDC](https://www.cdc.gov/nceh/radiation/emergencies/arsphysicianfactsheet.htm) (DL50 2,5–5 Gy); [WA DAHP](https://dahp.wa.gov/sites/default/files/Fallout%20Protection%20Homes%20with%20Basements.pdf) (PF de casas). A taxa de pico é escolha de jogo dentro da faixa real.
 
 ## Próximos passos
-- **RimWorld 1.7**: testar em jogo seguindo `../MountedArms/Docs/MIGRATION_1_7.md` ("Teste a fazer"). Quando sair um CE 1.7: `build.ps1 -CE17 <CombatExtended.dll>` e rever os alvos do CE listados lá. Decidir se o `PatchAll()` de `Settings.cs` ganha try/catch por classe.
-- Vanilla: sistema próprio de tiro no mapa-mundo.
-- Remote do git.
+- Quando sair um CE 1.7: `build.ps1 -CE17 <CombatExtended.dll>` e rever os alvos do CE listados em `../MountedArms/Docs/MIGRATION_1_7.md`. Decidir se o `PatchAll()` de `Settings.cs` ganha try/catch por classe.
+- Ideias em aberto (nada decidido): pulso térmico nuclear (fogo além do raio da onda); Tomahawk R 17,9 é 20–40% generoso pela física (~14–15); perda única de goodwill por facção atingida; tiro no mapa-mundo sem CE; remote do git.

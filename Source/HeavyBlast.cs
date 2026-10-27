@@ -128,13 +128,15 @@ namespace MountedArmsStrategic
 
         /// <summary>
         /// One blast spread over ticks: the front grows from the center to R in ~6-25 ticks, and each tick handles the
-        /// cells it passed (at most MaxThingsPerTick things, so a dense base slows the front instead of the frame).
+        /// cells it passed (at most MaxThingsPerTick things and MaxCellsPerTick cells, so a dense base or a nuclear
+        /// R slows the front instead of the frame).
         /// Roofs are stripped RoofReach cells ahead of the front, so no wall is ever destroyed under a roof that
         /// is still there. Not saved: a save made mid-wave loses the rest of it (it lasts well under a second).
         /// </summary>
         public class BlastWave
         {
             private const int MaxThingsPerTick = 150;
+            private const int MaxCellsPerTick = 600;   // empty cells too (a nuclear R 250 covers ~62k cells)
             private const float RoofReach = 7f;   // vanilla roof support distance is 6.9
 
             private readonly Map map;
@@ -176,14 +178,26 @@ namespace MountedArmsStrategic
                 cellFleck = fx.explosionCellFleck;
                 colorCenter = fx.explosionColorCenter;
                 colorEdge = fx.explosionColorEdge;
-                foreach (IntVec3 cell in GenRadial.RadialCellsAround(center, radius, true))   // sorted by distance
+                // map cells within R sorted by distance (GenRadial's pattern stops near r120; nuclear R goes to 250)
+                int r = Mathf.CeilToInt(radius);
+                List<IntVec3> inRadius = new List<IntVec3>();
+                for (int x = Mathf.Max(0, center.x - r); x <= Mathf.Min(map.Size.x - 1, center.x + r); x++)
                 {
-                    if (cell.InBounds(map))
+                    for (int z = Mathf.Max(0, center.z - r); z <= Mathf.Min(map.Size.z - 1, center.z + r); z++)
                     {
-                        cells.Add(cell);
-                        dist.Add(cell.DistanceTo(center));
-                        confined.Add(map.roofGrid.Roofed(cell));   // snapshot before stripping (thermobaric confinement)
+                        IntVec3 cell = new IntVec3(x, 0, z);
+                        if ((cell - center).LengthHorizontalSquared <= radius * radius)
+                        {
+                            inRadius.Add(cell);
+                        }
                     }
+                }
+                inRadius.SortBy(c => (c - center).LengthHorizontalSquared);
+                foreach (IntVec3 cell in inRadius)
+                {
+                    cells.Add(cell);
+                    dist.Add(cell.DistanceTo(center));
+                    confined.Add(map.roofGrid.Roofed(cell));   // snapshot before stripping (thermobaric confinement)
                 }
                 // pawns inside R at impact: one that walks into a cell the front already passed is still hit in Finish
                 List<Pawn> pawns = new List<Pawn>(map.mapPawns.AllPawnsSpawned);
@@ -221,9 +235,11 @@ namespace MountedArmsStrategic
                     roofNext++;
                 }
                 int budget = MaxThingsPerTick;
-                while (next < cells.Count && dist[next] <= front && budget > 0)
+                int cellBudget = MaxCellsPerTick;
+                while (next < cells.Count && dist[next] <= front && budget > 0 && cellBudget > 0)
                 {
                     budget -= HitCell(next);
+                    cellBudget--;
                     next++;
                 }
                 if (next >= cells.Count)
@@ -271,7 +287,7 @@ namespace MountedArmsStrategic
                         FleckMaker.ThrowFireGlow(pos, map, Rand.Range(1f, 2f));
                     }
                 }
-                return Mathf.Max(1, handled);
+                return handled;
             }
 
             private void Finish()

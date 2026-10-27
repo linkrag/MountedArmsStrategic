@@ -2,12 +2,15 @@
 <Defs>
 
 	<!-- ================================================================= -->
-	<!--  Nuclear ICBM: only loads with Dubs Rimatomics (LoadFolders).     -->
-	<!--  Built around Rimatomics' FissionWarhead. On a loaded map the     -->
-	<!--  projectile spawns Rimatomics' "ICBMStrike" (NuclearStrike) with  -->
-	<!--  Yield 55 does the blast without the long-event screen; the NuclearFallout (3 days, decaying) is started by MountedArmsStrategic.NuclearFallout, since Rimatomics only starts it above Yield 150. -->
-	<!--  On an unloaded settlement: CE world damage 20 (razes any tech    -->
-	<!--  level: 20 x 0.4 / 6 > 1).                                        -->
+	<!--  Nuclear ICBMs: only load with Dubs Rimatomics (LoadFolders).     -->
+	<!--  Built around Rimatomics' FissionWarhead. On a loaded map:        -->
+	<!--  our blast (ProjectileCE_NuclearBlast = HeavyBlast, zones by      -->
+	<!--  fractions of R, see Docs/BLAST.md), Rimatomics' mushroom cloud   -->
+	<!--  and sound, and our 3-day decaying fallout (NuclearFallout).      -->
+	<!--  R = the old Rimatomics yield (55 / 151 / 250), which was the     -->
+	<!--  zero-damage radius of its strike (Yield * ln(Yield / d)).        -->
+	<!--  Unloaded settlement: CE world damage 20 / 25 / 30 (razes any     -->
+	<!--  tech level: 20 x 0.4 / 6 > 1).                                   -->
 	<!-- ================================================================= -->
 
 	<CombatExtended.AmmoCategoryDef>
@@ -35,13 +38,14 @@
 
 	<ThingDef ParentName="MAS_ICBMProjectileBase">
 		<defName>MAS_Bullet_ICBM_Nuclear</defName>
-		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearStrike</thingClass>
+		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearBlast</thingClass>
 		<label>LGM-30G Minuteman III (nuclear)</label>
 		<description>A nuclear intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Bomb</damageDef>
 			<damageAmountBase>1000</damageAmountBase>
 			<explosionRadius>5.9</explosionRadius>
+			<soundExplode>nuclearBlastInMap</soundExplode>
 			<shellingProps>
 				<iconPath>Things/WorldObjects/Munitions/Rocket</iconPath>
 				<tilesPerTick>0.6</tilesPerTick>
@@ -50,12 +54,14 @@
 			</shellingProps>
 		</projectile>
 		<modExtensions>
-			<li Class="MountedArmsStrategic.NuclearStrikeExtension">
-				<strikeDef>ICBMStrike</strikeDef>
-				<yield>55</yield>
+			<li Class="MountedArmsStrategic.HeavyBlastExtension">
+				<radius>55</radius>
+				<crater>CraterLarge</crater>
+				<fxRadius>5.9</fxRadius>
 			</li>
 			<li Class="MountedArmsStrategic.NuclearFalloutExtension">
 				<scale>1</scale>
+				<cloudScale>1.2</cloudScale>
 			</li>
 		</modExtensions>
 	</ThingDef>
@@ -114,16 +120,11 @@
 
 
 	<!-- ================================================================= -->
-	<!--  Thermonuclear warheads (W62 / W78 class). Yield above 150 runs   -->
-	<!--  Rimatomics' full blast: damage Yield * ln(Yield / d) out to d =  -->
-	<!--  Yield cells, every constructed roof on the map stripped, flash   -->
-	<!--  over Yield/10, and its "Detonating" long-event screen. 151 is    -->
-	<!--  the lowest yield that takes that path (150 still does the fixed  -->
-	<!--  r25/r55 blast of the 55 warhead). Its own constant 10-30 day     -->
-	<!--  fallout is skipped (ours is active first): NuclearFalloutExtension -->
-	<!--  scales ours by ~sqrt(yield / 55). The fission warhead is the     -->
-	<!--  primary; depleted uranium (tamper/secondary) and plutonium are   -->
-	<!--  the extra stage.                                                 -->
+	<!--  Thermonuclear warheads (W62 / W78 class): same class, R 151 and  -->
+	<!--  250 (core 38 / 62 vaporized; R 250 covers a whole 250 map from   -->
+	<!--  its center), fallout x1.6 / x2.1 (~sqrt(yield / 55)). The        -->
+	<!--  fission warhead is the primary; depleted uranium (tamper /       -->
+	<!--  secondary) and plutonium are the extra stage.                    -->
 	<!-- ================================================================= -->
 
 	<CombatExtended.AmmoCategoryDef>
@@ -136,7 +137,7 @@
 	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
 		<defName>MAS_Ammo_ICBM_W62_Nuclear</defName>
 		<label>LGM-30G Minuteman III (W62)</label>
-		<description>An intercontinental ballistic missile with a two-stage thermonuclear warhead. Its blast reaches far across the map, strips every constructed roof and leaves heavy nuclear fallout. Fired from an ICBM silo at settlements and sites anywhere within reach on the world map.</description>
+		<description>An intercontinental ballistic missile with a two-stage thermonuclear warhead. Its blast reaches far across the map and leaves heavy nuclear fallout. Fired from an ICBM silo at settlements and sites anywhere within reach on the world map.</description>
 		<statBases>
 			<MaxHitPoints>600</MaxHitPoints>
 			<Mass>1800</Mass>
@@ -149,13 +150,14 @@
 
 	<ThingDef ParentName="MAS_ICBMProjectileBase">
 		<defName>MAS_Bullet_ICBM_W62_Nuclear</defName>
-		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearStrike</thingClass>
+		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearBlast</thingClass>
 		<label>LGM-30G Minuteman III (W62)</label>
 		<description>A nuclear intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Bomb</damageDef>
 			<damageAmountBase>1000</damageAmountBase>
 			<explosionRadius>5.9</explosionRadius>
+			<soundExplode>nuclearBlastInMap</soundExplode>
 			<shellingProps>
 				<iconPath>Things/WorldObjects/Munitions/Rocket</iconPath>
 				<tilesPerTick>0.6</tilesPerTick>
@@ -164,12 +166,14 @@
 			</shellingProps>
 		</projectile>
 		<modExtensions>
-			<li Class="MountedArmsStrategic.NuclearStrikeExtension">
-				<strikeDef>ICBMStrike</strikeDef>
-				<yield>151</yield>
+			<li Class="MountedArmsStrategic.HeavyBlastExtension">
+				<radius>151</radius>
+				<crater>CraterLarge</crater>
+				<fxRadius>5.9</fxRadius>
 			</li>
 			<li Class="MountedArmsStrategic.NuclearFalloutExtension">
 				<scale>1.6</scale>
+				<cloudScale>1.8</cloudScale>
 			</li>
 		</modExtensions>
 	</ThingDef>
@@ -184,7 +188,7 @@
 	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
 		<defName>MAS_Ammo_ICBM_W78_Nuclear</defName>
 		<label>LGM-30G Minuteman III (W78)</label>
-		<description>An intercontinental ballistic missile with a high-yield thermonuclear warhead. Its blast sweeps the whole map, strips every constructed roof and leaves very heavy nuclear fallout. Fired from an ICBM silo at settlements and sites anywhere within reach on the world map.</description>
+		<description>An intercontinental ballistic missile with a high-yield thermonuclear warhead. Its blast sweeps the whole map and leaves very heavy nuclear fallout. Fired from an ICBM silo at settlements and sites anywhere within reach on the world map.</description>
 		<statBases>
 			<MaxHitPoints>600</MaxHitPoints>
 			<Mass>1800</Mass>
@@ -197,13 +201,14 @@
 
 	<ThingDef ParentName="MAS_ICBMProjectileBase">
 		<defName>MAS_Bullet_ICBM_W78_Nuclear</defName>
-		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearStrike</thingClass>
+		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearBlast</thingClass>
 		<label>LGM-30G Minuteman III (W78)</label>
 		<description>A nuclear intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Bomb</damageDef>
 			<damageAmountBase>1000</damageAmountBase>
 			<explosionRadius>5.9</explosionRadius>
+			<soundExplode>nuclearBlastInMap</soundExplode>
 			<shellingProps>
 				<iconPath>Things/WorldObjects/Munitions/Rocket</iconPath>
 				<tilesPerTick>0.6</tilesPerTick>
@@ -212,12 +217,14 @@
 			</shellingProps>
 		</projectile>
 		<modExtensions>
-			<li Class="MountedArmsStrategic.NuclearStrikeExtension">
-				<strikeDef>ICBMStrike</strikeDef>
-				<yield>250</yield>
+			<li Class="MountedArmsStrategic.HeavyBlastExtension">
+				<radius>250</radius>
+				<crater>CraterLarge</crater>
+				<fxRadius>5.9</fxRadius>
 			</li>
 			<li Class="MountedArmsStrategic.NuclearFalloutExtension">
 				<scale>2.1</scale>
+				<cloudScale>2.2</cloudScale>
 			</li>
 		</modExtensions>
 	</ThingDef>

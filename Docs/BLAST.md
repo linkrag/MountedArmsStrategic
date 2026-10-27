@@ -36,7 +36,7 @@ Paredes vanilla (HP base 300 × fator do material): madeira ~195, aço 300, pedr
 - Fogo 100/60/60/25/5% por zona, até 200 focos. Pawns levam dano `Thermobaric`.
 
 ## Regras de desempenho (a primeira versão travou o jogo)
-- **Onda de choque espalhada no tempo** (`BlastWave` + `HeavyBlastWaves`, um MapComponent): o clarão e o som saem no impacto; a frente cresce do centro até R em 6–25 ticks (~0,1–0,4 s) e cada tick processa as células que ela passou, no máximo 150 coisas por tick (base densa deixa a frente mais lenta, não o quadro). Cada célula gera o efeito de explosão vanilla do tipo de dano (`explosionCellFleck`, cor do centro para a borda), mais fumaça/poeira sorteadas e brilho de fogo no termobárico. Antes, tudo num tick só: ~1 s de travamento, sem efeito visual, e tudo aparecia destruído de uma vez.
+- **Onda de choque espalhada no tempo** (`BlastWave` + `HeavyBlastWaves`, um MapComponent): o clarão e o som saem no impacto; a frente cresce do centro até R em 6–25 ticks (~0,1–0,4 s) e cada tick processa as células que ela passou, no máximo 150 coisas e 600 células por tick (base densa ou raio nuclear deixam a frente mais lenta, não o quadro; as células vêm de um retângulo recortado pelo mapa, porque o `GenRadial` vai só até ~r120). Cada célula gera o efeito de explosão vanilla do tipo de dano (`explosionCellFleck`, cor do centro para a borda), mais fumaça/poeira sorteadas e brilho de fogo no termobárico. Antes, tudo num tick só: ~1 s de travamento, sem efeito visual, e tudo aparecia destruído de uma vez.
 - A onda não é salva: um save feito no meio dela perde o resto (dura menos de meio segundo).
 - Pawns no raio no momento do impacto são registrados; quem entrar numa célula já processada leva o dano da zona onde estava, no fim da onda.
 - Paredes, colunas e portas construídas que seguram teto de montanha (teto espesso a até 6,9 células): um golpe que não mata é aplicado na hora. Um golpe letal (sempre no núcleo) fica guardado, e elas caem todas juntas no fim da onda, antes da varredura final do núcleo (que limpa os restos delas). O desabamento vanilla roda uma vez, no tick seguinte (`MapPreTick`): rocha desmoronada cai e esmaga o que estiver embaixo, com uma carta só. Antes elas ficavam com no mínimo 1 de HP e sobreviviam a qualquer número de mísseis (relato do usuário, out/2026).
@@ -52,7 +52,7 @@ Paredes vanilla (HP base 300 × fator do material): madeira ~195, aço 300, pedr
 - Fora do núcleo o dano em prédios passa pelo aviso normal à facção, mas **sem instigador**, para uma onda não gerar centenas de perdas de goodwill e mensagens. Uma perda única de goodwill por facção atingida ficou como ideia.
 
 ## Mísseis com este modelo
-Minuteman III HE (R 24,9) e termobárico (24,9), ATACMS HE (11,9) e termobárico (12,9), GMLRS (7,4), Tomahawk (17,9). Não usam: cluster (submunições), EMP (fórmula do CE no mapa-mundo), nuclear (Rimatomics).
+Minuteman III HE (R 24,9) e termobárico (24,9), ATACMS HE (11,9) e termobárico (12,9), GMLRS (7,4), Tomahawk (17,9); nucleares (`ProjectileCE_NuclearBlast`): Minuteman nuclear 55, W62 151, W78 250 (R = o yield do Rimatomics, raio onde o dano dele `Yield × ln(Yield / d)` zerava) e ogivas do Sarmat 29,9. Não usam: cluster (submunições), EMP (fórmula do CE no mapa-mundo).
 
 ## Fontes
 - Swisdak 1994, *Simplified Kingery Airblast Calculations*: https://apps.dtic.mil/sti/pdfs/ADA526744.pdf

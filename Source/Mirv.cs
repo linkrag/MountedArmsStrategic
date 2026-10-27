@@ -7,25 +7,6 @@ using Verse;
 
 namespace MountedArmsStrategic
 {
-    /// <summary>
-    /// A small nuclear warhead with our own blast (ProjectileCE_HeavyBlast + HeavyBlastExtension) instead of
-    /// Rimatomics' strike: Rimatomics' blast radii are fixed below Yield 150 (25 destroyed, 55 plasma), so a
-    /// "small" yield there is as big as the Minuteman. Starts our fallout with NuclearFalloutExtension.scale.
-    /// </summary>
-    public class ProjectileCE_NuclearBlast : ProjectileCE_HeavyBlast
-    {
-        public override void Impact(Thing hitThing)
-        {
-            Map map = Map;
-            float scale = def.GetModExtension<NuclearFalloutExtension>()?.scale ?? 1f;
-            base.Impact(hitThing);
-            if (map != null && Find.Maps.Contains(map))
-            {
-                NuclearFallout.Start(map, scale);
-            }
-        }
-    }
-
     /// <summary>How a MIRV bus splits over the target map (ProjectileCE_Mirv).</summary>
     public class MirvExtension : DefModExtension
     {

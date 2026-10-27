@@ -9,10 +9,10 @@
 	<!--  releases 10 warheads at 20% of the re-entry flight: one at the   -->
 	<!--  aim cell, the rest spread over the whole map. Each warhead is a  -->
 	<!--  separate CE projectile, so missile defense can shoot it down.    -->
-	<!--  Warhead blast: ours (R 29.9 = 2 psi contour, core 7.5            -->
-	<!--  vaporized), not Rimatomics' (fixed r25/r55 below Yield 150, as   -->
-	<!--  big as the Minuteman). Fallout 0.25 each; a salvo adds up to     -->
-	<!--  2.5x the Minuteman's (cap 3).                                    -->
+	<!--  Warhead: the nuclear blast of the Minuteman (ProjectileCE_       -->
+	<!--  NuclearBlast) at R 29.9 (core 7.5 vaporized), small mushroom     -->
+	<!--  cloud. Fallout 0.25 each; a salvo adds up to 2.5x the            -->
+	<!--  Minuteman's (cap 3).                                             -->
 	<!--  Unloaded settlement: CE world damage 40 (razes any tech level).  -->
 	<!-- ================================================================= -->
 
@@ -91,6 +91,7 @@
 			</li>
 			<li Class="MountedArmsStrategic.NuclearFalloutExtension">
 				<scale>0.25</scale>
+				<cloudScale>0.7</cloudScale>
 			</li>
 		</modExtensions>
 	</ThingDef>
@@ -116,8 +117,8 @@
 			<damageAmountBase>1000</damageAmountBase>
 			<explosionRadius>5.9</explosionRadius>
 			<applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
-			<soundExplode>Explosion_GiantBomb</soundExplode>
-			<soundHitThickRoof>Explosion_GiantBomb</soundHitThickRoof>
+			<soundExplode>nuclearBlastInMap</soundExplode>
+			<soundHitThickRoof>nuclearBlastInMap</soundHitThickRoof>
 			<soundImpactAnticipate>MortarRound_PreImpact</soundImpactAnticipate>
 			<dropsCasings>false</dropsCasings>
 		</projectile>
@@ -129,6 +130,7 @@
 			</li>
 			<li Class="MountedArmsStrategic.NuclearFalloutExtension">
 				<scale>0.25</scale>
+				<cloudScale>0.7</cloudScale>
 			</li>
 		</modExtensions>
 	</ThingDef>

@@ -8,70 +8,63 @@ using Verse;
 
 namespace MountedArmsStrategic
 {
-    /// <summary>
-    /// Which thing to spawn at the impact cell and with what yield. Defaults match Dubs Rimatomics:
-    /// its ICBM drops an "ICBMStrike" (Rimatomics.NuclearStrike) with Yield set, and that thing does
-    /// the flash and blast by itself (read from Rimatomics.dll IL). Its NuclearFallout only comes with
-    /// Yield > 150 (full long-event blast), so the fallout is ours (NuclearFallout).
-    /// </summary>
-    public class NuclearStrikeExtension : DefModExtension
-    {
-        public string strikeDef = "ICBMStrike";
-        public string yieldField = "Yield";
-        public float yield = 55f;   // what Rimatomics uses for a manually armed fission warhead
-    }
-
     /// <summary>Fallout strength of a nuclear warhead, relative to the 55-yield Minuteman (NuclearFallout).</summary>
     public class NuclearFalloutExtension : DefModExtension
     {
         public float scale = 1f;
+        public float cloudScale = 1.2f;   // Rimatomics' mushroom cloud (Mote_NukeCloud.AtomicScale; it uses 1.2 and 2.2)
     }
 
     /// <summary>
-    /// Explosive CE projectile that also starts a Rimatomics nuclear strike where it lands.
-    /// No compile-time reference to Rimatomics: the strike def and its field are looked up by name,
-    /// and the defs using this class only load when Rimatomics is active.
+    /// Nuclear warhead: our blast (ProjectileCE_HeavyBlast + HeavyBlastExtension, R = the 2 psi contour) instead of
+    /// Rimatomics' NuclearStrike, plus Rimatomics' mushroom cloud and our fallout. Rimatomics' strike (lote 13 test)
+    /// logged "already-destroyed" and "null map" errors and CE fragments out of bounds, deleted everything in r25
+    /// below Yield 150 and used the "Detonating" long-event screen above it. R = the Rimatomics yield, which was its
+    /// zero-damage radius (damage Yield * ln(Yield / d)), so the warheads keep their reach. The defs using this class
+    /// only load with Rimatomics; its defs are looked up by name (no compile-time reference).
     /// </summary>
-    public class ProjectileCE_NuclearStrike : ProjectileCE_Explosive
+    public class ProjectileCE_NuclearBlast : ProjectileCE_HeavyBlast
     {
+        private static FieldInfo atomicScale;
+
         public override void Impact(Thing hitThing)
         {
             Map map = Map;
             IntVec3 cell = Position;
-            NuclearStrikeExtension ext = def.GetModExtension<NuclearStrikeExtension>();
-            if (map != null && ext != null && cell.InBounds(map))
-            {
-                ThingDef strikeDef = DefDatabase<ThingDef>.GetNamedSilentFail(ext.strikeDef);
-                if (strikeDef == null)
-                {
-                    Log.ErrorOnce("[Mounted Arms: Strategic] Nuclear strike def '" + ext.strikeDef + "' not found (is Dubs Rimatomics active?).", 0x4D415331);
-                }
-                else
-                {
-                    Thing strike = ThingMaker.MakeThing(strikeDef);
-                    FieldInfo yieldInfo = strike.GetType().GetField(ext.yieldField, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    if (yieldInfo != null && yieldInfo.FieldType == typeof(float))
-                    {
-                        yieldInfo.SetValue(strike, ext.yield);
-                    }
-                    else
-                    {
-                        Log.WarningOnce("[Mounted Arms: Strategic] Field '" + ext.yieldField + "' not found on " + strike.GetType().FullName + "; using its default yield.", 0x4D415332);
-                    }
-                    GenSpawn.Spawn(strike, cell, map);
-                    // before the strike's first tick: above Yield 150 Rimatomics would start its own constant
-                    // fallout, but it skips that when a NuclearFallout is already active
-                    NuclearFallout.Start(map, def.GetModExtension<NuclearFalloutExtension>()?.scale ?? 1f);
-                }
-            }
+            NuclearFalloutExtension ext = def.GetModExtension<NuclearFalloutExtension>();
             base.Impact(hitThing);
+            if (map == null || !Find.Maps.Contains(map) || !cell.InBounds(map))
+            {
+                return;
+            }
+            SpawnCloud(cell, map, ext?.cloudScale ?? 1.2f);
+            NuclearFallout.Start(map, ext?.scale ?? 1f);
+        }
+
+        private static void SpawnCloud(IntVec3 cell, Map map, float scale)
+        {
+            ThingDef cloudDef = DefDatabase<ThingDef>.GetNamedSilentFail("Mote_NukeCloud");
+            if (cloudDef == null || scale <= 0f)
+            {
+                return;
+            }
+            Thing cloud = ThingMaker.MakeThing(cloudDef);
+            if (cloud is Mote mote)
+            {
+                mote.exactPosition = cell.ToVector3();
+            }
+            atomicScale = atomicScale ?? cloud.GetType().GetField("AtomicScale", BindingFlags.Public | BindingFlags.Instance);
+            if (atomicScale != null && atomicScale.FieldType == typeof(float))
+            {
+                atomicScale.SetValue(cloud, scale);
+            }
+            GenSpawn.Spawn(cloud, cell, map);
         }
     }
 
     /// <summary>
-    /// Fallout of our nuclear ICBM. Rimatomics only starts NuclearFallout for Yield > 150, which also runs its
-    /// full blast as long events (the "Detonating" screen), so we keep Yield 55 and register the condition here.
-    /// Its own fallout is constant for 10-30 days (rads only: its toxic part multiplies by the resistance, so it is
+    /// Fallout of our nuclear warheads (Rimatomics' NuclearFallout condition, registered and driven by us).
+    /// Rimatomics' own fallout (from its strike above Yield 150) is constant for 10-30 days (rads only: its toxic part multiplies by the resistance, so it is
     /// 0 for most pawns). Ours follows real local fallout instead (Docs/STATUS.md, lote 12, has the sources):
     /// it starts falling ~30 min after the burst and builds up to the H+1 rate, then decays by the 7-10 rule
     /// (dose rate ~ t^-1.2, t in hours: 10% at H+7, 1% at H+48). The first 2-3 days are the dangerous ones; from
