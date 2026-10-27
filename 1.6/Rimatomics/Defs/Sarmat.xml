@@ -18,14 +18,14 @@
 
 	<CombatExtended.AmmoCategoryDef>
 		<defName>MAS_ICBMMIRV</defName>
-		<label>ICBM (MIRV)</label>
+		<label>RS-28 Sarmat (MIRV)</label>
 		<labelShort>MIRV</labelShort>
 		<description>Heavy ICBM carrying multiple independently targetable nuclear re-entry vehicles.</description>
 	</CombatExtended.AmmoCategoryDef>
 
 	<CombatExtended.AmmoSetDef>
 		<defName>MAS_AmmoSet_Sarmat</defName>
-		<label>heavy MIRV ICBMs</label>
+		<label>RS-28 Sarmat</label>
 		<ammoTypes>
 			<MAS_Ammo_Sarmat>MAS_Bullet_Sarmat</MAS_Ammo_Sarmat>
 		</ammoTypes>
@@ -93,6 +93,11 @@
 				<scale>0.25</scale>
 				<cloudScale>0.7</cloudScale>
 			</li>
+			<li Class="MountedArmsStrategic.NuclearPulseExtension">
+				<thermalRadius>12</thermalRadius>
+				<radiationRadius>44</radiationRadius>
+				<maxFires>40</maxFires>
+			</li>
 		</modExtensions>
 	</ThingDef>
 
@@ -131,6 +136,11 @@
 			<li Class="MountedArmsStrategic.NuclearFalloutExtension">
 				<scale>0.25</scale>
 				<cloudScale>0.7</cloudScale>
+			</li>
+			<li Class="MountedArmsStrategic.NuclearPulseExtension">
+				<thermalRadius>12</thermalRadius>
+				<radiationRadius>44</radiationRadius>
+				<maxFires>40</maxFires>
 			</li>
 		</modExtensions>
 	</ThingDef>

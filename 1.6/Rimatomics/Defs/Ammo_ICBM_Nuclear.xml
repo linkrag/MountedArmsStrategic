@@ -7,6 +7,9 @@
 	<!--  our blast (ProjectileCE_NuclearBlast = HeavyBlast, zones by      -->
 	<!--  fractions of R, see Docs/BLAST.md), Rimatomics' mushroom cloud   -->
 	<!--  and sound, and our 3-day decaying fallout (NuclearFallout).      -->
+	<!--  At the burst: thermal pulse and initial radiation                -->
+	<!--  (NuclearPulseExtension; radii from the equivalent yield on the   -->
+	<!--  map, ~0.03 / 0.6 / 2.7 kt; real W62 170 kt, W78 ~335 kt).        -->
 	<!--  R = the old Rimatomics yield (55 / 151 / 250), which was the     -->
 	<!--  zero-damage radius of its strike (Yield * ln(Yield / d)).        -->
 	<!--  Unloaded settlement: CE world damage 20 / 25 / 30 (razes any     -->
@@ -15,14 +18,14 @@
 
 	<CombatExtended.AmmoCategoryDef>
 		<defName>MAS_ICBMNuclear</defName>
-		<label>ICBM (nuclear)</label>
-		<labelShort>Nuclear</labelShort>
+		<label>ICBM (fission)</label>
+		<labelShort>Fission</labelShort>
 		<description>Fission warhead for an intercontinental ballistic missile.</description>
 	</CombatExtended.AmmoCategoryDef>
 
 	<ThingDef Class="CombatExtended.AmmoDef" ParentName="MAS_ICBMAmmoBase">
 		<defName>MAS_Ammo_ICBM_Nuclear</defName>
-		<label>LGM-30G Minuteman III (nuclear)</label>
+		<label>LGM-30G Minuteman III (fission)</label>
 		<description>An intercontinental ballistic missile carrying a fission warhead. Its blast levels everything around the impact and leaves nuclear fallout over the map. Fired from an ICBM silo at settlements and sites anywhere within reach on the world map.</description>
 		<statBases>
 			<MaxHitPoints>600</MaxHitPoints>
@@ -39,8 +42,8 @@
 	<ThingDef ParentName="MAS_ICBMProjectileBase">
 		<defName>MAS_Bullet_ICBM_Nuclear</defName>
 		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearBlast</thingClass>
-		<label>LGM-30G Minuteman III (nuclear)</label>
-		<description>A nuclear intercontinental ballistic missile in flight.</description>
+		<label>LGM-30G Minuteman III (fission)</label>
+		<description>A Minuteman III intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Bomb</damageDef>
 			<damageAmountBase>1000</damageAmountBase>
@@ -63,13 +66,18 @@
 				<scale>1</scale>
 				<cloudScale>1.2</cloudScale>
 			</li>
+			<li Class="MountedArmsStrategic.NuclearPulseExtension">
+				<thermalRadius>29</thermalRadius>
+				<radiationRadius>80</radiationRadius>
+				<maxFires>150</maxFires>
+			</li>
 		</modExtensions>
 	</ThingDef>
 
 	<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_ICBM_Nuclear</defName>
-		<label>make ICBM (nuclear)</label>
+		<label>make Minuteman III (fission)</label>
 		<description>Mate a Rimatomics fission warhead to an intercontinental ballistic missile.</description>
 		<jobString>Assembling a nuclear ICBM.</jobString>
 		<researchPrerequisite>MAS_Research_ICBM</researchPrerequisite>
@@ -120,7 +128,7 @@
 
 
 	<!-- ================================================================= -->
-	<!--  Thermonuclear warheads (W62 / W78 class): same class, R 151 and  -->
+	<!--  Thermonuclear warheads W62 / W78       : same class, R 151 and  -->
 	<!--  250 (core 38 / 62 vaporized; R 250 covers a whole 250 map from   -->
 	<!--  its center), fallout x1.6 / x2.1 (~sqrt(yield / 55)). The        -->
 	<!--  fission warhead is the primary; depleted uranium (tamper /       -->
@@ -129,7 +137,7 @@
 
 	<CombatExtended.AmmoCategoryDef>
 		<defName>MAS_ICBMThermonuclear</defName>
-		<label>ICBM (thermonuclear)</label>
+		<label>ICBM (W62)</label>
 		<labelShort>W62</labelShort>
 		<description>Two-stage thermonuclear warhead for an intercontinental ballistic missile.</description>
 	</CombatExtended.AmmoCategoryDef>
@@ -152,7 +160,7 @@
 		<defName>MAS_Bullet_ICBM_W62_Nuclear</defName>
 		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearBlast</thingClass>
 		<label>LGM-30G Minuteman III (W62)</label>
-		<description>A nuclear intercontinental ballistic missile in flight.</description>
+		<description>A Minuteman III intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Bomb</damageDef>
 			<damageAmountBase>1000</damageAmountBase>
@@ -175,12 +183,17 @@
 				<scale>1.6</scale>
 				<cloudScale>1.8</cloudScale>
 			</li>
+			<li Class="MountedArmsStrategic.NuclearPulseExtension">
+				<thermalRadius>126</thermalRadius>
+				<radiationRadius>171</radiationRadius>
+				<maxFires>400</maxFires>
+			</li>
 		</modExtensions>
 	</ThingDef>
 
 	<CombatExtended.AmmoCategoryDef>
 		<defName>MAS_ICBMThermonuclearHeavy</defName>
-		<label>ICBM (high-yield thermonuclear)</label>
+		<label>ICBM (W78)</label>
 		<labelShort>W78</labelShort>
 		<description>High-yield thermonuclear warhead for an intercontinental ballistic missile.</description>
 	</CombatExtended.AmmoCategoryDef>
@@ -203,7 +216,7 @@
 		<defName>MAS_Bullet_ICBM_W78_Nuclear</defName>
 		<thingClass>MountedArmsStrategic.ProjectileCE_NuclearBlast</thingClass>
 		<label>LGM-30G Minuteman III (W78)</label>
-		<description>A nuclear intercontinental ballistic missile in flight.</description>
+		<description>A Minuteman III intercontinental ballistic missile in flight.</description>
 		<projectile Class="CombatExtended.ProjectilePropertiesCE">
 			<damageDef>Bomb</damageDef>
 			<damageAmountBase>1000</damageAmountBase>
@@ -226,12 +239,17 @@
 				<scale>2.1</scale>
 				<cloudScale>2.2</cloudScale>
 			</li>
+			<li Class="MountedArmsStrategic.NuclearPulseExtension">
+				<thermalRadius>257</thermalRadius>
+				<radiationRadius>229</radiationRadius>
+				<maxFires>600</maxFires>
+			</li>
 		</modExtensions>
 	</ThingDef>
 
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_ICBM_W62_Nuclear</defName>
-		<label>make ICBM (W62)</label>
+		<label>make Minuteman III (W62)</label>
 		<description>Build a two-stage thermonuclear warhead around a Rimatomics fission warhead and mate it to an intercontinental ballistic missile.</description>
 		<jobString>Assembling a nuclear ICBM.</jobString>
 		<researchPrerequisite>MAS_Research_ThermonuclearWarheads</researchPrerequisite>
@@ -255,7 +273,7 @@
 
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_ICBM_W78_Nuclear</defName>
-		<label>make ICBM (W78)</label>
+		<label>make Minuteman III (W78)</label>
 		<description>Build a high-yield thermonuclear warhead around a Rimatomics fission warhead and mate it to an intercontinental ballistic missile.</description>
 		<jobString>Assembling a nuclear ICBM.</jobString>
 		<researchPrerequisite>MAS_Research_HighYieldWarheads</researchPrerequisite>

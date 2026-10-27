@@ -32,6 +32,12 @@ namespace MountedArmsStrategic
             Map map = Map;
             IntVec3 cell = Position;
             NuclearFalloutExtension ext = def.GetModExtension<NuclearFalloutExtension>();
+            NuclearPulseExtension pulse = def.GetModExtension<NuclearPulseExtension>();
+            if (pulse != null && map != null && cell.InBounds(map))
+            {
+                // light speed: before the blast front strips the roofs, so a roof still shields
+                NuclearPulse.Fire(map, cell, pulse, launcher, def);
+            }
             base.Impact(hitThing);
             if (map == null || !Find.Maps.Contains(map) || !cell.InBounds(map))
             {
@@ -59,6 +65,107 @@ namespace MountedArmsStrategic
                 atomicScale.SetValue(cloud, scale);
             }
             GenSpawn.Spawn(cloud, cell, map);
+        }
+    }
+
+    /// <summary>
+    /// Prompt effects of a nuclear burst (NuclearPulse). Radii in cells (~4.1 m), from the warhead's equivalent yield
+    /// on this map scale (R = the 2 psi contour; Docs/BLAST.md has the numbers and sources).
+    /// </summary>
+    public class NuclearPulseExtension : DefModExtension
+    {
+        public float thermalRadius;     // radiant exposure for 3rd-degree burns and fine fuels igniting (~5-6 cal/cm2)
+        public float radiationRadius;   // unshielded initial radiation ~ LD50 (~450 rem)
+        public int maxFires = 300;
+    }
+
+    /// <summary>
+    /// The thermal pulse and the initial radiation, at the instant of the burst. Thermal: radiant exposure falls as
+    /// 1/d^2 (q = (thermalRadius / d)^2, 1 = 3rd-degree burns); only pawns under open sky with a line of sight to the
+    /// burst are burned (any roof or wall shades them), and flammable things under open sky catch fire out to
+    /// q = 0.5 (random cells, capped at maxFires). Initial radiation: dose ~ e^(-d / lambda) / d^2, lambda ~250 m
+    /// of air; Rimatomics' radiation sickness (0.9 = fatal) at radiationRadius unshielded; a roof halves it (house
+    /// protection factor ~2 against the initial gamma and neutrons), overhead mountain stops it.
+    /// </summary>
+    public static class NuclearPulse
+    {
+        private const float RelaxationCells = 61f;
+        private const float FatalSickness = 0.9f;
+        private const float MaxSickness = 2f;
+        private const float RoofRadiationFactor = 0.5f;
+        private const float ThickRoofRadiationFactor = 0.001f;
+
+        // burn tiers: q >= 4 (charring), q >= 1 (3rd degree), q >= 0.5 (2nd degree)
+        private static readonly int[] BurnMin = { 120, 50, 15 };
+        private static readonly int[] BurnMax = { 180, 80, 30 };
+        private static readonly int[] BurnHits = { 5, 4, 3 };
+
+        public static void Fire(Map map, IntVec3 center, NuclearPulseExtension ext, Thing instigator, ThingDef weapon)
+        {
+            List<Pawn> pawns = new List<Pawn>(map.mapPawns.AllPawnsSpawned);
+            for (int i = 0; i < pawns.Count; i++)
+            {
+                Pawn pawn = pawns[i];
+                float d = Mathf.Max(1f, pawn.Position.DistanceTo(center));
+                RoofDef roof = pawn.Position.GetRoof(map);
+                if (ext.thermalRadius > 0f && roof == null)
+                {
+                    float q = Sq(ext.thermalRadius / d);
+                    if (q >= 0.5f && GenSight.LineOfSight(center, pawn.Position, map, true))
+                    {
+                        Burn(pawn, q >= 4f ? 0 : q >= 1f ? 1 : 2, instigator, weapon);
+                    }
+                }
+                if (ext.radiationRadius > 0f && !pawn.Dead)
+                {
+                    float sickness = FatalSickness * Sq(ext.radiationRadius / d)
+                        * Mathf.Exp(-(d - ext.radiationRadius) / RelaxationCells);
+                    sickness *= roof == null ? 1f : roof.isThickRoof ? ThickRoofRadiationFactor : RoofRadiationFactor;
+                    if (sickness >= 0.01f)
+                    {
+                        NuclearFallout.Irradiate(pawn, Mathf.Min(sickness, MaxSickness));
+                    }
+                }
+            }
+            if (ext.thermalRadius > 0f)
+            {
+                Ignite(map, center, ext, instigator);
+            }
+        }
+
+        private static void Burn(Pawn pawn, int tier, Thing instigator, ThingDef weapon)
+        {
+            int total = Rand.RangeInclusive(BurnMin[tier], BurnMax[tier]);
+            int perHit = Mathf.Max(1, total / BurnHits[tier]);
+            for (int h = 0; h < BurnHits[tier] && !pawn.Destroyed && !pawn.Dead; h++)
+            {
+                pawn.TakeDamage(new DamageInfo(DamageDefOf.Burn, perHit, 0f, -1f, instigator, null, weapon));
+            }
+        }
+
+        private static void Ignite(Map map, IntVec3 center, NuclearPulseExtension ext, Thing instigator)
+        {
+            float reach = ext.thermalRadius * 1.414f;   // q = 0.5
+            int fires = 0;
+            for (int i = 0; i < ext.maxFires * 3 && fires < ext.maxFires; i++)
+            {
+                Vector2 v = Rand.InsideUnitCircle * reach;
+                IntVec3 c = center + new IntVec3(Mathf.RoundToInt(v.x), 0, Mathf.RoundToInt(v.y));
+                if (!c.InBounds(map) || c.Roofed(map))
+                {
+                    continue;
+                }
+                float q = Sq(ext.thermalRadius / Mathf.Max(1f, c.DistanceTo(center)));
+                if (Rand.Chance(q >= 1f ? 0.5f : 0.15f) && FireUtility.TryStartFireIn(c, map, Rand.Range(0.3f, 0.9f), instigator))
+                {
+                    fires++;
+                }
+            }
+        }
+
+        private static float Sq(float x)
+        {
+            return x * x;
         }
     }
 
@@ -142,6 +249,19 @@ namespace MountedArmsStrategic
             comp.scale = Mathf.Min(MaxScale, scale);
         }
 
+        /// <summary>
+        /// Adds radiation sickness to a flesh pawn through Rimatomics (0.9 turns into FatalRad). applyRads feeds every
+        /// later dose straight into FatalRad, which killed pawns ~7 h after the fatal threshold; ~7-14 Gy kills in
+        /// 1-3 weeks, so after it only Rimatomics' own course runs.
+        /// </summary>
+        public static void Irradiate(Pawn pawn, float sickness)
+        {
+            if (applyRads != null && pawn.def.race.IsFlesh && (fatalRad == null || !pawn.health.hediffSet.HasHediff(fatalRad)))
+            {
+                applyRads(pawn, sickness / SicknessPerRadStrength);
+            }
+        }
+
         /// <summary>Dose rate relative to the 55-yield Minuteman's 1st hour, or -1 when the condition is not ours.</summary>
         public static float Rate(GameCondition cond)
         {
@@ -186,17 +306,10 @@ namespace MountedArmsStrategic
             if (applyRads != null && rate > 0f && Find.TickManager.TicksGame % DoseInterval == 0)
             {
                 float sickness = PeakSicknessPerHour * rate * DoseInterval / GenDate.TicksPerHour;
-                float strength = sickness / SicknessPerRadStrength;
                 IReadOnlyList<Pawn> pawns = map.mapPawns.AllPawnsSpawned;
                 for (int i = pawns.Count - 1; i >= 0; i--)
                 {
-                    Pawn pawn = pawns[i];
-                    // applyRads feeds every later dose straight into FatalRad, which killed pawns ~7 h after the
-                    // fatal threshold; ~7-14 Gy kills in 1-3 weeks, so after it only Rimatomics' own course runs
-                    if (pawn.def.race.IsFlesh && (fatalRad == null || !pawn.health.hediffSet.HasHediff(fatalRad)))
-                    {
-                        applyRads(pawn, strength * Shielding(pawn.Position, map));
-                    }
+                    Irradiate(pawns[i], sickness * Shielding(pawns[i].Position, map));
                 }
             }
             List<SkyOverlay> overlays = cond.SkyOverlays(map);

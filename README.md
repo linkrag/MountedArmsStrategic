@@ -17,13 +17,13 @@ Mod de RimWorld 1.6 e 1.7 com lançadores de mísseis balísticos que atacam o m
 | Obuseiro M777 155 mm (3x3, tripulado) | Munição 155 mm do CE; até 60 tiles |
 | Ogivas especiais (tático e ICBM) | Cluster, termobárica, EMP (contra colmeias mecanoides) |
 | Bateria antimíssil (3x3, energia, estilo Patriot PAC-3) | Intercepta granadas de artilharia, mísseis e drop pods hostis até 119 células; 4 interceptadores, 2 por ameaça |
-| ICBM (nuclear), só com Dubs Rimatomics | Feito da ogiva de fissão do Rimatomics; explosão por zonas raio 55 com o cogumelo do Rimatomics, fallout realista de 3 dias (letal ao ar livre nas primeiras horas, decai pela regra 7-10, abrigo protege); destrói qualquer assentamento |
-| ICBM W62 / W78, só com Dubs Rimatomics | Ogivas termonucleares: explosão por zonas raio 151 e 250 (boa parte do mapa ou o mapa todo), sem tela de carregamento; fallout mais forte |
+| Minuteman III (fissão), só com Dubs Rimatomics | Feito da ogiva de fissão do Rimatomics; explosão por zonas raio 55, pulso térmico, radiação inicial, cogumelo do Rimatomics, fallout realista de 3 dias (letal ao ar livre nas primeiras horas, decai pela regra 7-10, abrigo protege); destrói qualquer assentamento |
+| Minuteman III W62 / W78, só com Dubs Rimatomics | Ogivas termonucleares: explosão por zonas raio 151 e 250 (boa parte do mapa ou o mapa todo), pulso térmico que incendeia boa parte do mapa, sem tela de carregamento; fallout mais forte |
 | RS-28 Sarmat (MIRV), só com Dubs Rimatomics | Silo próprio 4×4; sobre o alvo se divide em 10 ogivas nucleares pequenas espalhadas pelo mapa todo, cada uma abatível pela defesa antimíssil |
 
 Configurações do mod: orçamento da retaliação da IA (0–500%) e retaliação nuclear opcional (com Rimatomics).
 
-Retaliação da IA (CE): facções espaciais podem responder com mísseis táticos; ultra/archotech também com ICBM HE. Com a opção de retaliação nuclear: Minuteman nuclear (espacial em diante) e, só ultra/archotech, W62, W78 e Sarmat, cada vez mais caros e raros.
+Retaliação da IA (CE): facções espaciais podem responder com mísseis táticos; ultra/archotech também com ICBM HE. Com a opção de retaliação nuclear: Minuteman (fissão) (espacial em diante) e, só ultra/archotech, W62, W78 e Sarmat, cada vez mais caros e raros.
 
 ## Desenvolvimento
 Guia para agentes: `AGENTS.md`. DLL: `powershell -File build.ps1` (SDK .NET 10, jogo fechado; gera `Bin/1.6` e `Bin/1.7`). Texturas: `python tools/gen_tex.py 1.6/Textures/MountedArmsStrategic`.

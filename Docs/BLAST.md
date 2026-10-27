@@ -52,13 +52,43 @@ Paredes vanilla (HP base 300 × fator do material): madeira ~195, aço 300, pedr
 - Fora do núcleo o dano em prédios passa pelo aviso normal à facção, mas **sem instigador**, para uma onda não gerar centenas de perdas de goodwill e mensagens. Uma perda única de goodwill por facção atingida ficou como ideia.
 
 ## Mísseis com este modelo
-Minuteman III HE (R 24,9) e termobárico (24,9), ATACMS HE (11,9) e termobárico (12,9), GMLRS (7,4), Tomahawk (17,9); nucleares (`ProjectileCE_NuclearBlast`): Minuteman nuclear 55, W62 151, W78 250 (R = o yield do Rimatomics, raio onde o dano dele `Yield × ln(Yield / d)` zerava) e ogivas do Sarmat 29,9. Não usam: cluster (submunições), EMP (fórmula do CE no mapa-mundo).
+Minuteman III HE (R 24,9) e termobárico (24,9), ATACMS HE (11,9) e termobárico (12,9), GMLRS (7,4), Tomahawk (17,9); nucleares (`ProjectileCE_NuclearBlast`): Minuteman (fissão) 55, W62 151, W78 250 (R = o yield do Rimatomics, raio onde o dano dele `Yield × ln(Yield / d)` zerava) e ogivas do Sarmat 29,9. Não usam: cluster (submunições), EMP (fórmula do CE no mapa-mundo).
+
+## Nucleares: escala, pulso térmico e radiação inicial
+**Escala.** Com ~4,1 m por célula e o contorno de 2 psi nuclear em ~0,74 km × Y^(1/3) (Y em kt, explosão aérea; 20 kt: 5 psi 1,2 km, 1 psi 3 km), o R de cada ogiva equivale a:
+
+| Ogiva | R (2 psi) | Yield equivalente no mapa | Yield real | 2 psi real |
+|---|---|---|---|---|
+| Ogiva do Sarmat | 29,9 (123 m) | ~5 t | Sarmat: ~10 × 300–750 kt (estimado) | ~1 000+ células |
+| Minuteman (fissão) | 55 (225 m) | ~0,03 kt (classe W54/Davy Crockett) | não existe ogiva de fissão pura no Minuteman | — |
+| W62 | 151 (620 m) | ~0,6 kt | 170 kt | ~4 km ≈ 950 células |
+| W78 | 250 (1 025 m) | ~2,7 kt | ~335 kt | ~5 km ≈ 1 200 células |
+
+Ou seja: as nucleares são comprimidas **~6× em distância (~250× em energia)** para caber num mapa de 250–400 células. Com o yield real, só o anel de ≥ 20 psi (concreto arrasado) da W62 já teria ~1,1 km ≈ 260 células: o mapa inteiro seria núcleo. Escolha de jogo; o resto do modelo (proporções entre zonas, pulso térmico, radiação, fallout) segue a física **do yield equivalente**, então fica coerente dentro do mapa.
+
+**Pulso térmico** (`NuclearPulse`, no instante da explosão, antes da onda arrancar os tetos): ~35% da energia sai como radiação térmica; a exposição cai com 1/d² (Q ≈ 2,8·10⁶ · Y · T / d², cal/cm², d em m, transmitância T ~0,9). Queimadura de 3º grau e ignição de combustível fino (capim seco, folhas, papel) em ~5–6 cal/cm² nesses yields pequenos. `thermalRadius` = esse contorno; q = (thermalRadius / d)²:
+- pawn ao ar livre (sem teto) e com linha de visão até a explosão: q ≥ 4 carbonização (120–180 de Burn em 5 golpes), q ≥ 1 3º grau (50–80 em 4), q ≥ 0,5 2º grau (15–30 em 3). Roupa protege pelo armor de calor do CE; qualquer teto ou parede faz sombra;
+- fogo: células ao ar livre sorteadas até q = 0,5 (1,41 × thermalRadius), chance 50% com q ≥ 1 e 15% abaixo, só onde há algo inflamável (`FireUtility.TryStartFireIn`), até `maxFires`;
+- a fração do raio cresce com o yield (∝ Y^(1/6)): é por isso que o fogo pesa pouco na fissão e cobre o mapa na W78, como na realidade (acima de ~1 kt o térmico passa o raio de 5 psi).
+
+**Radiação inicial** (gama e nêutrons do instante): dose ∝ e^(−d/λ) / d², λ ≈ 250 m de ar (61 células), calibrada em ~500 rem a 1,2–1,3 km em 15–20 kt. `radiationRadius` = onde a dose sem proteção chega à DL50 (~450 rem = 0,9 de radiation sickness do Rimatomics, que vira `FatalRad`); teto comum ×0,5 (fator de proteção de casa ~2), teto de montanha ×0,001; máximo 2,0 por pawn. Em yields pequenos ela é a maior assassina (passa o raio de 2 psi: a W54 matava por radiação a ~400 m); acima de alguns kt fica dentro da zona de blast letal.
+
+| Ogiva | thermalRadius | radiationRadius | maxFires |
+|---|---|---|---|
+| Sarmat (por ogiva) | 12 (0,39R) | 44 (1,47R) | 40 |
+| Minuteman (fissão) | 29 (0,53R) | 80 (1,46R) | 150 |
+| W62 | 126 (0,83R) | 171 (1,13R) | 400 |
+| W78 | 257 (1,03R) | 229 (0,92R) | 600 |
+
+O que **não** é modelado: bola de fogo separada (na escala equivalente ela teria 4–15 células, dentro do núcleo de 0,25R), tempestade de fogo (fica com o fogo vanilla se espalhando), pulso eletromagnético, cegueira por flash, efeitos sobre rocha e montanha (rocha natural fica intocada por regra de jogo).
 
 ## Fontes
 - Swisdak 1994, *Simplified Kingery Airblast Calculations*: https://apps.dtic.mil/sti/pdfs/ADA526744.pdf
 - Implementação de Kingery-Bulmash: https://pypi.org/project/kingery-bulmash/ · https://github.com/fcento100/kingery-bulmash
 - NIOSH/CDC, *Explosions and Refuge Chambers* (tabela de Glasstone & Dolan, Sartori, TM 5-1300): https://Cdc.gov/niosh/docket/archive/pdfs/NIOSH-125/125-ExplosionsandRefugeChambers.pdf
 - OTA, *The Effects of Nuclear War*, efeitos de blast: https://atomicarchive.com/resources/documents/effects/ota/chapter-2-2-2.html
+- Glasstone & Dolan, *The Effects of Nuclear Weapons* (1977), cap. 7 (radiação térmica, exposições para queimaduras e ignição) e cap. 8 (radiação inicial): https://www.fourmilab.ch/etexts/www/effects/
+- Ogivas: W62 https://en.wikipedia.org/wiki/W62 · W78 https://en.wikipedia.org/wiki/W78 · W54 https://en.wikipedia.org/wiki/W54 · RS-28 https://en.wikipedia.org/wiki/RS-28_Sarmat
 - US Army FM 8-9, Parte I, cap. 4: https://nuke.fas.org/guide/usa/doctrine/dod/fm8-9/1ch4.htm
 - HYDESim (dados de Glasstone & Dolan): https://mail.meyerweb.com/eric/tools/gmap/hydesim.html
 - CDC, lesões por explosão: https://stacks.cdc.gov/view/cdc/28987

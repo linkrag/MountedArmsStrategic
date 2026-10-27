@@ -6,8 +6,8 @@
 
 	<ResearchProjectDef>
 		<defName>MAS_Research_ThermonuclearWarheads</defName>
-		<label>thermonuclear warheads</label>
-		<description>Two-stage warheads: a fission primary ignites a secondary of depleted uranium and fusion fuel. Unlocks the Minuteman III with a W62-class thermonuclear warhead, whose blast reaches far across the map.</description>
+		<label>W62 thermonuclear warhead</label>
+		<description>Two-stage warheads: a fission primary ignites a secondary of depleted uranium and fusion fuel. Unlocks the Minuteman III with the W62 thermonuclear warhead, whose blast reaches far across the map.</description>
 		<baseCost>8000</baseCost>
 		<techLevel>Spacer</techLevel>
 		<tab>MAS_Tab</tab>
@@ -21,8 +21,8 @@
 
 	<ResearchProjectDef>
 		<defName>MAS_Research_HighYieldWarheads</defName>
-		<label>high-yield warheads</label>
-		<description>Larger secondaries and better boosting. Unlocks the Minuteman III with a W78-class warhead, whose blast sweeps the whole map.</description>
+		<label>W78 thermonuclear warhead</label>
+		<description>Larger secondaries and better boosting. Unlocks the Minuteman III with the W78 thermonuclear warhead, whose blast sweeps the whole map.</description>
 		<baseCost>10000</baseCost>
 		<techLevel>Spacer</techLevel>
 		<tab>MAS_Tab</tab>
@@ -36,7 +36,7 @@
 
 	<ResearchProjectDef>
 		<defName>MAS_Research_MIRV</defName>
-		<label>MIRV heavy ICBMs</label>
+		<label>RS-28 Sarmat (MIRV)</label>
 		<description>Multiple independently targetable re-entry vehicles on a heavy liquid-fuelled ICBM. Unlocks the RS-28 Sarmat silo and missile: over the target its bus releases ten small nuclear warheads spread across the whole map, each one a separate target for missile defense.</description>
 		<baseCost>12000</baseCost>
 		<techLevel>Spacer</techLevel>

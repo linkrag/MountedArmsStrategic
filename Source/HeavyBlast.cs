@@ -332,7 +332,8 @@ namespace MountedArmsStrategic
                 }
             }
 
-            // returns how many things were handled (the per-tick budget)
+            // returns how many things were damaged (the per-tick budget; rock and indestructible things are free,
+            // or a mountain map spent the budget on rock and the front crawled for seconds)
             private int DamageCell(IntVec3 cell, int zone, float fraction, float mult)
             {
                 List<Thing> things = cell.GetThingList(map);
@@ -341,6 +342,7 @@ namespace MountedArmsStrategic
                     return 0;
                 }
                 things = new List<Thing>(things);
+                int handled = 0;
                 for (int i = 0; i < things.Count; i++)
                 {
                     Thing t = things[i];
@@ -351,6 +353,7 @@ namespace MountedArmsStrategic
                     Pawn pawn = t as Pawn;
                     if (pawn != null)
                     {
+                        handled++;
                         DamagePawn(pawn, zone, mult, pawnDamage, instigator, projectileDef);
                         continue;
                     }
@@ -358,6 +361,7 @@ namespace MountedArmsStrategic
                     {
                         continue;
                     }
+                    handled++;
                     int loss = zone == 0 ? t.HitPoints : ZoneLoss(t, zone, mult);
                     if (t.def.holdsRoof && t.def.category == ThingCategory.Building && NearThickRoof(t.Position, map))
                     {
@@ -385,7 +389,7 @@ namespace MountedArmsStrategic
                     }
                     Hit(t, loss);
                 }
-                return things.Count;
+                return handled;
             }
 
             private void Hit(Thing t, int amount)
