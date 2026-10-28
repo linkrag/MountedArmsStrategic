@@ -204,10 +204,11 @@ namespace MountedArmsStrategic
                 for (int i = 0; i < pawns.Count; i++)
                 {
                     float d = pawns[i].Position.DistanceTo(center);
-                    if (d <= radius)
+                    int zone = d <= radius ? ShelteredZone(pawns[i].Position, ZoneOf(d / radius, ext.thermobaric)) : -1;
+                    if (zone >= 0)
                     {
                         pawnsAtStart.Add(pawns[i]);
-                        pawnZones.Add(ZoneOf(d / radius, ext.thermobaric));
+                        pawnZones.Add(zone);
                     }
                 }
             }
@@ -260,7 +261,8 @@ namespace MountedArmsStrategic
                 float mult = ext.thermobaric && zone > 0 && confined[c] ? 1.5f : 1f;
                 int handled = DamageCell(cell, zone, fraction, mult);
 
-                float fire = ext.thermobaric ? FireThermobaric[zone] : FireHE[zone];
+                int fireZone = ShelteredZone(cell, zone);
+                float fire = fireZone < 0 ? 0f : ext.thermobaric ? FireThermobaric[fireZone] : FireHE[fireZone];
                 if (fire > 0f && Rand.Chance(fire))
                 {
                     fireCells.Add(cell);
@@ -332,6 +334,22 @@ namespace MountedArmsStrategic
                 }
             }
 
+            /// <summary>
+            /// Zone a cell under overhead mountain really gets, or -1 for none: the rock above is a blast shelter
+            /// (the shock only gets in through the openings), so outside the core nothing there is touched and in
+            /// the core it takes the outer ring's damage (ground shock). Thick roofs are never stripped, so the live
+            /// roof is the one at impact.
+            /// </summary>
+            private int ShelteredZone(IntVec3 cell, int zone)
+            {
+                RoofDef roof = map.roofGrid.RoofAt(cell);
+                if (roof == null || !roof.isThickRoof)
+                {
+                    return zone;
+                }
+                return zone == 0 ? 4 : -1;
+            }
+
             // returns how many things were damaged (the per-tick budget; rock and indestructible things are free,
             // or a mountain map spent the budget on rock and the front crawled for seconds)
             private int DamageCell(IntVec3 cell, int zone, float fraction, float mult)
@@ -341,6 +359,13 @@ namespace MountedArmsStrategic
                 {
                     return 0;
                 }
+                int realZone = ShelteredZone(cell, zone);
+                if (realZone < 0)
+                {
+                    return 0;
+                }
+                bool sheltered = realZone != zone;
+                zone = realZone;
                 things = new List<Thing>(things);
                 int handled = 0;
                 for (int i = 0; i < things.Count; i++)
@@ -376,9 +401,14 @@ namespace MountedArmsStrategic
                         }
                         continue;
                     }
-                    // ammo and explosives only get the chance to go off in the outer 3-8% of R
-                    if ((t.def is AmmoDef || ExplodesOnDeath(t)) && fraction < 1f - Rand.Range(0.03f, 0.08f))
+                    // ammo and explosives only get the chance to go off in the outer 3-8% of R (a sheltered stockpile
+                    // is left alone: Defuse would consume it)
+                    if ((t.def is AmmoDef || ExplodesOnDeath(t)) && (sheltered || fraction < 1f - Rand.Range(0.03f, 0.08f)))
                     {
+                        if (sheltered)
+                        {
+                            continue;
+                        }
                         Defuse(t, loss);
                         continue;
                     }

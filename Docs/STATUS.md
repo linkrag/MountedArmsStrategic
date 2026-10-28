@@ -4,15 +4,17 @@ Ambiente: RimWorld 1.6 e 1.7, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (
 
 Testes do usuário nesta fase: na 1.7 com o CE 16.7.4. A 1.6 não é testada desde o lote 10 (compila igual).
 
-## Lote 15 (27/out, implementado, NÃO testado): nomes reais, pulso térmico, radiação inicial
+## Lote 16 (28/out, implementado, NÃO testado): montanha como abrigo contra a onda
+- Teste do lote 15: os 4 pontos confirmados. Novo problema: colonos sob/dentro de montanha morriam nas explosões. Causa: a onda (`HeavyBlast`) dava o dano da zona a todo pawn no raio sem olhar o teto; com R 151/250 bases inteiras em montanha ficaram dentro do raio (o térmico e a radiação já respeitavam a montanha).
+- Agora, sob teto de montanha (`ShelteredZone`): fora do núcleo nada é tocado (pawns, prédios, itens, fogo); no núcleo vale o dano do anel externo (zona 4: pawn 10–25, prédio −100, choque do solo). Munição e explosivos sob montanha ficam intactos. Valem para todas as explosões grandes.
+- O que continua: paredes/portas ao ar livre que sustentam o teto de montanha (a boca da base) ainda caem e podem causar um desabamento vanilla na beira, que esmaga quem estiver embaixo.
+- Testar: W62/W78 com colonos dentro de base em montanha, longe da entrada: sobrevivem sem dano; quem está na boca/ao ar livre sofre normalmente.
+
+## Lote 15 (27/out, confirmado em 28/out): nomes reais, pulso térmico, radiação inicial
 - Teste do lote 14 (sessão de 27/out 16:34, log sem nenhum erro): sem tela; W62 destruiu como devia; a fissão igual a antes; a **W78 "não destruiu nem a base toda"**. Sem erro no log e com a W78 mais forte que a W62 em qualquer distância pelo modelo, a causa não foi confirmada. Suspeitas: (a) a onda gastava o orçamento de 150 coisas/tick também com rocha e coisas indestrutíveis, então num mapa com montanha a frente da W78 (62k células) levava muitos segundos e parecia ter parado; (b) ponto de impacto longe da base ou base escavada em montanha (rocha natural fica intacta). Corrigido (a): só conta o que leva dano.
 - Nomes: as categorias de munição mostravam "nuclear / thermonuclear / high-yield thermonuclear". Agora: Minuteman III (fission), (W62), (W78); pesquisas "W62 thermonuclear warhead", "W78 thermonuclear warhead", "RS-28 Sarmat (MIRV)". Não existe ogiva de fissão pura real no Minuteman: a do Rimatomics ficou "fission".
 - Pulso térmico e radiação inicial (`NuclearPulse` em `Source/Nuclear.cs`, números e fontes em `Docs/BLAST.md`): queimaduras em quem está ao ar livre com linha de visão, fogo em células inflamáveis ao ar livre, dose de radiação imediata (teto ×0,5, montanha ×0,001). Raios: fissão 29 / 80, W62 126 / 171, W78 257 / 229, ogiva do Sarmat 12 / 44 (térmico / radiação).
-- Testar:
-  1. W78 de novo, mirando o centro da base: tudo até ~62 células some; até ~125 prédios levam −600; a onda deve terminar em poucos segundos. Se ainda ficar fraca, dizer onde caiu, o tamanho do mapa e se a base era em montanha.
-  2. Nomes novos no seletor de munição do silo e na aba de pesquisa.
-  3. Fissão: colono ao ar livre a ~30 células queima; a ~60–80 sem teto recebe radiação fatal; dentro de casa metade; sob montanha nada. Fogo em volta (até 150 focos).
-  4. W62/W78: incêndios por boa parte do mapa (400/600 focos) sem queda forte de frames.
+- Confirmado (28/out): W78 arrasa a base e a onda termina rápido; nomes novos; queimaduras, radiação inicial e proteção por teto/montanha na fissão; incêndios da W62/W78 sem queda forte de frames.
 
 ## Lote 14 (27/out, testado no lote 15): explosão nuclear própria
 - Teste do lote 13: o W62/W78 funcionou, mas a explosão do Rimatomics (`NuclearStrike.BlastWaveThing`, em long events) encheu o log de "Tried to destroy already-destroyed thing", "Tried to place thing Chunk… in a null map" e fragmentos do CE fora do mapa, e o usuário a achou menos balanceada que a nossa. Pedido: trocar pela nossa nas mesmas proporções.
