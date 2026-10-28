@@ -1,10 +1,10 @@
-# Onde paramos (27/out/2026)
+# Onde paramos (28/out/2026)
 
 Vale para os dois mods (**MountedArms** e **MountedArmsStrategic**). Leia este arquivo primeiro e depois o `Docs/STATUS.md` de cada mod.
 
 ## Estado
 - Os dois mods rodam em RimWorld 1.6 e 1.7 (decisão do usuário: manter as duas). DLL por versão em `Bin/1.6` e `Bin/1.7`, compiladas com o SDK .NET 10 pelo `build.ps1` de cada mod; a 1.7 contra o CE 1.6 (`tools/unity_facades.ps1`). Confirmado em jogo na 1.7 com o CE 16.7.4 (26/out). Detalhes e riscos: `../MountedArms/Docs/MIGRATION_1_7.md`.
-- Strategic: lote 16 (montanha como abrigo contra a onda) implementado e não testado; o que já foi confirmado e o que falta testar estão no `Docs/STATUS.md`.
+- Strategic: tudo implementado até 28/out confirmado em jogo (nucleares com explosão própria, pulso térmico, radiação inicial, fallout, Sarmat, montanha como abrigo). Testes ainda pendentes e ideias em aberto: `Docs/STATUS.md`.
 - Sem remote no git.
 
 ## Regras do projeto (resumo)

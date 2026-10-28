@@ -41,6 +41,8 @@
 
 - Ogivas maiores e MIRV (27/out, escolhas do usuário): Minuteman W62 e W78 (yield 151 e 250 do Rimatomics), com o nosso fallout escalado; RS-28 Sarmat com 10 ogivas pequenas espalhadas pelo mapa todo e abatíveis uma a uma, em silo próprio.
 - Explosão nuclear (27/out, lote 14): a nossa (`HeavyBlast` por zonas) em todas as nucleares, com R = o yield do Rimatomics (raio onde o dano dele zerava), em vez do `NuclearStrike` do Rimatomics (erros no log, remoção direta, tela "Detonating" acima de 150). Do Rimatomics ficam o cogumelo, o som e a condição de fallout. A IA usa as quatro armas nucleares com custos crescentes, as maiores só em facções ultra/archotech.
+- Nomes e escala nuclear (28/out): categorias e pesquisas com os nomes reais (W62, W78, RS-28 Sarmat); a ogiva do Rimatomics fica "fission" (nenhum Minuteman real levou ogiva só de fissão). As nucleares ficam comprimidas ~6× em distância para caber no mapa; pulso térmico e radiação inicial seguem a física do yield equivalente no mapa (`BLAST.md`). Modo "yield real" (mapa inteiro no núcleo) ficou como ideia.
+- Montanha como abrigo (28/out): sob teto de montanha a onda não entra fora do núcleo (antes colonos dentro de montanha morriam com a W62/W78); a boca da base continua sendo atingida e pode desabar.
 
 ## Dubs Rimatomics (verificado nos defs, workshop 1127530465)
 - Tem o silo "Liberator" (`Rimatomics.MissileSilo`, 9x5, 5 mísseis, precisa de SACS), ICBM de fissão como WorldObject próprio (`WorldObject_ICBMfission`), mísseis táticos HE/químico/nuclear e os GameConditions `NuclearFallout`/`RadioactiveFallout`.
