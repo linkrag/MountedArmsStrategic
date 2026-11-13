@@ -63,6 +63,7 @@ Docs/WORKSHOP_DESCRIPTION.txt   descrição da Oficina (BBCode, inglês)
 | `README.md` | visão geral |
 | `Docs/STATUS.md` | o que existe, testado ou não, próximos passos |
 | `Docs/DECISIONS.md` | decisões do usuário e técnicas |
+| `Docs/CHANGELOG.md` | versões para jogador (inglês), espelhadas na descrição da Oficina |
 | `Docs/CE_WORLD_SHELLING.md` | como o CE faz tiro no mapa-mundo (com fonte) |
 | `Docs/LAUNCH.md` | lançamento realista (pesquisa + perfis por míssil) |
 | `Docs/HANDOFF.md` | **onde paramos** (ler primeiro) |

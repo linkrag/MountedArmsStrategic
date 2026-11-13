@@ -26,4 +26,15 @@ Spacer, ultra and archotech factions can retaliate with guided rockets and balli
 [b]Optional:[/b] Dubs Rimatomics (nuclear content), Mounted Arms (buildings move to its "Military" Architect tab; otherwise they are under Security). Own research tab: "Strategic Missiles".
 [b]Load order:[/b] after Harmony, Combat Extended, Mounted Arms and Dubs Rimatomics.
 [b]Versions:[/b] RimWorld 1.6 and 1.7.
+[b]Mod version:[/b] 1.0.1 (2026-11-13), see the changelog below.
 [b]Languages:[/b] English; Portuguese (Brazil) for settings/UI text.
+
+[h2]Changelog[/h2]
+[b]1.0.1[/b] (2026-11-13)
+[list]
+[*]Missile recipes now step by 1 in the "Until X" bill count instead of 20.
+[/list]
+[b]1.0.0[/b] (2026-11-07)
+[list]
+[*]First Steam Workshop release, with the features described above.
+[/list]

@@ -54,3 +54,8 @@
 
 ## Passo de "Até X" = lote (13/nov/2026)
 - Toda receita sobre o `AmmoRecipeBase` do CE declara `targetCountAdjustment` igual à contagem do produto (1 nos mísseis); o CE põe 20 na base, o que fazia o -/+ de "Até X" andar de 20 numa receita que faz 1.
+
+## Versionamento (13/nov/2026)
+- Pedido do usuário: changelog e versão nas descrições da Oficina.
+- SemVer. 1.0.0 = 1ª publicação na Oficina (7/nov/2026). MINOR = recurso novo, PATCH = só correção ou ajuste. Uma versão por dia com mudança visível (não sabemos quais dias foram enviados à Oficina; a próxima subida leva tudo).
+- Fonte da verdade: `Docs/CHANGELOG.md` (inglês, texto de jogador, sem nomes internos nem "não testado"). Antes de cada "Atualizar na Oficina": subir `<modVersion>` no `About.xml`, o `CHANGELOG.md` e a seção Changelog da `WORKSHOP_DESCRIPTION.txt` juntos, à mão. A descrição precisa ficar abaixo de 8000 caracteres.
