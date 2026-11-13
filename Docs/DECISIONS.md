@@ -1,6 +1,7 @@
 # Decisões
 
 ## Do usuário (Felipe)
+- **Fonte fora de `Mods`** (7/nov/2026, escolha do usuário entre as opções): o fonte e os docs ficam em `RimWorld/_dev/src/<mod>`; `Mods/<mod>` é cópia gerada pelo deploy (só About, LoadFolders.xml, 1.6, Bin), e o upload continua pelo botão do jogo. Alternativa recusada: manter tudo e publicar pelo SteamCMD a partir de uma cópia limpa (exige login no SteamCMD e proíbe o botão do jogo).
 - **Mod separado** do Mounted Arms (out/2026): escopo estratégico, conteúdo só-CE no início.
 - Fazer **os dois**: lançador de míssil balístico tático e silo de ICBM.
 - Ogivas do ICBM: convencional **e** nuclear (perguntou "tem como?"). Depois apontou que o **Dubs Rimatomics** já tem armas nucleares → decidiu: **nuclear integrada ao Rimatomics** (a ogiva nuclear só existe com o Rimatomics ativo, é feita da ogiva de fissão dele e usa a condição `NuclearFallout` dele). Sem Rimatomics, o ICBM só tem ogivas convencionais.
@@ -47,3 +48,9 @@
 ## Dubs Rimatomics (verificado nos defs, workshop 1127530465)
 - Tem o silo "Liberator" (`Rimatomics.MissileSilo`, 9x5, 5 mísseis, precisa de SACS), ICBM de fissão como WorldObject próprio (`WorldObject_ICBMfission`), mísseis táticos HE/químico/nuclear e os GameConditions `NuclearFallout`/`RadioactiveFallout`.
 - Usa código próprio, não o sistema de mapa-mundo do CE. O CE tem patches de compatibilidade para o Rimatomics (apparel, dano, torretas), nada dos mísseis.
+
+## Aba "Militar" do Architect (2/nov/2026)
+- Uma aba única `MA_Military` para as torretas dos dois mods, definida no Mounted Arms. O Strategic continua sem depender dele: o patch de categoria fica em `1.6/MountedArms/`, carregado só com `linkrag.mountedarms` ativo. Alternativas descartadas: duplicar o `DesignationCategoryDef` nos dois (defName repetido não funde, o último sobrescreve) e criar um terceiro mod só da categoria.
+
+## Passo de "Até X" = lote (13/nov/2026)
+- Toda receita sobre o `AmmoRecipeBase` do CE declara `targetCountAdjustment` igual à contagem do produto (1 nos mísseis); o CE põe 20 na base, o que fazia o -/+ de "Até X" andar de 20 numa receita que faz 1.

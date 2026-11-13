@@ -148,6 +148,7 @@
 	<!-- 4 fission warheads re-machined into 10 small ones; liquid propellant as chemfuel -->
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_Sarmat</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make RS-28 Sarmat</label>
 		<description>Re-machine Rimatomics fission warheads into ten small re-entry vehicles and fit them to a heavy liquid-fuelled ICBM.</description>
 		<jobString>Assembling a MIRV ICBM.</jobString>

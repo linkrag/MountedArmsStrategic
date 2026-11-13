@@ -13,7 +13,7 @@ Mod de RimWorld **1.6 e 1.7** (conteúdo comum em `1.6/`, DLL por versão em `Bi
 ## Estrutura
 ```
 About/About.xml          metadados (depende de CE)
-LoadFolders.xml          v1.6: /, 1.6, Bin/1.6; v1.7: /, 1.6, Bin/1.7; 1.6/Rimatomics só com Dubwise.Rimatomics
+LoadFolders.xml          v1.6: /, 1.6, Bin/1.6; v1.7: /, 1.6, Bin/1.7; 1.6/Rimatomics só com Dubwise.Rimatomics; 1.6/MountedArms só com linkrag.mountedarms (aba Architect "Militar")
 1.6/Defs/                Research, Ammo_*, Weapons, Buildings, DamageDefs (defs CE nativos, sem patch)
 1.6/Textures/MountedArmsStrategic/   geradas por tools/gen_tex.py
 tools/gen_tex.py         gerador de texturas (PIL)
@@ -24,7 +24,12 @@ Source/                  C# (DLL só-CE, usa Harmony): Settings (MASMod, retalia
 Bin/1.6/Assemblies/, Bin/1.7/Assemblies/  MountedArmsStrategic.dll compilada por versão (NÃO versionada; build.ps1)
 build.ps1, Directory.Build.props   build das duas versões (SDK .NET 10; ver ../MountedArms/Docs/TOOLING.md)
 Docs/                    status, decisões, notas do sistema de mapa-mundo do CE
+tools/deploy.ps1         publica a cópia limpa em RimWorld/Mods/<mod> (build.ps1 chama)
+tools/gen_preview.py     gera About/Preview.png (thumb da Oficina e do menu de mods)
+Docs/WORKSHOP_DESCRIPTION.txt   descrição da Oficina (BBCode, inglês)
 ```
+**Fonte x publicado:** esta pasta (`RimWorld/_dev/src/MountedArmsStrategic`) é o fonte. `RimWorld/Mods/MountedArmsStrategic` é só a cópia que o jogo carrega e a Oficina recebe (About, LoadFolders.xml, 1.6, Bin), gerada por `tools/deploy.ps1` (o `build.ps1` chama no fim). Nunca edite em `Mods/`. Mudou só XML/textura/Keyed: rode `powershell -File tools/deploy.ps1`. Oficina: `Docs/WORKSHOP_DESCRIPTION.txt` (colar à mão na página) e `tools/gen_preview.py` (thumb). Ver `../MountedArms/Docs/TOOLING.md`.
+
 
 ## Regras de ouro
 1. Prefixo `MAS_` em todos os defs. **defName de ThingDef nunca termina em dígito** (já quebrou com `M777`: use `_M777_Howitzer`). Rode `python tools/check_defnames.py` antes de entregar.
@@ -43,8 +48,9 @@ Docs/                    status, decisões, notas do sistema de mapa-mundo do CE
 10. **Lançador guiado** (míssil/foguete com GPS/inércia): `verbClass` `MountedArmsStrategic.Verb_ShootGuidedCE` e `CombatExtended.OrbitalTurretExtension` (`isMarkMandatory` false) na gun; precisão só pelo `circularError`: no mapa local cada míssil cai num ponto próprio, uniforme dentro dele (o CE travaria a rajada na mira do 1º tiro); `ShotSpread`/`recoilAmount` não contam. Artilharia não guiada fica no `Verb_ShootMortarCE`.
 11. Compile a DLL com o jogo **fechado** (o jogo trava o arquivo).
 12. **Explosões grandes**: nunca matar rocha (natural, alisada, desmoronada, minério) nem derrubar paredes sob teto em massa (travou o jogo): arranque o teto antes (ver `HeavyBlast`). Núcleo = remoção direta; anéis = `TakeDamage` com `MAS_BlastWave` (fatores 1). Paredes sob teto de montanha só caem no fim da onda (um desabamento). Munição/explosivos só reagem nos últimos 3–8% do raio. Trabalho de explosão grande vai em ticks (`BlastWave`), nunca num tick só; as nucleares também usam a `HeavyBlast` (nunca o `NuclearStrike` do Rimatomics). `GenRadial` só vai até ~r120. O cook-off do CE (`AmmoThing.TryDetonate`) usa o `explosionRadius` do projétil direto: munição de ogiva grande precisa do patch de cook-off. **Chama de foguete**: use `CompProperties_Exhaust`, não o `CompProperties_ProjectileFleck` do CE.
-13. **Docs sempre atualizados:** toda edição atualiza os MDs afetados (STATUS, DECISIONS, CE_WORLD_SHELLING, LAUNCH, BLAST, HANDOFF, README, AGENTS) no mesmo commit. Mudança de build atualiza também `../MountedArms/Docs/TOOLING.md`/`MIGRATION_1_7.md`, commitados no repositório do Mounted Arms.
+13. **Docs sempre atualizados (regra obrigatória):** toda implementação ou modificação atualiza os MDs afetados (STATUS, DECISIONS, CE_WORLD_SHELLING, LAUNCH, BLAST, HANDOFF, README, este AGENTS e o CLAUDE.md se o fluxo mudar) no mesmo commit. Mudança de build atualiza também `../MountedArms/Docs/TOOLING.md`/`MIGRATION_1_7.md`, commitados no repositório do Mounted Arms.
 14. Replace em massa: confira a linha certa; valide o XML depois.
+15. **Aba do Architect:** prédio novo do Strategic entra na lista de `1.6/MountedArms/Patches/MilitaryCategory.xml` (troca `designationCategory` para `MA_Military`, definida no Mounted Arms; só carrega com `linkrag.mountedarms`). Sem o Mounted Arms o prédio fica em Security.
 
 ## Convenções
 - Git: branch `main`, commits curtos no imperativo, identidade `Felipe <linkrag.felipe@gmail.com>` (o global da máquina é outro: use `git -c user.name=... -c user.email=...`). Sem remote ainda.

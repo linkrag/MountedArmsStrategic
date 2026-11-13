@@ -6,6 +6,7 @@
     <li>1.6</li>
     <li>Bin/1.6</li>
     <li IfModActive="Dubwise.Rimatomics">1.6/Rimatomics</li>
+    <li IfModActive="linkrag.mountedarms">1.6/MountedArms</li>
   </v1.6>
   <!-- the 1.7 DLL references UnityStubs (Waylith); it is built against the 1.6 CE through tools/unity_facades.ps1 -->
   <v1.7>
@@ -13,5 +14,6 @@
     <li>1.6</li>
     <li>Bin/1.7</li>
     <li IfModActive="Dubwise.Rimatomics">1.6/Rimatomics</li>
+    <li IfModActive="linkrag.mountedarms">1.6/MountedArms</li>
   </v1.7>
 </loadFolders>

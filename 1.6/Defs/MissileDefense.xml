@@ -93,6 +93,7 @@
 	<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_Interceptor</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make interceptor missile</label>
 		<description>Assemble a hit-to-kill interceptor missile in its launch canister.</description>
 		<jobString>Assembling an interceptor missile.</jobString>

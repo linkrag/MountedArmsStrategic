@@ -4,3 +4,5 @@ obj/
 *.pdb
 Thumbs.db
 .DS_Store
+# assets baked by the game (Waylith) on Workshop upload
+1.6/Assets.zip*

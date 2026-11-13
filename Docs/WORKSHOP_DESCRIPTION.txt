@@ -1,0 +1,29 @@
+[h1]Mounted Arms: Strategic Missiles[/h1]
+[b]Your colony's reach no longer ends at the map edge.[/b] Build real-world missile launchers and artillery, pick a settlement on the world map and strike it from home, while a Patriot battery keeps the enemy's answer out of your sky. Powered by Combat Extended's world shelling.
+
+[h2]Launchers[/h2]
+[list]
+[*][b]M270 launcher (ATACMS)[/b]: crewed tactical ballistic missiles, local map or up to 120 world tiles.
+[*][b]M142 HIMARS[/b]: salvos of six M31 GMLRS guided rockets, up to 40 world tiles.
+[*][b]M777 howitzer[/b]: fires Combat Extended 155 mm shells up to 60 world tiles.
+[*][b]Mk 41 VLS (Tomahawk)[/b]: slow, very precise cruise missiles, up to 400 world tiles.
+[*][b]Minuteman III silo[/b]: fires on command only, at settlements up to 500 world tiles away.
+[*][b]MIM-104 Patriot[/b]: PAC-3 MSE interceptors shoot down incoming shells, missiles and drop pods (needs CE's "Enable CIWS" option).
+[/list]
+
+[h2]Warheads and blasts[/h2]
+[list]
+[*]Large explosions use real overpressure zones: a vaporized core with a crater, damage rings outward, and mountain bases act as real shelters.
+[*]Cluster, thermobaric and EMP warheads for ATACMS and Minuteman. EMP is the answer to mechanoid hives.
+[*][b]With Dubs Rimatomics:[/b] fission, W62 and W78 thermonuclear Minutemen with thermal pulse, Rimatomics' mushroom cloud and a 3-day fallout where shelter matters. Plus the [b]RS-28 Sarmat[/b] from its own 4x4 silo: ten warheads spread across the whole map, each one a separate target for your missile defense.
+[/list]
+
+[h2]They shoot back[/h2]
+Spacer, ultra and archotech factions can retaliate with guided rockets and ballistic missiles. Mod settings let you scale the retaliation budget (0-500%) and, with Rimatomics, opt into nuclear retaliation.
+
+[hr]
+[b]Requires:[/b] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2009463077]Harmony[/url], [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2890901044]Combat Extended[/url].
+[b]Optional:[/b] Dubs Rimatomics (nuclear content), Mounted Arms (buildings move to its "Military" Architect tab; otherwise they are under Security). Own research tab: "Strategic Missiles".
+[b]Load order:[/b] after Harmony, Combat Extended, Mounted Arms and Dubs Rimatomics.
+[b]Versions:[/b] RimWorld 1.6 and 1.7.
+[b]Languages:[/b] English; Portuguese (Brazil) for settings/UI text.

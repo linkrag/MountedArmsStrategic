@@ -269,6 +269,7 @@
 
 	<RecipeDef ParentName="MAS_TacticalRecipeBase">
 		<defName>MakeMAS_Ammo_TacticalMissile_HE</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make tactical ballistic missile (HE)</label>
 		<description>Assemble a single tactical ballistic missile with a high-explosive warhead.</description>
 		<researchPrerequisite>MAS_Research_TacticalMissiles</researchPrerequisite>
@@ -284,6 +285,7 @@
 
 	<RecipeDef ParentName="MAS_TacticalRecipeBase">
 		<defName>MakeMAS_Ammo_TacticalMissile_Cluster</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make tactical ballistic missile (cluster)</label>
 		<description>Assemble a single tactical ballistic missile with a cluster warhead.</description>
 		<researchPrerequisite>MAS_Research_SpecialWarheads</researchPrerequisite>
@@ -299,6 +301,7 @@
 
 	<RecipeDef ParentName="MAS_TacticalRecipeBase">
 		<defName>MakeMAS_Ammo_TacticalMissile_Thermobaric</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make tactical ballistic missile (thermobaric)</label>
 		<description>Assemble a single tactical ballistic missile with a thermobaric warhead.</description>
 		<researchPrerequisite>MAS_Research_SpecialWarheads</researchPrerequisite>
@@ -315,6 +318,7 @@
 
 	<RecipeDef ParentName="MAS_TacticalRecipeBase">
 		<defName>MakeMAS_Ammo_TacticalMissile_EMP</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make tactical ballistic missile (EMP)</label>
 		<description>Assemble a single tactical ballistic missile with an EMP warhead.</description>
 		<researchPrerequisite>MAS_Research_SpecialWarheads</researchPrerequisite>

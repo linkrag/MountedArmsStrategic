@@ -2,7 +2,18 @@
 
 Ambiente: RimWorld 1.6 e 1.7, Harmony, Combat Extended 16.7.4, Dubs Rimatomics (opcional; todo o conteúdo nuclear só carrega com ele). Conteúdo comum em `1.6/`; DLL por versão em `Bin/1.6` e `Bin/1.7`, compiladas juntas pelo `build.ps1` (SDK .NET 10) **com o jogo fechado** (o jogo trava a DLL; `-Out <pasta>` só valida a compilação). A 1.7 compila contra o CE 1.6 com `tools/unity_facades.ps1`. Migração, riscos e toolchain: `../MountedArms/Docs/MIGRATION_1_7.md`.
 
+## Passo de "Até X" dos mísseis (13/nov/2026) - deploy feito, **NÃO testado no jogo**
+- As 15 receitas de míssil (cruzeiro, ICBM HE/Cluster/Termobárico/EMP, GMLRS, tático x4, interceptador, ICBM nucleares x3 e Sarmat no `1.6/Rimatomics`) herdavam `targetCountAdjustment` 20 do `AmmoRecipeBase` do CE, mas fazem 1 por construção: agora cada uma declara `<targetCountAdjustment>1</targetCountAdjustment>` (o -/+ de "Até X" anda de 1). Achado pela auditoria do Colony Organizer, que também corrige em runtime; aqui vale mesmo sem ele. Regra para receitas novas sobre `AmmoRecipeBase`/`MAS_TacticalRecipeBase`: declarar `targetCountAdjustment` = contagem do produto.
+
+## Oficina Steam e fonte fora de `Mods` (7/nov/2026)
+- Publicado na Oficina pelo usuário (ID 3835655252). O 1º upload levou a pasta inteira (Docs, Source, .git...): o fonte foi para `RimWorld/_dev/src/MountedArmsStrategic` e `Mods/MountedArmsStrategic` virou cópia limpa gerada por `tools/deploy.ps1` (chamado pelo `build.ps1`). Build 1.6 + 1.7 e deploy rodados com sucesso; a cópia tem só `About/`, `LoadFolders.xml`, `1.6/`, `Bin/`. **Falta:** "Atualizar na Oficina Steam" no jogo (troca conteúdo e thumb) e confirmar que o jogo carrega a cópia nova sem erro (**não testado no jogo**).
+- Novo `About/Preview.png` (1280x720, `tools/gen_preview.py`) e descrição da Oficina em `Docs/WORKSHOP_DESCRIPTION.txt` (BBCode; colar à mão na página, o jogo não reenvia descrição). Detalhes: `../MountedArms/Docs/TOOLING.md` (seção "Fonte x cópia publicada").
+- Achado da checagem: o `About.xml` não lista Harmony em `modDependencies` (a DLL usa Harmony; o CE já exige Harmony, então funciona). Não alterado: dependência nova no About só com pedido.
+
 Testes do usuário nesta fase: na 1.7 com o CE 16.7.4. A 1.6 não é testada desde o lote 10 (compila igual).
+
+## Pendente de teste (2/nov/2026)
+- **Aba "Militar" do Architect** compartilhada com o Mounted Arms: `1.6/MountedArms/Patches/MilitaryCategory.xml`, carregado por `LoadFolders IfModActive="linkrag.mountedarms"`. Troca `designationCategory` de TacticalLauncher, ICBMSilo, MLRS, CruiseVLS, M777, InterceptorBattery e Sarmat (esta só com Rimatomics) para `MA_Military`, definida no Mounted Arms. Sem o Mounted Arms nada muda (Security). NÃO testado no jogo.
 
 ## Confirmado em jogo
 - Carregamento sem erros (1.6 e 1.7), aba de pesquisa, construção, receitas no injector do CE.

@@ -112,6 +112,7 @@
 	<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_GMLRS</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make 227mm guided rocket</label>
 		<description>Assemble a single satellite-guided artillery rocket.</description>
 		<jobString>Assembling a guided rocket.</jobString>

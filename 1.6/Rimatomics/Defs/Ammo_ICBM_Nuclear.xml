@@ -77,6 +77,7 @@
 	<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_ICBM_Nuclear</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make Minuteman III (fission)</label>
 		<description>Mate a Rimatomics fission warhead to an intercontinental ballistic missile.</description>
 		<jobString>Assembling a nuclear ICBM.</jobString>
@@ -249,6 +250,7 @@
 
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_ICBM_W62_Nuclear</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make Minuteman III (W62)</label>
 		<description>Build a two-stage thermonuclear warhead around a Rimatomics fission warhead and mate it to an intercontinental ballistic missile.</description>
 		<jobString>Assembling a nuclear ICBM.</jobString>
@@ -273,6 +275,7 @@
 
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_ICBM_W78_Nuclear</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make Minuteman III (W78)</label>
 		<description>Build a high-yield thermonuclear warhead around a Rimatomics fission warhead and mate it to an intercontinental ballistic missile.</description>
 		<jobString>Assembling a nuclear ICBM.</jobString>

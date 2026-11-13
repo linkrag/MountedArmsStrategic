@@ -251,6 +251,7 @@
 	<!-- CE ammo injector looks the recipe up as "Make" + ammo defName -->
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_ICBM_HE</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make ICBM (HE)</label>
 		<description>Assemble an intercontinental ballistic missile with a heavy high-explosive warhead.</description>
 		<jobString>Assembling an ICBM.</jobString>
@@ -298,6 +299,7 @@
 
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_ICBM_Cluster</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make ICBM (cluster)</label>
 		<description>Assemble an intercontinental ballistic missile with a cluster warhead.</description>
 		<jobString>Assembling an ICBM.</jobString>
@@ -319,6 +321,7 @@
 
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_ICBM_Thermobaric</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make ICBM (thermobaric)</label>
 		<description>Assemble an intercontinental ballistic missile with a thermobaric warhead.</description>
 		<jobString>Assembling an ICBM.</jobString>
@@ -341,6 +344,7 @@
 
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_ICBM_EMP</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make ICBM (EMP)</label>
 		<description>Assemble an intercontinental ballistic missile with an EMP warhead.</description>
 		<jobString>Assembling an ICBM.</jobString>

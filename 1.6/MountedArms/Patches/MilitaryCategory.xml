@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Loaded only with Mounted Arms (LoadFolders.xml): moves every Strategic building into its "Military" Architect tab (MA_Military).
+     Each building: replace the designationCategory if the def sets it, else add it (inherited from a vanilla base), else skip (def absent, e.g. Sarmat without Rimatomics). -->
+<Patch>
+
+  <Operation Class="PatchOperationSequence">
+    <operations>
+      <li Class="PatchOperationConditional">
+        <xpath>Defs/ThingDef[defName="MAS_Turret_TacticalLauncher"]/designationCategory</xpath>
+        <match Class="PatchOperationReplace">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_TacticalLauncher"]/designationCategory</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </match>
+        <nomatch Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_TacticalLauncher"]</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </nomatch>
+      </li>
+      <li Class="PatchOperationConditional">
+        <xpath>Defs/ThingDef[defName="MAS_Turret_ICBMSilo"]/designationCategory</xpath>
+        <match Class="PatchOperationReplace">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_ICBMSilo"]/designationCategory</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </match>
+        <nomatch Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_ICBMSilo"]</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </nomatch>
+      </li>
+      <li Class="PatchOperationConditional">
+        <xpath>Defs/ThingDef[defName="MAS_Turret_MLRS"]/designationCategory</xpath>
+        <match Class="PatchOperationReplace">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_MLRS"]/designationCategory</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </match>
+        <nomatch Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_MLRS"]</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </nomatch>
+      </li>
+      <li Class="PatchOperationConditional">
+        <xpath>Defs/ThingDef[defName="MAS_Turret_CruiseVLS"]/designationCategory</xpath>
+        <match Class="PatchOperationReplace">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_CruiseVLS"]/designationCategory</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </match>
+        <nomatch Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_CruiseVLS"]</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </nomatch>
+      </li>
+      <li Class="PatchOperationConditional">
+        <xpath>Defs/ThingDef[defName="MAS_Turret_M777_Howitzer"]/designationCategory</xpath>
+        <match Class="PatchOperationReplace">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_M777_Howitzer"]/designationCategory</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </match>
+        <nomatch Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_M777_Howitzer"]</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </nomatch>
+      </li>
+      <li Class="PatchOperationConditional">
+        <xpath>Defs/ThingDef[defName="MAS_Turret_InterceptorBattery"]/designationCategory</xpath>
+        <match Class="PatchOperationReplace">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_InterceptorBattery"]/designationCategory</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </match>
+        <nomatch Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_InterceptorBattery"]</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </nomatch>
+      </li>
+      <!-- Sarmat exists only with Rimatomics: this one is skipped when the def is absent -->
+      <li Class="PatchOperationConditional">
+        <xpath>Defs/ThingDef[defName="MAS_Turret_SarmatSilo"]</xpath>
+        <match Class="PatchOperationReplace">
+          <xpath>Defs/ThingDef[defName="MAS_Turret_SarmatSilo"]/designationCategory</xpath>
+          <value><designationCategory>MA_Military</designationCategory></value>
+        </match>
+      </li>
+    </operations>
+  </Operation>
+
+</Patch>

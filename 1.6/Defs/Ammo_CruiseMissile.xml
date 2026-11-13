@@ -115,6 +115,7 @@
 
 	<RecipeDef ParentName="AmmoRecipeBase">
 		<defName>MakeMAS_Ammo_CruiseMissile</defName>
+		<targetCountAdjustment>1</targetCountAdjustment> <!-- "until X" step = items per craft (CE AmmoRecipeBase says 20) -->
 		<label>make cruise missile</label>
 		<description>Assemble a land-attack cruise missile in its launch canister.</description>
 		<jobString>Assembling a cruise missile.</jobString>

@@ -1,15 +1,18 @@
 # Builds MountedArmsStrategic.dll with the .NET SDK (10+) for both game versions:
 #   RimWorld 1.6 (net472)  -> Bin/1.6/Assemblies
 #   RimWorld 1.7 (net10.0) -> Bin/1.7/Assemblies
+# Then tools/deploy.ps1 mirrors the public part (About, LoadFolders.xml, 1.6, Bin) into the game's Mods folder
+# (skipped with -Out or -NoDeploy). This folder (_dev/src) is the source; Mods/<mod> is only the shipped copy.
 # Close the game first (it locks the DLL). -Out <folder>: build there instead of Bin/ (just to check the compile).
 # 1.7 needs the 1.7 game folder (-RW) for the UnityEngine.* -> UnityStubs facades (CE is still the 1.6 build).
 # -CE17 <CombatExtended.dll>: once a CE 1.7 exists, build 1.7 against it (no facades; 1.6 keeps the workshop CE).
 # -Workshop <folder>: Steam workshop content folder of RimWorld (294100), for Harmony and CE.
-# usage: powershell -File build.ps1 [-Version all|1.6|1.7] [-Out <folder>] [-RW <RimWorld 1.7 folder>] [-CE17 <dll>]
+# usage: powershell -File build.ps1 [-Version all|1.6|1.7] [-Out <folder>] [-NoDeploy] [-RW <RimWorld 1.7 folder>] [-CE17 <dll>]
 #        [-Workshop <folder>]
 param(
     [ValidateSet("all", "1.6", "1.7")][string]$Version = "all",
     [string]$Out = "",
+    [switch]$NoDeploy,
     [string]$RW = "F:\Steam\steamapps\common\RimWorld",
     [string]$CE17 = "",
     [string]$Workshop = "F:\Steam\steamapps\workshop\content\294100"
@@ -39,4 +42,8 @@ foreach ($v in $versions) {
 $bin = (Get-Item $(if ($Out) { $Out } else { "$root\Bin" })).FullName
 Get-ChildItem $bin -Recurse -Filter *.dll | ForEach-Object {
     "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm MD5).Hash, $_.FullName.Substring($bin.Length).TrimStart([char]'\')
+}
+if (-not $Out -and -not $NoDeploy) {
+    & powershell -NoProfile -ExecutionPolicy Bypass -File "$root\tools\deploy.ps1"
+    if ($LASTEXITCODE -ne 0) { throw "deploy failed ($LASTEXITCODE)" }
 }

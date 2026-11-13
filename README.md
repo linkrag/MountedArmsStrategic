@@ -4,6 +4,7 @@ Mod de RimWorld 1.6 e 1.7 com lançadores de mísseis balísticos que atacam o m
 
 - packageId: `linkrag.mountedarms.strategic` · autor: Felipe
 - Aba de pesquisa própria: "Strategic Missiles"
+- Com o Mounted Arms ativo, os prédios entram na aba "Militar" do Architect (patch em `1.6/MountedArms/`); sem ele ficam em Security
 
 ## Conteúdo
 | Item | Resumo |
@@ -26,4 +27,4 @@ Configurações do mod: orçamento da retaliação da IA (0–500%) e retaliaç�
 Retaliação da IA (CE): facções espaciais podem responder com mísseis táticos; ultra/archotech também com ICBM HE. Com a opção de retaliação nuclear: Minuteman (fissão) (espacial em diante) e, só ultra/archotech, W62, W78 e Sarmat, cada vez mais caros e raros.
 
 ## Desenvolvimento
-Guia para agentes: `AGENTS.md`. DLL: `powershell -File build.ps1` (SDK .NET 10, jogo fechado; gera `Bin/1.6` e `Bin/1.7`). Texturas: `python tools/gen_tex.py 1.6/Textures/MountedArmsStrategic`.
+Guia para agentes: `AGENTS.md`. DLL: `powershell -File build.ps1` (SDK .NET 10, jogo fechado; gera `Bin/1.6` e `Bin/1.7` e publica a cópia limpa em `RimWorld/Mods/MountedArmsStrategic` com `tools/deploy.ps1`; o fonte fica em `RimWorld/_dev/src/MountedArmsStrategic`). Texturas: `python tools/gen_tex.py 1.6/Textures/MountedArmsStrategic`.
