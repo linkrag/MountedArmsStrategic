@@ -1,9 +1,4 @@
 @AGENTS.md
 
-## Regra obrigatória: manter a documentação atualizada
-Toda **implementação ou modificação** (código, XML, textura, build, configuração, decisão ou pedido do usuário, correção de bug) só está terminada depois de atualizar, **no mesmo passo/commit**, os documentos afetados deste mod:
-- `Docs/STATUS.md` (o que mudou; marque **testado x não testado** no jogo) e, conforme o caso, `DECISIONS`, `HISTORY` (erros e lições), `TURRETS`/`CE_NOTES` etc.;
-- o `README.md`, se a funcionalidade visível mudou;
-- o `AGENTS.md` (estrutura, regras de ouro, estado atual) e este `CLAUDE.md`, se a estrutura, as regras ou o fluxo mudaram;
-- o `CLAUDE.md` do workspace (`RimWorld/_dev/src/`, um nível acima; tabela de mods e "Estado"), se mudou algo que vale para o workspace.
-Mudança que afeta outro mod do workspace atualiza também os MDs dele. Sem essa atualização o trabalho está inacabado: diga explicitamente quais docs foram atualizados na resposta final.
+## Regra obrigatória: manter docs, versão e changelog atualizados
+Siga a tabela **"O que atualizar, onde e quando"** do `CLAUDE.md` do workspace (`_dev/src/CLAUDE.md`, um nível acima, carregado junto). Toda implementação ou modificação só termina depois de atualizar, no mesmo passo/commit, os arquivos afetados deste mod: `Docs/STATUS.md`, `DECISIONS`, `HANDOFF`, `BLAST`/`LAUNCH` (se o modelo mudar), `CHANGELOG`, `WORKSHOP_DESCRIPTION.txt`, `README.md`, `AGENTS.md`, `About/About.xml`. Mudança visível ao jogador também atualiza a versão nos três lugares juntos: `Docs/CHANGELOG.md`, `<modVersion>` no `About/About.xml` e a seção "Changelog" + linha "Mod version" da `Docs/WORKSHOP_DESCRIPTION.txt`. Na resposta final, diga quais docs foram atualizados e o que fica com o usuário (testar, colar a descrição, atualizar na Oficina).
